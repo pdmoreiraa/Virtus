@@ -37,5 +37,12 @@ namespace Virtus.Repository
             await connection.ExecuteAsync(sql, produto);
         }
 
+        public async Task<Produto?> ProdutosPorId(int id)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            var sql = "select Id, Nome, Marca, Categoria, Tipo, Descricao, Preco, ImageUrl, Estoque FROM produtos WHERE Id = @Id";
+            return await connection.QueryFirstOrDefaultAsync<Produto>(sql, new { Id = id });
+        }
+
     }
 }

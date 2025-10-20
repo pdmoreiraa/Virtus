@@ -2,6 +2,7 @@ create database dbVirtus;
 use dbVirtus;
 
 
+
 create table produtos(
  Id int primary key auto_increment,
  Nome varchar(100),
