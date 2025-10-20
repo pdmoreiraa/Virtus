@@ -1,0 +1,57 @@
+﻿@model IEnumerable<Virtus.Models.Produto>
+
+<h2 class="text-center mb-5">Lista de Produtos</h2>
+
+<div class="row mb-5">
+    <div class="col">
+        <a class="btn btn-primary" asp-controller="Produto" asp-action="Criar">Novo Produto</a>
+    </div>
+    <div class="col">
+
+    </div>
+</div>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Marca</th>
+            <th>Categoria</th>
+            <th>Tipo</th>
+            <th>Preço</th>
+            <th>Imagem</th>
+            <th>Estoque</th>
+            <th>Data de Criação</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var produto in Model)
+        {
+            <tr>
+                <td>@produto.Id</td>
+                <td>@produto.Nome</td>
+                <td>@produto.Marca</td>
+                <td>@produto.Categoria</td>
+                <td>@produto.Tipo</td>
+                <td>R$ @produto.Preco.ToString("F2")</td>
+                <td><img src="@produto.ImageUrl" width="100" /></td>
+                <td>@produto.Estoque</td>
+                <td>@produto.DataCriada.ToString("dd/MM/yyyy")</td>
+                <td style="white-space:nowrap">
+                    <a class="btn btn-primary btn-sm" asp-controller="Produto" asp-action="Editar"
+                       asp-route-id="@produto.Id">Editar</a>
+                    <form asp-action="Deletar" asp-route-id="@produto.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este produto?')">
+                            Excluir
+                        </button>
+                    </form>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
