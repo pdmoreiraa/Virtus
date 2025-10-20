@@ -44,5 +44,19 @@ namespace Virtus.Repository
             return await connection.QueryFirstOrDefaultAsync<Produto>(sql, new { Id = id });
         }
 
+        public async Task AtualizarProduto(Produto produto)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+
+            var sql = @"
+            UPDATE Produtos
+            SET Nome = @Nome, Marca = @Marca, Categoria = @Categoria, Tipo = @Tipo, Descricao = @Descricao, 
+            Preco = @Preco, ImageUrl = @ImageUrl, Estoque = @Estoque
+            WHERE Id = @Id;
+            ";
+
+            await connection.ExecuteAsync(sql, produto);
+        }
+
     }
 }
