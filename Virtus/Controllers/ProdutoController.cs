@@ -5,6 +5,7 @@ using Virtus.Repository;
 
 namespace Virtus.Controllers
 {
+    [Route("/Admin/[controller]/{action=Index}/{id?}")]
     public class ProdutoController : Controller
     {
 
