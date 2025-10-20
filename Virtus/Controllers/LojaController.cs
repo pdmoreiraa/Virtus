@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Virtus.Models;
 using Virtus.Repository;
 
 namespace Virtus.Controllers
@@ -40,6 +41,17 @@ namespace Virtus.Controllers
             ViewData["TotalPag"] = totalPag;
 
             return View(produtosPaginados);
+        }
+
+        public async Task<IActionResult> Detalhes(Produto produto)
+        {
+            var produtos = await _produtoRepository.ProdutosPorId(produto.Id);
+            if (produtos == null)
+            {
+                return RedirectToAction("index", "Store");
+            }
+
+            return View(produtos);
         }
     }
 }
