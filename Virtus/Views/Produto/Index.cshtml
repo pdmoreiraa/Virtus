@@ -2,6 +2,8 @@
 @{
     int pagIndex = (int)ViewData["PagIndex"];
     int totalPag = (int)ViewData["TotalPag"];
+
+    string buscar = (string)ViewData["Buscar"]!;
 }
 
 <h2 class="text-center mb-5">Lista de Produtos</h2>
@@ -11,7 +13,10 @@
         <a class="btn btn-primary" asp-controller="Produto" asp-action="Criar">Novo Produto</a>
     </div>
     <div class="col">
-
+        <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" name="buscar" value="@buscar" placeholder="Buscar por Nome ou Marca" aria-label="Buscar">
+            <button class="btn btn-outline-success" type="submit">Buscar</button>
+        </form>
     </div>
 </div>
 
@@ -66,7 +71,7 @@
         {
             string ativo = i == pagIndex ? "active" : "";
             <li class="page-item @ativo">
-                <a class="page-link" href="?pagIndex=@i">@i</a>
+                <a class="page-link" href="?pagIndex=@i&buscar=@buscar">@i</a>
             </li>
         }
     </ul>
