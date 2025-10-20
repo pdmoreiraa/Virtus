@@ -1,3 +1,5 @@
+using Virtus.Repository;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -13,6 +15,9 @@ builder.Services.AddSession(options =>
 
 // REGISTRAR A CONNECTION STRING COMO UM SERVIÇO STRING AQUI
 builder.Services.AddSingleton<string>(builder.Configuration.GetConnectionString("DefaultConnection")!);
+
+// Registrar Repositórios
+builder.Services.AddScoped<ProdutoRepository>();
 
 var app = builder.Build();
 
