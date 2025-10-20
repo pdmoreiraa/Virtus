@@ -96,3 +96,43 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const precoInput = document.getElementById("Preco");
+
+            // Valor inicial formatado
+            if (!precoInput.value) {
+                precoInput.value = "0,00";
+            }
+
+            precoInput.addEventListener("input", function (e) {
+                let value = e.target.value;
+
+                // Remove tudo que não for número
+                value = value.replace(/\D/g, "");
+
+                // Se vazio, assume 0
+                if (value === "") {
+                    value = "0";
+                }
+
+                // Converte para centavos e insere a vírgula
+                value = (parseInt(value) / 100).toFixed(2);
+
+                // Substitui ponto por vírgula
+                value = value.replace(".", ",");
+
+                e.target.value = value;
+            });
+
+            // Garante o formato correto ao perder o foco
+            precoInput.addEventListener("blur", function (e) {
+                if (e.target.value === "" || e.target.value === "0") {
+                    e.target.value = "0,00";
+                }
+            });
+        });
+    </script>
+}
