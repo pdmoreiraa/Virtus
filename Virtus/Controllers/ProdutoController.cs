@@ -63,5 +63,90 @@ namespace Virtus.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Editar(int id)
+        {
+            var produto = await _produtoRepository.ProdutosPorId(id);
+            if (produto == null)
+            {
+                return RedirectToAction("Index", "Produto");
+            }
+
+            return View(produto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Editar(Produto produto, IFormFile imagemArquivo)
+        {
+            var produtos = await _produtoRepository.ProdutosPorId(produto.Id);
+
+            if (produtos == null)
+            {
+                return RedirectToAction("Index", "Produto");
+            }
+
+            var caminhoPasta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img");
+
+            if (imagemArquivo != null && imagemArquivo.Length > 0)
+            {
+                // Apagar imagem antiga
+                if (!string.IsNullOrEmpty(produtos.ImageUrl))
+                {
+                    var caminhoAntigo = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", produtos.ImageUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(caminhoAntigo))
+                    {
+                        System.IO.File.Delete(caminhoAntigo);
+                    }
+                }
+
+                // Criar pasta se necessário
+                if (!Directory.Exists(caminhoPasta))
+                    Directory.CreateDirectory(caminhoPasta);
+
+                // Salvar nova imagem
+                var nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(imagemArquivo.FileName);
+                var caminhoCompleto = Path.Combine(caminhoPasta, nomeArquivo);
+
+                using (var stream = new FileStream(caminhoCompleto, FileMode.Create))
+                {
+                    await imagemArquivo.CopyToAsync(stream);
+                }
+
+                produto.ImageUrl = "/img/" + nomeArquivo;
+            }
+            else
+            {
+                produto.ImageUrl = produtos.ImageUrl;
+            }
+
+            await _produtoRepository.AtualizarProduto(produto);
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Deletar(int id)
+        {
+            var produto = await _produtoRepository.ProdutosPorId(id);
+            if (produto == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Apaga imagem associada, se existir
+            if (!string.IsNullOrEmpty(produto.ImageUrl))
+            {
+                var caminhoImagem = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", produto.ImageUrl.TrimStart('/'));
+                if (System.IO.File.Exists(caminhoImagem))
+                {
+                    System.IO.File.Delete(caminhoImagem);
+                }
+            }
+
+            await _produtoRepository.DeletarProduto(id);
+
+            return RedirectToAction("Index");
+        }
     }
 }

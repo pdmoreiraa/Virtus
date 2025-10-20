@@ -58,5 +58,14 @@ namespace Virtus.Repository
             await connection.ExecuteAsync(sql, produto);
         }
 
+        public async Task DeletarProduto(int id)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+
+            var sql = "DELETE FROM Produtos WHERE Id = @Id;";
+
+            await connection.ExecuteAsync(sql, new { Id = id });
+        }
+
     }
 }
