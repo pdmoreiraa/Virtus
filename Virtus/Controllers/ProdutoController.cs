@@ -18,5 +18,10 @@ namespace Virtus.Controllers
 
             return View(produtos);
         }
+
+        public IActionResult Criar()
+        {
+            return View();
+        }
     }
 }
