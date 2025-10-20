@@ -73,7 +73,7 @@ namespace Virtus.Controllers
             ViewData["Coluna"] = coluna;
             ViewData["OrdPor"] = ordPor;
 
-            return View(produtos);
+            return View(produtosPaginados);
         }
 
         public IActionResult Criar()

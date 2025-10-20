@@ -1,10 +1,13 @@
 ﻿@using Microsoft.AspNetCore.Html
 @model IEnumerable<Virtus.Models.Produto>
+@using Microsoft.AspNetCore.Html
+
 @{
     int pagIndex = (int)ViewData["PagIndex"];
     int totalPag = (int)ViewData["TotalPag"];
 
     string buscar = (string)ViewData["Buscar"]!;
+
 
     string coluna = (string)ViewData["Coluna"]!;
     string ordPor = (string)ViewData["OrdPor"]!;
@@ -20,7 +23,9 @@
 
         return new HtmlString("<i class='bi bi-arrow-up'></i>");
     }
+
 }
+
 
 <h2 class="text-center mb-5">Lista de Produtos</h2>
 
@@ -36,6 +41,7 @@
     </div>
 </div>
 
+
 <script>
     function sortTable(coluna) {
         let ordPor = "desc"
@@ -50,7 +56,6 @@
 
     }
 </script>
-
 
 <table class="table">
     <thead>
@@ -100,8 +105,8 @@
     <ul class="pagination">
         @for (int i = 1; i <= totalPag; i++)
         {
-            string ativo = i == pagIndex ? "active" : "";
-            <li class="page-item @ativo">
+            string active = i == pagIndex ? "active" : "";
+            <li class="page-item @active">
                 <a class="page-link" href="?pagIndex=@i&buscar=@buscar&coluna=@coluna&ordPor=@ordPor">@i</a>
             </li>
         }
