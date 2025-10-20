@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Mysqlx.Crud;
 using Virtus.Models;
 using Virtus.Repository;
 
@@ -14,7 +15,7 @@ namespace Virtus.Controllers
         {
             _produtoRepository = produtoRepository;
         }
-        public async Task<IActionResult> Index(int pagIndex, string? buscar = null)
+        public async Task<IActionResult> Index(int pagIndex, string? buscar = null, string? coluna = "Id", string? ordPor = "desc")
         {
             var produtos = await _produtoRepository.ProdutosOrdenados();
 
@@ -28,6 +29,23 @@ namespace Virtus.Controllers
 
                 pagIndex = 1; // reset para página 1
             }
+
+            // Normaliza coluna
+            coluna ??= "Id";
+            ordPor ??= "desc";
+
+            // Ordenação
+            produtos = coluna switch
+            {
+                "Nome" => ordPor == "asc" ? produtos.OrderBy(p => p.Nome).ToList() : produtos.OrderByDescending(p => p.Nome).ToList(),
+                "Marca" => ordPor == "asc" ? produtos.OrderBy(p => p.Marca).ToList() : produtos.OrderByDescending(p => p.Marca).ToList(),
+                "Categoria" => ordPor == "asc" ? produtos.OrderBy(p => p.Categoria).ToList() : produtos.OrderByDescending(p => p.Categoria).ToList(),
+                "Tipo" => ordPor == "asc" ? produtos.OrderBy(p => p.Tipo).ToList() : produtos.OrderByDescending(p => p.Tipo).ToList(),
+                "Preco" => ordPor == "asc" ? produtos.OrderBy(p => p.Preco).ToList() : produtos.OrderByDescending(p => p.Preco).ToList(),
+                "Estoque" => ordPor == "asc" ? produtos.OrderBy(p => p.Estoque).ToList() : produtos.OrderByDescending(p => p.Estoque).ToList(),
+                "DataCriada" => ordPor == "asc" ? produtos.OrderBy(p => p.DataCriada).ToList() : produtos.OrderByDescending(p => p.DataCriada).ToList(),
+                _ => ordPor == "asc" ? produtos.OrderBy(p => p.Id).ToList() : produtos.OrderByDescending(p => p.Id).ToList(),
+            };
 
             if (pagIndex < 1) pagIndex = 1;
 
@@ -51,6 +69,9 @@ namespace Virtus.Controllers
             ViewData["TotalPag"] = totalPag;
 
             ViewData["Buscar"] = buscar ?? "";
+
+            ViewData["Coluna"] = coluna;
+            ViewData["OrdPor"] = ordPor;
 
             return View(produtos);
         }

@@ -1,9 +1,25 @@
-﻿@model IEnumerable<Virtus.Models.Produto>
+﻿@using Microsoft.AspNetCore.Html
+@model IEnumerable<Virtus.Models.Produto>
 @{
     int pagIndex = (int)ViewData["PagIndex"];
     int totalPag = (int)ViewData["TotalPag"];
 
     string buscar = (string)ViewData["Buscar"]!;
+
+    string coluna = (string)ViewData["Coluna"]!;
+    string ordPor = (string)ViewData["OrdPor"]!;
+
+    HtmlString getArrow(string tblColuna)
+    {
+        if (tblColuna != coluna) return new HtmlString("");
+
+        if (ordPor == "desc")
+        {
+            return new HtmlString("<i class='bi bi-arrow-down'></i>");
+        }
+
+        return new HtmlString("<i class='bi bi-arrow-up'></i>");
+    }
 }
 
 <h2 class="text-center mb-5">Lista de Produtos</h2>
@@ -20,19 +36,34 @@
     </div>
 </div>
 
+<script>
+    function sortTable(coluna) {
+        let ordPor = "desc"
+        let colunaAtual = "@coluna";
+        let ordemAtual = "@ordPor";
+        if (coluna === colunaAtual) {
+            if (ordemAtual == "asc") ordPor = "desc";
+            else ordPor = "asc";
+        }
+            // Reset pagIndex ao mudar a ordenação
+    window.location.href = `?buscar=@buscar&coluna=${coluna}&ordPor=${ordPor}&pagIndex=1`;
+
+    }
+</script>
+
 
 <table class="table">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Marca</th>
-            <th>Categoria</th>
-            <th>Tipo</th>
-            <th>Preço</th>
+            <th style="cursor: pointer;" onclick="sortTable('Id')">ID @getArrow("Id")</th>
+            <th style="cursor: pointer;" onclick="sortTable('Nome')">Nome @getArrow("Nome")</th>
+            <th style="cursor: pointer;" onclick="sortTable('Marca')">Marca @getArrow("Marca")</th>
+            <th style="cursor: pointer;" onclick="sortTable('Categoria')">Categoria @getArrow("Categoria")</th>
+            <th style="cursor: pointer;" onclick="sortTable('Tipo')">Tipo @getArrow("Tipo")</th>
+            <th style="cursor: pointer;" onclick="sortTable('Preco')">Preço @getArrow("Preco")</th>
             <th>Imagem</th>
-            <th>Estoque</th>
-            <th>Data de Criação</th>
+            <th style="cursor: pointer;" onclick="sortTable('Estoque')">Estoque @getArrow("Estoque")</th>
+            <th style="cursor: pointer;" onclick="sortTable('DataCriada')">Data de Criação @getArrow("DataCriada")</th>
             <th>Ações</th>
         </tr>
     </thead>
@@ -71,7 +102,7 @@
         {
             string ativo = i == pagIndex ? "active" : "";
             <li class="page-item @ativo">
-                <a class="page-link" href="?pagIndex=@i&buscar=@buscar">@i</a>
+                <a class="page-link" href="?pagIndex=@i&buscar=@buscar&coluna=@coluna&ordPor=@ordPor">@i</a>
             </li>
         }
     </ul>
