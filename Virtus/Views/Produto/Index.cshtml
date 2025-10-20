@@ -105,8 +105,8 @@
     <ul class="pagination">
         @for (int i = 1; i <= totalPag; i++)
         {
-            string active = i == pagIndex ? "active" : "";
-            <li class="page-item @active">
+            string ativo = i == pagIndex ? "active" : "";
+            <li class="page-item @ativo">
                 <a class="page-link" href="?pagIndex=@i&buscar=@buscar&coluna=@coluna&ordPor=@ordPor">@i</a>
             </li>
         }
