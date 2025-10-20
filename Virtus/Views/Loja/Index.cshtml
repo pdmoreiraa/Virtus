@@ -1,4 +1,8 @@
 ﻿@model IEnumerable<Virtus.Models.Produto>
+@{
+    int pagIndex = (int)ViewData["PagIndex"];
+    int totalPag = (int)ViewData["TotalPag"];
+}
 
 
 <h2 class="pb-4 text-center">Produtos</h2>
@@ -25,3 +29,15 @@
         </div>
     }
 </div>
+
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= totalPag; i++)
+        {
+            string active = i == pagIndex ? "active" : "";
+            <li class="page-item @active">
+                <a class="page-link" href="?pagIndex=@i">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
