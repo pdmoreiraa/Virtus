@@ -1,21 +1,25 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using Virtus.Models;
+using Virtus.Repository;
 
 namespace Virtus.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ProdutoRepository _produtoRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ProdutoRepository produtoRepositorio)
         {
             _logger = logger;
+            _produtoRepository = produtoRepositorio;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var produtos = await _produtoRepository.ProdutosOrdenados();
+            return View(produtos);
         }
 
         public IActionResult Privacy()
