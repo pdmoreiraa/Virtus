@@ -36,3 +36,6 @@ values ('Carrinhos', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Pacote com 5 Carros
 ('Pista de Percurso e Mini Veículo',  'Hot Wheels', 'Infantil', 'Brinquedo', 'City - Lava-Rápido', 109.90, '/img/04.jpg', 15),
 ('City Nemesis - Gorila', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Pista de Percurso e Mini Veículo', 161.90, '/img/05.jpg', 20),
 ('Reboque e Mini Veículo', 'Hot Wheels', 'Brinquedo', 'Infantil', 'City - Reboque de Dragão', 127.90, '/img/06.jpg', 25);
+
+insert into usuarios(Nome, Sobrenome, Email, Senha, CPF, Telefone, Tipo)
+values ('Admin', 'Admin', 'admin@gmail.com', 'admin123', '11111111111', '11999999999', 'admin');

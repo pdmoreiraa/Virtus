@@ -50,5 +50,13 @@ namespace Virtus.Repository
             return await connection.QueryFirstOrDefaultAsync<Usuario>(sql, new { Email = email, Senha = senha });
         }
 
+
+        public async Task<Usuario?> ObterPorId(int id)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            string sql = "SELECT * FROM Usuarios WHERE Id = @Id";
+            return await connection.QueryFirstOrDefaultAsync<Usuario>(sql, new { Id = id });
+        }
+
     }
 }

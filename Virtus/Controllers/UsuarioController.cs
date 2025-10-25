@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Virtus.Models;
 using Virtus.Repository;
 
@@ -86,6 +87,29 @@ namespace Virtus.Controllers
 
             ViewBag.ErrorMessage = "Email ou senha inválidos.";
             return View(login);
+        }
+
+        public async Task<IActionResult> Perfil()
+        {
+            // Pega o ID da sessão
+            var usuarioId = HttpContext.Session.GetString("UsuarioId");
+
+            if (string.IsNullOrEmpty(usuarioId))
+            {
+                // Não está logado
+                return RedirectToAction("Login");
+            }
+
+
+            var usuario = await _usuarioRepository.ObterPorId(int.Parse(usuarioId));
+
+            if (usuario == null)
+            {
+                HttpContext.Session.Clear();
+                return RedirectToAction("Login");
+            }
+
+            return View(usuario);
         }
 
 
