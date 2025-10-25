@@ -49,5 +49,13 @@ namespace Virtus.Controllers
                 return View(usuario);
             }
         }
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+
+            return RedirectToAction("Index", "Home");
+        }
+
     }
 }
