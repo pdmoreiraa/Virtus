@@ -10,10 +10,10 @@ namespace Virtus.Models
         [Required(ErrorMessage = "O sobrenome é obrigatório."), MaxLength(100)]
         public string Sobrenome { get; set; } = "";
 
-        [Required, EmailAddress, MaxLength(100)]
+        [Required(ErrorMessage = "O email é obrigatório."), EmailAddress, MaxLength(100)]
         public string Email { get; set; } = "";
 
-        [Required, MaxLength(100)]
+        [Required(ErrorMessage = "A senha é obrigatória."), MaxLength(100)]
         public string Senha { get; set; } = "";
 
         [Required(ErrorMessage = "Confirmar a senha é obrigatório.")]
