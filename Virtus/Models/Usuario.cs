@@ -28,7 +28,7 @@ namespace Virtus.Models
         [RegularExpression(@"^\d{11}$", ErrorMessage = "O telefone deve conter 11 números (DDD + número).")]
         public string Telefone { get; set; }
 
-
+        public string Tipo { get; set; } = "cliente";
 
 
     }
