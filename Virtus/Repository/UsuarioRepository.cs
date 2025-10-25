@@ -58,5 +58,18 @@ namespace Virtus.Repository
             return await connection.QueryFirstOrDefaultAsync<Usuario>(sql, new { Id = id });
         }
 
+        public async Task<bool> AtualizarPerfil(Usuario usuario)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+
+            var sql = @"
+            UPDATE Usuarios
+            SET Nome = @Nome, Sobrenome = @Sobrenome, Email = @Email, Telefone = @Telefone, 
+            CPF = @CPF, Tipo = @Tipo WHERE Id = @Id;";
+
+            int linhasAfetadas = await connection.ExecuteAsync(sql, usuario);
+            return linhasAfetadas > 0;
+        }
+
     }
 }

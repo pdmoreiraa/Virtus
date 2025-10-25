@@ -1,4 +1,4 @@
-﻿@model Usuario
+﻿@model Perfil
 
 @{
     ViewData["Title"] = "Perfil";
@@ -131,18 +131,19 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-<script>
-    $('#Telefone').mask('(00)00000-0000');
-    $('#CPF').mask('000.000.000-00');
-
-    $('form').on('submit', function() {
-        $('#Telefone').val($('#Telefone').val().replace(/\D/g, ''));
-        $('#CPF').val($('#CPF').val().replace(/\D/g, ''));
-    });
-</script>
-
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#Telefone').mask('(00)00000-0000');
+            $('#CPF').mask('000.000.000-00');
+
+            $('#perfilForm').on('submit', function () {
+                // Remove máscara antes de enviar
+                $('#Telefone').val($('#Telefone').val().replace(/\D/g, ''));
+                $('#CPF').val($('#CPF').val().replace(/\D/g, ''));
+            });
+        });
+    </script>
 }

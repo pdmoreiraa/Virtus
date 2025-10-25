@@ -89,29 +89,82 @@ namespace Virtus.Controllers
             return View(login);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Perfil()
         {
-            // Pega o ID da sessão
-            var usuarioId = HttpContext.Session.GetString("UsuarioId");
+            var usuarioIdString = HttpContext.Session.GetString("UsuarioId");
+            if (string.IsNullOrEmpty(usuarioIdString))
+                return RedirectToAction("Login", "Usuario");
 
-            if (string.IsNullOrEmpty(usuarioId))
-            {
-                // Não está logado
-                return RedirectToAction("Login");
-            }
+            int usuarioId = int.Parse(usuarioIdString);
 
-
-            var usuario = await _usuarioRepository.ObterPorId(int.Parse(usuarioId));
-
+            var usuario = await _usuarioRepository.ObterPorId(usuarioId);
             if (usuario == null)
-            {
-                HttpContext.Session.Clear();
-                return RedirectToAction("Login");
-            }
+                return RedirectToAction("Index", "Home");
 
-            return View(usuario);
+            var perfil = new Perfil
+            {
+                Nome = usuario.Nome,
+                Sobrenome = usuario.Sobrenome,
+                Email = usuario.Email,
+                Telefone = usuario.Telefone,
+                CPF = usuario.CPF,
+                Tipo = usuario.Tipo
+            };
+
+            return View(perfil);
         }
 
+
+        // POST: Perfil
+        [HttpPost]
+        public async Task<IActionResult> Perfil(Perfil perfil)
+        {
+            var usuarioIdString = HttpContext.Session.GetString("UsuarioId");
+            if (string.IsNullOrEmpty(usuarioIdString))
+                return RedirectToAction("Login", "Usuario");
+
+            int usuarioId = int.Parse(usuarioIdString);
+            var usuarioL = await _usuarioRepository.ObterPorId(usuarioId);
+            if (usuarioL == null)
+                return RedirectToAction("Index", "Home");
+
+            // Remove máscara antes da validação
+            perfil.CPF = new string(perfil.CPF.Where(char.IsDigit).ToArray());
+            perfil.Telefone = new string(perfil.Telefone.Where(char.IsDigit).ToArray());
+
+            // Limpa ModelState antigo para evitar erros anteriores
+            ModelState.Clear();
+
+            // Revalida os campos
+            TryValidateModel(perfil);
+
+            if (!ModelState.IsValid)
+            {
+                var erros = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                ViewBag.ErrorMessage = string.Join("<br/>", erros);
+                return View(perfil);
+            }
+
+
+            // Atualiza campos permitidos
+            usuarioL.Nome = perfil.Nome;
+            usuarioL.Sobrenome = perfil.Sobrenome;
+            usuarioL.Email = perfil.Email;
+            usuarioL.Telefone = perfil.Telefone;
+            usuarioL.CPF = perfil.CPF;
+
+            var sucesso = await _usuarioRepository.AtualizarPerfil(usuarioL);
+
+            ModelState.Clear(); // limpa erros antigos
+
+            if (sucesso)
+                ViewBag.SuccessMessage = "Perfil atualizado com sucesso!";
+            else
+                ViewBag.ErrorMessage = "Erro ao atualizar o perfil. Tente novamente.";
+
+            return View(perfil);
+        }
 
     }
 }

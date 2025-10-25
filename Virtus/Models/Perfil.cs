@@ -2,7 +2,7 @@
 
 namespace Virtus.Models
 {
-    public class Usuario
+    public class Perfil
     {
         public int Id { get; set; }
 
@@ -15,13 +15,6 @@ namespace Virtus.Models
         [Required(ErrorMessage = "O email é obrigatório."), EmailAddress, MaxLength(100)]
         public string Email { get; set; } = "";
 
-        [Required(ErrorMessage = "A senha é obrigatória."), MaxLength(100)]
-        public string Senha { get; set; } = "";
-
-        [Required(ErrorMessage = "Confirmar a senha é obrigatório.")]
-        [Compare("Senha", ErrorMessage = "As senhas não coincidem")]
-        public string ConfirmarSenha { get; set; } = "";
-
 
         [RegularExpression(@"^\d{11}$", ErrorMessage = "O CPF deve conter 11 números.")]
         public string CPF { get; set; }
@@ -31,5 +24,7 @@ namespace Virtus.Models
         public string Telefone { get; set; }
 
         public string Tipo { get; set; } = "cliente";
+
+
     }
 }
