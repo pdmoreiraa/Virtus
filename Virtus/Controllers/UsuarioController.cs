@@ -57,5 +57,10 @@ namespace Virtus.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        public IActionResult Login()
+        {
+            return View();
+        }
+
     }
 }
