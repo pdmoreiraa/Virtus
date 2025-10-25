@@ -27,6 +27,8 @@ Telefone varchar(11),
 Tipo enum  ('admin', 'cliente') not null default 'cliente'
 );
 
+select * from usuarios;
+
 insert into produtos (Nome, Marca, Categoria, Tipo, Descricao, Preco, ImageUrl, Estoque)
 values ('Carrinhos', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Pacote com 5 Carros', 67.90, '/img/01.jpg', 5),
 ('Guincho Tubarão',  'Hot Wheels', 'Brinquedo', 'Infantil', 'Conjunto de Guincho Tubarão', 172.90, '/img/02.jpg', 5),

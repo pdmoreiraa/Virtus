@@ -4,6 +4,8 @@ namespace Virtus.Models
 {
     public class Usuario
     {
+        public int Id { get; set; }
+
         [Required(ErrorMessage = "O nome é obrigatório."), MaxLength(100)]
         public string Nome { get; set; } = "";
 
