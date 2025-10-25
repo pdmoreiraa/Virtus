@@ -78,6 +78,7 @@ namespace Virtus.Repository
             var linhas = await connection.ExecuteAsync(sql, new { usuario.Senha, usuario.Id });
             return linhas > 0;
         }
+
     }
 
 

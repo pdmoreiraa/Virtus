@@ -168,10 +168,46 @@ namespace Virtus.Controllers
 
         public IActionResult Senha()
         {
-            return View();
+            return View(new SenhaNova());
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Senha(SenhaNova senhaNova)
+        {
+            var usuarioIdString = HttpContext.Session.GetString("UsuarioId");
+            if (string.IsNullOrEmpty(usuarioIdString))
+                return RedirectToAction("Login", "Usuario");
 
+            int usuarioId = int.Parse(usuarioIdString);
+            var usuarioL = await _usuarioRepository.ObterPorId(usuarioId);
+            if (usuarioL == null)
+                return RedirectToAction("Index", "Home");
+
+            if (!ModelState.IsValid)
+                return View(senhaNova);
+
+            // Verifica senha atual
+            if (usuarioL.Senha != senhaNova.SenhaAtual)
+            {
+                ModelState.AddModelError("", "A senha atual está incorreta.");
+                return View(senhaNova);
+            }
+
+            // Atualiza senha
+            usuarioL.Senha = senhaNova.NovaSenha;
+            var sucesso = await _usuarioRepository.AtualizarSenha(usuarioL);
+
+            if (sucesso)
+            {
+                return RedirectToAction("Perfil", "Usuario");
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "Erro ao alterar a senha.";
+
+                return View(senhaNova);
+            }
+        }
 
     }
 }
