@@ -71,5 +71,14 @@ namespace Virtus.Repository
             return linhasAfetadas > 0;
         }
 
+        public async Task<bool> AtualizarSenha(Usuario usuario)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            string sql = "UPDATE Usuarios SET Senha = @Senha WHERE Id = @Id";
+            var linhas = await connection.ExecuteAsync(sql, new { usuario.Senha, usuario.Id });
+            return linhas > 0;
+        }
     }
+
+
 }

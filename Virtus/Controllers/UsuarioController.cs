@@ -166,5 +166,12 @@ namespace Virtus.Controllers
             return View(perfil);
         }
 
+        public IActionResult Senha()
+        {
+            return View();
+        }
+
+
+
     }
 }
