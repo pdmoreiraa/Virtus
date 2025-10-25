@@ -4,16 +4,26 @@ use dbVirtus;
 
 
 create table produtos(
- Id int primary key auto_increment,
- Nome varchar(100),
- Marca varchar(50),
- Categoria varchar(70),
- Tipo varchar(70),
+Id int primary key auto_increment,
+Nome varchar(100),
+Marca varchar(50),
+Categoria varchar(70),
+Tipo varchar(70),
 Descricao varchar(500),
 Preco decimal(10,2),
 ImageUrl varchar(255),
 Estoque int,
 DataCriada date default (current_date)
+);
+
+create table usuarios(
+Id int primary key auto_increment,
+Nome varchar(100),
+Sobrenome varchar(100),
+Email varchar(150) unique,
+Senha varchar(100),
+CPF varchar(11) unique,
+Telefone varchar(11)
 );
 
 INSERT INTO produtos (Nome, Marca, Categoria, Tipo, Descricao, Preco, ImageUrl, Estoque)
