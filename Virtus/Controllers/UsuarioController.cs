@@ -62,5 +62,32 @@ namespace Virtus.Controllers
             return View();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Login(Login login)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(login);
+            }
+
+            // Busca o usuário no banco pelo email e senha
+            var usuarioL = await _usuarioRepository.ObterPorEmailESenha(login.Email, login.Senha);
+
+            if (usuarioL != null)
+            {
+                HttpContext.Session.SetString("UsuarioId", usuarioL.Id.ToString());
+                HttpContext.Session.SetString("UsuarioNome", usuarioL.Nome);
+                HttpContext.Session.SetString("UsuarioSobrenome", usuarioL.Sobrenome);
+                HttpContext.Session.SetString("UsuarioEmail", usuarioL.Email);
+                HttpContext.Session.SetString("UsuarioTipo", usuarioL.Tipo);
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.ErrorMessage = "Email ou senha inválidos.";
+            return View(login);
+        }
+
+
     }
 }

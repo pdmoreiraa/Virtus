@@ -42,5 +42,13 @@ namespace Virtus.Repository
 
             return null;
         }
+
+        public async Task<Usuario?> ObterPorEmailESenha(string email, string senha)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            string sql = "SELECT * FROM Usuarios WHERE Email = @Email AND Senha = @Senha";
+            return await connection.QueryFirstOrDefaultAsync<Usuario>(sql, new { Email = email, Senha = senha });
+        }
+
     }
 }
