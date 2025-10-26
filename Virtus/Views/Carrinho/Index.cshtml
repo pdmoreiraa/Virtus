@@ -1,8 +1,4 @@
-﻿@model Pedido
-@{
-}
-
-<div class="row border rounded-3">
+﻿<div class="row border rounded-3">
     <div class="col-md-8 p-3">
         <h4>Carrinho de Compras</h4>
         <hr />
@@ -65,7 +61,7 @@
 
             @if (!string.IsNullOrEmpty(usuarioLogado))
             {
-                <form method="post">
+                <form>
 
                     <div class="row">
                         <div class="col">
@@ -76,10 +72,7 @@
                         </div>
                     </div>
 
-                    <button type="submit"
-                            class="btn btn-outline-light"
-                            asp-controller="Carrinho"
-                            asp-action="Pagamento">
+                    <button type="submit" class="btn btn-outline-light" asp-controller="Carrinho" asp-action="Infos">
                         Finalizar Compra
                     </button>
                 </form>

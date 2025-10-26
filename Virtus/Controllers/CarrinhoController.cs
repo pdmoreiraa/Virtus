@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Virtus.Models;
 using Virtus.Repository;
 using Virtus.Services;
 
@@ -16,7 +17,7 @@ namespace Virtus.Controllers
         }
 
         // Página do carrinho
-        public async Task<IActionResult> Index()
+        public async Task <IActionResult> Index()
         {
             var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository);
             decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
@@ -25,6 +26,20 @@ namespace Virtus.Controllers
             ViewBag.TaxaEntrega = taxaEntrega;
             ViewBag.Subtotal = subtotal;
             ViewBag.Total = subtotal + taxaEntrega;
+
+            return View();
+        }
+
+        public async Task<IActionResult> Infos()
+        {
+            var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository);
+            decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
+
+            ViewBag.ItensCarrinho = itensCarrinho;
+            ViewBag.TaxaEntrega = taxaEntrega;
+            ViewBag.Subtotal = subtotal;
+            ViewBag.Total = subtotal + taxaEntrega;
+            ViewBag.Pix = ((subtotal + taxaEntrega) * 0.95m).ToString("F2");
 
             return View();
         }

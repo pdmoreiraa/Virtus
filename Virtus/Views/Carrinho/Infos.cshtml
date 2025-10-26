@@ -1,0 +1,88 @@
+﻿@{
+    ViewData["Title"] = "Frete e Pagamento";
+    decimal subtotal = ViewBag.Subtotal ?? 0m;
+    decimal frete = ViewBag.Frete ?? 0m;
+    decimal total = subtotal + frete;
+}
+
+<div class="container my-4">
+    <h3 class="fw-bold mb-4">Frete e pagamento</h3>
+
+    <div class="row">
+        <!-- Coluna esquerda -->
+        <div class="col-md-8">
+            <!-- Endereço -->
+            <div class="border rounded-3 mb-4 p-3 bg-light">
+                <h6 class="fw-bold">Entregar para:</h6>
+                <button class="btn btn-dark mt-2">Escolher um endereço</button>
+            </div>
+
+            <!-- Pagamento com cartão -->
+            <h6 class="fw-bold mt-4 mb-3">Pagar com cartão</h6>
+            <div class="border rounded-3 mb-4 p-3">
+                <table class="table table-borderless align-middle mb-0">
+                    <thead>
+                        <tr class="text-muted small">
+                            <th>Cartão</th>
+                            <th>Nome no cartão</th>
+                            <th>Vencimento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <img src="/img/cartao.png" width="60" alt="Cartão" class="rounded">
+                                (Crédito) Mastercard
+                            </td>
+                            <td>Pedro Henrique</td>
+                            <td>08/25</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <button class="btn btn-dark mt-3">Adicionar outro cartão</button>
+            </div>
+
+            <!-- Pagamento com PIX -->
+            <h6 class="fw-bold mt-4 mb-3">Pagar com pix <img src="/img/pix-icon.png" width="18" alt="pix" /></h6>
+            <div class="border rounded-3 p-3">
+                <div class="p-2">
+                    <h6 class="fw-bold">Ganhe 5% de desconto</h6>
+                    <p class="small mb-1">1. Após a finalização do pedido, abra o app do seu banco e escolha pagar com Pix.</p>
+                    <p class="small mb-1">2. Copie o código Pix ou escaneie o QR Code exibido.</p>
+                    <p class="small mb-3">3. Você receberá a confirmação de pagamento por e-mail.</p>
+
+                    <button id="btnPix" class="btn btn-dark w-100">Finalizar compra com Pix</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna direita -->
+        <div class="col-md-4">
+            <div class="border rounded-3 p-3 bg-light">
+                <h6 class="fw-bold">Resumo do pedido</h6>
+                <hr>
+
+                <div class="d-flex justify-content-between">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">R$ @(ViewBag.Subtotal)</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Frete:</span>
+                    <span id="frete">@(ViewBag.TaxaEntrega)</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between fw-bold">
+                    <span>Valor total:</span>
+                    <span id="total">R$ @(ViewBag.Total)</span>
+                </div>
+
+                <small class="text-muted">
+                    ou R$ <span id="pixPrice">@(ViewBag.Pix)</span> no pix com desconto de 5%
+                </small>
+
+                <button class="btn btn-dark w-100 mt-3">Usar esse método de pagamento</button>
+            </div>
+        </div>
+    </div>
+</div>
