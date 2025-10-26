@@ -31,5 +31,9 @@ namespace Virtus.Models
         public string Telefone { get; set; }
 
         public string Tipo { get; set; } = "cliente";
+
+        public List<Endereco>? Enderecos { get; set; }
+        public List<Cartao>? Cartoes { get; set; }
+        public List<Pedido>? Pedidos { get; set; }
     }
 }

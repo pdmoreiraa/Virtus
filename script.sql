@@ -3,28 +3,99 @@ use dbVirtus;
 
 
 
-create table produtos(
-Id int primary key auto_increment,
-Nome varchar(100),
-Marca varchar(50),
-Categoria varchar(70),
-Tipo varchar(70),
-Descricao varchar(500),
-Preco decimal(10,2),
-ImageUrl varchar(255),
-Estoque int,
-DataCriada date default (current_date)
+CREATE TABLE produtos(
+Id INT PRIMARY KEY AUTO_INCREMENT,
+Nome VARCHAR(100),
+Marca VARCHAR(50),
+Categoria VARCHAR(70),
+Tipo VARCHAR(70),
+Descricao VARCHAR(500),
+Preco DECIMAL(10,2),
+ImageUrl VARCHAR(255),
+Estoque INT,
+DataCriada DATE DEFAULT (CURRENT_DATE)
 );
 
-create table usuarios(
-Id int primary key auto_increment,
-Nome varchar(100),
-Sobrenome varchar(100),
-Email varchar(150) unique,
-Senha varchar(100),
-CPF varchar(11) unique,
-Telefone varchar(11),
-Tipo enum  ('admin', 'cliente') not null default 'cliente'
+CREATE TABLE usuarios(
+Id INT PRIMARY KEY AUTO_INCREMENT,
+Nome VARCHAR(100),
+Sobrenome VARCHAR(100),
+Email VARCHAR(150) UNIQUE,
+Senha VARCHAR(100),
+CPF VARCHAR(11) UNIQUE,
+Telefone VARCHAR(11),
+Tipo ENUM  ('admin', 'cliente') NOT NULL DEFAULT 'cliente'
+);
+
+CREATE TABLE enderecos (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    UsuarioId INT NOT NULL,
+    NomeCompleto VARCHAR(100) NOT NULL,
+    Rua VARCHAR(150) NOT NULL,
+    Numero VARCHAR(10),
+    Bairro VARCHAR(80),
+    Cidade VARCHAR(100),
+    Estado VARCHAR(50),
+    CEP VARCHAR(15),
+    Complemento VARCHAR(100),
+    FOREIGN KEY (UsuarioId) REFERENCES usuarios(Id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE metodosPagamento (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    Descricao VARCHAR(50) NOT NULL
+);
+
+
+CREATE TABLE cartoes (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    UsuarioId INT NOT NULL,
+    MetodoPagamentoId INT NOT NULL,
+    Tipo varchar(20) NOT NULL,
+    NomeTitular VARCHAR(100) NOT NULL,
+    Numero VARCHAR(25) NOT NULL, 
+    Bandeira VARCHAR(30) NOT NULL,
+    ValidadeMes INT NOT NULL,
+    ValidadeAno INT NOT NULL,
+    CVV VARCHAR(3) NOT NULL,
+    FOREIGN KEY (UsuarioId) REFERENCES usuarios(Id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (MetodoPagamentoId) REFERENCES metodosPagamento(Id)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+
+CREATE TABLE pedidos (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    UsuarioId INT NOT NULL,
+    EnderecoId INT NOT NULL,
+    MetodoPagamentoId INT NULL,
+    CartaoId INT NULL,
+    TaxaEntrega DECIMAL(10,2) DEFAULT 0.00,
+    StatusPedido VARCHAR(50) DEFAULT 'Pendente',
+    CriadoEm DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UsuarioId) REFERENCES usuarios(Id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (EnderecoId) REFERENCES enderecos(Id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (MetodoPagamentoId) REFERENCES metodosPagamento(Id)
+        ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (CartaoId) REFERENCES cartoes(Id)
+        ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+
+CREATE TABLE itensPedido (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    PedidoId INT NOT NULL,
+    ProdutoId INT NOT NULL,
+    Quantidade INT NOT NULL,
+    PrecoUnitario DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (PedidoId) REFERENCES pedidos(Id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (ProdutoId) REFERENCES produtos(Id)
+        ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 select * from usuarios;
