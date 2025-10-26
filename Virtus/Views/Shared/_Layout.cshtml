@@ -11,6 +11,117 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
+
+    <script>
+                // Função para salvar o carrinho no cookie
+        function salvarCarrinho(carrinho) {
+            // Converte o objeto para JSON e codifica em base64
+            let carrinhoStr = btoa(JSON.stringify(carrinho));
+
+            // Define a validade do cookie (1 ano)
+            let data = new Date();
+            data.setDate(data.getDate() + 365);
+            let expiracao = data.toUTCString();
+
+            // Cria o cookie do carrinho
+            document.cookie = "shopping_cart=" + carrinhoStr + ";expires=" + expiracao + ";path=/; SameSite=Strict; Secure";
+        }
+
+        // Função para adicionar um produto ao carrinho
+        function adicionarAoCarrinho(botao, id) {
+            let carrinho = obterCarrinhoDeCompras();
+
+            let quantidade = carrinho[id];
+            if (isNaN(quantidade)) {
+                // Se não existir quantidade válida, define como 1
+                carrinho[id] = 1;
+            } else {
+                carrinho[id] = Number(quantidade) + 1;
+            }
+
+            salvarCarrinho(carrinho);
+
+            // Atualiza o texto do botão
+            botao.innerHTML = "Adicionado <i class='bi bi-check-lg'></i>";
+
+            // Atualiza o número total de itens no carrinho
+            let tamanhoCarrinho = 0;
+            for (var item of Object.entries(carrinho)) {
+                quantidade = item[1];
+                if (isNaN(quantidade)) continue;
+                tamanhoCarrinho += Number(quantidade);
+            }
+
+            document.getElementById("CartSize").innerHTML = tamanhoCarrinho;
+        }
+
+        // Função para aumentar a quantidade de um item no carrinho
+        function aumentar(id) {
+            let carrinho = obterCarrinhoDeCompras();
+
+            let quantidade = carrinho[id];
+            if (isNaN(quantidade)) {
+                carrinho[id] = 1;
+            } else {
+                carrinho[id] = Number(quantidade) + 1;
+            }
+
+            salvarCarrinho(carrinho);
+            location.reload();
+        }
+
+        // Função para diminuir a quantidade de um item no carrinho
+        function diminuir(id) {
+            let carrinho = obterCarrinhoDeCompras();
+
+            let quantidade = carrinho[id];
+            if (isNaN(quantidade)) {
+                // Se não existir quantidade válida, sai da função
+                return;
+            }
+
+            quantidade = Number(quantidade);
+
+            if (quantidade > 1) {
+                carrinho[id] = quantidade - 1;
+                salvarCarrinho(carrinho);
+                location.reload();
+            }
+        }
+
+        // Função para remover um item do carrinho
+        function remover(id) {
+            let carrinho = obterCarrinhoDeCompras();
+
+            if (carrinho[id]) {
+                delete carrinho[id];
+                salvarCarrinho(carrinho);
+                location.reload();
+            }
+        }
+
+        // Função auxiliar para obter o carrinho a partir do cookie
+        function obterCarrinhoDeCompras() {
+            const nomeCookie = "shopping_cart";
+            let cookies = document.cookie.split(';');
+
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
+                if (cookie.startsWith(nomeCookie + "=")) {
+                    let valor = cookie.substring(cookie.indexOf("=") + 1);
+                    try {
+                        let carrinho = JSON.parse(atob(valor));
+                        return carrinho;
+                    } catch (erro) {
+                        break;
+                    }
+                }
+            }
+
+            return {};
+        }
+
+    </script>
     <header>
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark border-bottom box-shadow py-2">
             <div class="container d-flex align-items-center justify-content-between">
