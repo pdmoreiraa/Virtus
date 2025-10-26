@@ -8,12 +8,13 @@ namespace Virtus.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly ProdutoRepository _produtoRepository;
+        private readonly IProdutoRepository _produtoRepository;
 
-        public HomeController(ILogger<HomeController> logger, ProdutoRepository produtoRepositorio)
+
+
+        public HomeController(IProdutoRepository produtoRepository)
         {
-            _logger = logger;
-            _produtoRepository = produtoRepositorio;
+            _produtoRepository = produtoRepository;
         }
 
         public async Task<IActionResult> Index()

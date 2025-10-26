@@ -15,15 +15,13 @@
     <script>
                 // Função para salvar o carrinho no cookie
         function salvarCarrinho(carrinho) {
-            // Converte o objeto para JSON e codifica em base64
+
             let carrinhoStr = btoa(JSON.stringify(carrinho));
 
-            // Define a validade do cookie (1 ano)
             let data = new Date();
             data.setDate(data.getDate() + 365);
             let expiracao = data.toUTCString();
 
-            // Cria o cookie do carrinho
             document.cookie = "shopping_cart=" + carrinhoStr + ";expires=" + expiracao + ";path=/; SameSite=Strict; Secure";
         }
 
@@ -33,7 +31,6 @@
 
             let quantidade = carrinho[id];
             if (isNaN(quantidade)) {
-                // Se não existir quantidade válida, define como 1
                 carrinho[id] = 1;
             } else {
                 carrinho[id] = Number(quantidade) + 1;
@@ -41,10 +38,8 @@
 
             salvarCarrinho(carrinho);
 
-            // Atualiza o texto do botão
             botao.innerHTML = "Adicionado <i class='bi bi-check-lg'></i>";
 
-            // Atualiza o número total de itens no carrinho
             let tamanhoCarrinho = 0;
             for (var item of Object.entries(carrinho)) {
                 quantidade = item[1];
@@ -76,7 +71,6 @@
 
             let quantidade = carrinho[id];
             if (isNaN(quantidade)) {
-                // Se não existir quantidade válida, sai da função
                 return;
             }
 

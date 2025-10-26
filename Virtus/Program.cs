@@ -18,8 +18,9 @@ builder.Services.AddSession(options =>
 builder.Services.AddSingleton<string>(builder.Configuration.GetConnectionString("DefaultConnection")!);
 
 // Registrar Repositórios
-builder.Services.AddScoped<ProdutoRepository>();
+builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
+
 
 var app = builder.Build();
 

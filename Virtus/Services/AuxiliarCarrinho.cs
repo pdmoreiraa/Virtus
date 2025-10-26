@@ -5,7 +5,7 @@ using Virtus.Repository;
 
 namespace Virtus.Services
 {
-    public class AuxiliarCarrinho
+    public static class AuxiliarCarrinho
     {
         /// <summary>
         /// Lê o cookie "shopping_cart" e retorna um dicionário com os produtos e suas quantidades.
@@ -51,29 +51,24 @@ namespace Virtus.Services
         }
 
         /// <summary>
-        /// Monta a lista de itens do carrinho com base nos produtos do banco.
+        /// Monta a lista de itens do carrinho com base nos produtos do banco (async).
         /// </summary>
-        public static List<ItemPedido> ObterItensCarrinho(HttpRequest requisicao, HttpResponse resposta, IProdutoRepository produtoRepository)
+        public static async Task<List<ItemPedido>> ObterItensCarrinho(HttpRequest requisicao, HttpResponse resposta, IProdutoRepository produtoRepository)
         {
             var itens = new List<ItemPedido>();
             var dicionario = ObterDicionarioCarrinho(requisicao, resposta);
 
             foreach (var par in dicionario)
             {
-                int produtoId = par.Key;
-                int quantidade = par.Value;
-
-                var produto = produtoRepository.ProdutosPorId(produtoId);
+                var produto = await produtoRepository.ProdutosPorId(par.Key);
                 if (produto == null) continue;
 
-                var item = new ItemPedido
+                itens.Add(new ItemPedido
                 {
                     Produto = produto,
-                    Quantidade = quantidade,
+                    Quantidade = par.Value,
                     PrecoUnitario = produto.Preco
-                };
-
-                itens.Add(item);
+                });
             }
 
             return itens;
@@ -95,7 +90,7 @@ namespace Virtus.Services
         }
 
         /// <summary>
-        /// Salva o estado atual do carrinho no cookie (em JSON e Base64).
+        /// Salva o estado atual do carrinho no cookie (JSON + Base64).
         /// </summary>
         public static void SalvarCarrinho(HttpResponse resposta, Dictionary<int, int> carrinho)
         {

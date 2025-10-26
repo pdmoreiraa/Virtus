@@ -4,13 +4,13 @@ using Dapper;
 
 namespace Virtus.Repository
 {
-    public class ProdutoRepository
+    public class ProdutoRepository : IProdutoRepository
     {
         private readonly string _connectionString;
 
-        public ProdutoRepository(string connectionString)
+        public ProdutoRepository(IConfiguration configuration)
         {
-            _connectionString = connectionString;
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         public async Task<IEnumerable<Produto>> TodosProdutos()
@@ -66,6 +66,5 @@ namespace Virtus.Repository
 
             await connection.ExecuteAsync(sql, new { Id = id });
         }
-
     }
 }

@@ -1,0 +1,103 @@
+﻿@model Pedido
+@{
+}
+
+<div class="row border rounded-3">
+    <div class="col-md-8 p-3">
+        <h4>Carrinho de Compras</h4>
+        <hr />
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-warning alert-dismissible fade show mt-4" role="alert">
+                <strong>@ViewBag.ErrorMessage</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <table class="table align-middle">
+            <tbody>
+                @foreach (var item in ViewBag.ItensCarrinho)
+                {
+                    <tr>
+                        <td>
+                            <img src="@item.Produto.ImageUrl" width="100" class="rounded" alt="@item.Produto.Nome">
+                        </td>
+                        <td>
+                            <h4>@item.Produto.Nome</h4>
+                            <p>
+                                Marca: @item.Produto.Marca<br>
+                                Categoria: @item.Produto.Categoria<br>
+                                Preço: R$ @item.PrecoUnitario
+                            </p>
+                        </td>
+                        <td style="white-space:nowrap">
+                            <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    onclick="diminuir(@item.Produto.Id)">
+                                -
+                            </button>
+                            <span class="border rounded-3 p-2 m-1">@item.Quantidade</span>
+                            <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    onclick="aumentar(@item.Produto.Id)">
+                                +
+                            </button>
+                        </td>
+                        <td>R$ @(item.PrecoUnitario * item.Quantidade)</td>
+                        <td>
+                            <i class="bi bi-trash text-danger h4" style="cursor: pointer" onclick="remover(@item.Produto.Id)"></i>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col-md-4">
+        <div class="text-white rounded my-2 p-3" style="background-color: #232323;">
+            <h4>Resumo do Pedido</h4>
+            <hr />
+
+            @using Microsoft.AspNetCore.Http
+
+            @{
+                var usuarioLogado = Context.Session.GetString("UsuarioNome"); 
+            }
+
+            @if (!string.IsNullOrEmpty(usuarioLogado))
+            {
+                <form method="post">
+
+                    <div class="row">
+                        <div class="col">
+                            <p>Subtotal:</p>
+                        </div>
+                        <div class="col">
+                            <p class="text-end">@(ViewBag.Subtotal)$</p>
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-outline-light"
+                            asp-controller="Carrinho"
+                            asp-action="Pagamento">
+                        Finalizar Compra
+                    </button>
+                </form>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col d-grid">
+                        <a class="btn btn-light" asp-controller="Usuario" asp-action="Cadastrar">Cadastrar</a>
+                    </div>
+                    <div class="col d-grid">
+                        <a class="btn btn-outline-light" asp-controller="Usuario" asp-action="Login">Login</a>
+                    </div>
+                </div>
+            }
+
+
+
+        </div>
+    </div>
+</div>
