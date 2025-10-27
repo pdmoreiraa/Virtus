@@ -13,72 +13,72 @@ namespace Virtus.Repository
             _connectionString = connectionString;
         }
 
-        public async Task AdicionarPedido(Pedido pedido)
+        public async Task<int> AdicionarPedido(Pedido pedido)
         {
             using var connection = new MySqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            using var transaction = await connection.BeginTransactionAsync();
+            // 1️⃣ Inserir o pedido
+            var sqlInsert = @"
+        INSERT INTO pedidos (UsuarioId, EnderecoId, MetodoPagamentoId, CartaoId, TaxaEntrega, StatusPedido, CriadoEm, ValorTotal)
+        VALUES (@UsuarioId, @EnderecoId, @MetodoPagamentoId, @CartaoId, @TaxaEntrega, @StatusPedido, @CriadoEm, @ValorTotal);
+    ";
 
-            try
+
+            await connection.ExecuteAsync(sqlInsert, pedido);
+
+            // 2️⃣ Obter o ID gerado
+            int pedidoId = await connection.ExecuteScalarAsync<int>("SELECT LAST_INSERT_ID();");
+
+            pedido.Id = pedidoId;
+
+            // 3️⃣ Inserir itens
+            const string sqlItem = @"
+        INSERT INTO itensPedido (PedidoId, ProdutoId, Quantidade, PrecoUnitario)
+        VALUES (@PedidoId, @ProdutoId, @Quantidade, @PrecoUnitario);
+    ";
+            Console.WriteLine($"🟢 ID gerado (pedidoId): {pedidoId}");
+
+            foreach (var item in pedido.Itens)
             {
-                // Inserir o pedido
-                var sqlPedido = @"
-            INSERT INTO pedidos 
-            (UsuarioId, EnderecoId, MetodoPagamentoId, CartaoId, TaxaEntrega, ValorTotal, StatusPedido, CriadoEm)
-            VALUES 
-            (@UsuarioId, @EnderecoId, @MetodoPagamentoId, @CartaoId, @TaxaEntrega, @ValorTotal, @StatusPedido, @CriadoEm);
-        ";
-
-                await connection.ExecuteAsync(sqlPedido, pedido, transaction);
-
-                // Recuperar o último ID inserido — precisa ser uma query separada!
-                var pedidoId = await connection.ExecuteScalarAsync<int>("SELECT LAST_INSERT_ID();", transaction: transaction);
-                pedido.Id = pedidoId;
-
-                // Inserir itens do pedido
-                var sqlItem = @"
-            INSERT INTO itenspedido (PedidoId, ProdutoId, Quantidade, PrecoUnitario)
-            VALUES (@PedidoId, @ProdutoId, @Quantidade, @PrecoUnitario);
-        ";
-
-                foreach (var item in pedido.Itens)
+                await connection.ExecuteAsync(sqlItem, new
                 {
-                    item.PedidoId = pedidoId;
-                    await connection.ExecuteAsync(sqlItem, item, transaction);
-                }
+                    PedidoId = pedidoId,
+                    item.ProdutoId,
+                    item.Quantidade,
+                    item.PrecoUnitario
+                });
+            }
 
-                await transaction.CommitAsync();
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                throw new Exception("Erro ao salvar pedido e itens no banco: " + ex.Message);
-            }
+            return pedidoId;
         }
-
-
 
 
         public async Task<Pedido?> ObterPedidoPorId(int pedidoId)
         {
             using var connection = new MySqlConnection(_connectionString);
 
+            // 🔹 Buscar pedido pelo Id
             var sqlPedido = "SELECT * FROM pedidos WHERE Id = @Id";
-            var pedido = await connection.QueryFirstOrDefaultAsync<Pedido>(sqlPedido, new { Id = pedidoId });
+            var pedido = await connection.QueryFirstOrDefaultAsync<Pedido>(
+                sqlPedido,
+                new { Id = pedidoId }  // ✅ o nome do parâmetro deve coincidir com o @Id
+            );
 
             if (pedido != null)
             {
+                // 🔹 Buscar itens do pedido junto com os produtos
                 var sqlItens = @"
-                SELECT i.*, p.*
-                FROM itensPedido i
-                INNER JOIN produtos p ON i.ProdutoId = p.Id
-                WHERE i.PedidoId = @PedidoId";
+            SELECT i.*, p.*
+            FROM itensPedido i
+            INNER JOIN produtos p ON i.ProdutoId = p.Id
+            WHERE i.PedidoId = @PedidoId
+        ";
 
                 var itens = await connection.QueryAsync<ItemPedido, Produto, ItemPedido>(
                     sqlItens,
                     (item, produto) => { item.Produto = produto; return item; },
-                    new { PedidoId = pedidoId }
+                    new { PedidoId = pedidoId }  // ✅ aqui o nome deve coincidir com @PedidoId
                 );
 
                 pedido.Itens = itens.ToList();
@@ -86,6 +86,22 @@ namespace Virtus.Repository
 
             return pedido;
         }
+
+        public async Task<int> AtualizarStatusPagamento(Pedido pedido)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+
+            string sql = @"
+        UPDATE pedidos 
+        SET StatusPedido = @StatusPedido, DataPagamento = @DataPagamento 
+        WHERE Id = @Id
+    ";
+
+            return await connection.ExecuteAsync(sql, new { pedido.StatusPedido, pedido.DataPagamento, pedido.Id });
+        }
+
+
+
 
         public async Task<List<Pedido>> ObterPedidosPorUsuario(int usuarioId)
         {
@@ -95,27 +111,6 @@ namespace Virtus.Repository
             var pedidos = await connection.QueryAsync<Pedido>(sql, new { UsuarioId = usuarioId });
 
             return pedidos.ToList();
-        }
-
-        public async Task<int> AtualizarStatusPagamento(Pedido pedido)
-        {
-            using var connection = new MySqlConnection(_connectionString);
-
-            var sql = @"
-        UPDATE pedidos
-        SET StatusPedido = @StatusPedido,
-            DataPagamento = @DataPagamento
-        WHERE Id = @Id;
-    ";
-
-            var linhas = await connection.ExecuteAsync(sql, new
-            {
-                Id = pedido.Id,
-                StatusPedido = pedido.StatusPedido,
-                DataPagamento = pedido.DataPagamento
-            });
-
-            return linhas;
         }
 
     }

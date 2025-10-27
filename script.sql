@@ -67,7 +67,7 @@ CREATE TABLE pedidos (
     UsuarioId INT NOT NULL,
     EnderecoId INT NOT NULL,
     MetodoPagamentoId INT NULL,
-    CartaoId INT NULL,
+    CartaoId INT,
     TaxaEntrega DECIMAL(10,2) DEFAULT 0.00,
     StatusPedido VARCHAR(50) DEFAULT 'Pendente',
     CriadoEm DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -99,6 +99,7 @@ INSERT INTO metodosPagamento (Descricao)
 VALUES ('Cartão'),
 ('Pix');
 
+SELECT * FROM pedidos;
 
 insert into produtos (Nome, Marca, Categoria, Tipo, Descricao, Preco, ImageUrl, Estoque)
 values ('Carrinhos', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Pacote com 5 Carros', 67.90, '/img/01.jpg', 5),

@@ -36,6 +36,14 @@ namespace Virtus.Repository
             return connection.Query<Cartao>(sql, new { UsuarioId = usuarioId });
         }
 
+        public async Task<Cartao> ObterCartaoPorId(int cartaoId)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            string sql = "SELECT * FROM cartoes WHERE Id = @Id";
+            return await connection.QueryFirstOrDefaultAsync<Cartao>(sql, new { Id = cartaoId });
+        }
+
+
         public void AdicionarCartao(Cartao cartao)
         {
             using var connection = new MySqlConnection(_connectionString);
