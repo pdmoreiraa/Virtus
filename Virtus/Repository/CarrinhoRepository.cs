@@ -8,9 +8,10 @@ namespace Virtus.Repository
     {
         private readonly string _connectionString;
 
-        public CarrinhoRepository(IConfiguration configuration)
+
+        public CarrinhoRepository(string connectionString)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = connectionString;
         }
 
         public List<Endereco> ObterEnderecosPorUsuario(int usuarioId)

@@ -10,9 +10,8 @@ namespace Virtus.Controllers
         private readonly IProdutoRepository _produtoRepository;
         private readonly IPedidoRepository _pedidoRepository;
         private readonly CarrinhoRepository _carrinhoRepository;
-        private readonly decimal taxaEntrega = 30.00m;
 
-        public CarrinhoController(IProdutoRepository produtoRepository, IConfiguration configuracao, 
+        public CarrinhoController(IProdutoRepository produtoRepository, 
             CarrinhoRepository carrinhoRepository, IPedidoRepository pedidoRepository)
         {
             _produtoRepository = produtoRepository;

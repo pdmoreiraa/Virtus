@@ -7,10 +7,7 @@ namespace Virtus.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly IProdutoRepository _produtoRepository;
-
-
 
         public HomeController(IProdutoRepository produtoRepository)
         {

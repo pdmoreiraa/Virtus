@@ -8,9 +8,10 @@ namespace Virtus.Repository
     {
         private readonly string _connectionString;
 
-        public ProdutoRepository(IConfiguration configuration)
+
+        public ProdutoRepository(string connectionString)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = connectionString;
         }
 
         public async Task<IEnumerable<Produto>> TodosProdutos()
