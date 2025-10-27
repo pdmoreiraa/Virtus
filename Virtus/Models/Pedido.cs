@@ -9,7 +9,9 @@
         public int? CartaoId { get; set; }
         public decimal TaxaEntrega { get; set; }
         public string StatusPedido { get; set; } = "Pendente";
+        public decimal ValorTotal { get; set; }
         public DateTime CriadoEm { get; set; }
+        public DateTime DataPagamento { get; set; }
         public DateTime Expiracao { get; set; }
 
         // Navegação

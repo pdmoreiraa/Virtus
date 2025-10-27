@@ -260,18 +260,28 @@ namespace Virtus.Controllers
             if (itensCarrinho == null || !itensCarrinho.Any())
                 TempData["Erro"] = "Seu carrinho está vazio."; // carrinho vazio
 
-            // Criar pedido
+            // Obter subtotal e taxa de entrega
+            decimal subtotal = itensCarrinho.Sum(i => i.PrecoUnitario * i.Quantidade);
+            decimal taxaEntrega = 10m;
+
+            // Calcular valor total com base no método de pagamento
+            decimal valorTotal = MetodoPagamento == "Pix"
+                ? (subtotal + taxaEntrega) * 0.95m  // Desconto Pix
+                : subtotal + taxaEntrega;
+
             var pedido = new Pedido
             {
                 UsuarioId = usuarioId,
                 EnderecoId = EnderecoSelecionadoId,
                 MetodoPagamentoId = MetodoPagamento == "Pix" ? 2 : 1, // 1 = Cartão, 2 = Pix
                 CartaoId = CartaoSelecionadoId,
-                TaxaEntrega = 10m,
+                TaxaEntrega = taxaEntrega,
+                ValorTotal = valorTotal,
                 StatusPedido = "Aguardando Pagamento",
                 CriadoEm = DateTime.Now,
                 Itens = itensCarrinho
             };
+
 
             try
             {
@@ -324,7 +334,7 @@ namespace Virtus.Controllers
                 Itens = itensCarrinho,
                 Enderecos = enderecos,
                 Cartoes = cartoes,
-                Subtotal = subtotal,
+                ValorTotal = pedido.ValorTotal,
                 TaxaEntrega = taxaEntrega,
                 NovoEndereco = new Endereco(),
                 NovoCartao = new Cartao(),
@@ -335,14 +345,53 @@ namespace Virtus.Controllers
 
             // Gerar código Pix fictício
             ViewBag.CodigoPix = $"PIX-{pedido.Id}-{Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper()}";
+            ViewBag.PedidoId = pedido.Id;
+
 
             return View(carrinho);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ConfirmarPagamento(int pedidoId)
+        {
 
+            var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
+            if (string.IsNullOrEmpty(usuarioIdStr))
+            {
+                return RedirectToAction("Login", "Usuario");
+            }
 
+            int usuarioId = Convert.ToInt32(usuarioIdStr);
 
+            try
+            {
+                var pedido = await _pedidoRepository.ObterPedidoPorId(pedidoId);
+                if (pedido == null)
+                {
+                    TempData["Erro"] = "Pedido não encontrado.";
+                    return RedirectToAction("Index");
+                }
 
+                // Atualizar status e data do pagamento
+                pedido.StatusPedido = "Pago";
+                pedido.DataPagamento = DateTime.Now;
+
+                var linhas = await _pedidoRepository.AtualizarStatusPagamento(pedido);
+                if (linhas <= 0)
+                {
+                    TempData["Erro"] = "Não foi possível atualizar o status do pagamento.";
+                    return RedirectToAction("Pix", new { pedidoId });
+                }
+
+                TempData["Sucesso"] = "Pagamento confirmado com sucesso!";
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                TempData["Erro"] = "Erro ao confirmar pagamento: " + ex.Message;
+                return RedirectToAction("Pix", new { pedidoId });
+            }
+        }
 
     }
 }

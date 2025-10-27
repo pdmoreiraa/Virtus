@@ -19,7 +19,7 @@
             </p>
             <p class="fw-semibold fs-5 mt-2">
                 Valor do pedido<br>
-                R$ @Model.Pix.ToString("F2")
+                R$ @Model.ValorTotal.ToString("F2")
             </p>
 
             <hr class="my-3">
@@ -50,6 +50,18 @@
                     O pagamento deve ser realizado dentro do prazo de vencimento.
                     Caso não consiga pagar, copie o código Pix e tente novamente no seu app bancário.
                 </p>
+            </div>
+
+            <!-- Botão de confirmação -->
+            <div class="text-center mt-4">
+                <form asp-action="ConfirmarPagamento" method="post">
+                    <input type="hidden" name="pedidoId" value="@ViewBag.PedidoId" />
+
+                    <button type="submit" class="btn btn-success w-100 mt-3">
+                        Já realizei o pagamento
+                    </button>
+                </form>
+
             </div>
         </div>
     </div>

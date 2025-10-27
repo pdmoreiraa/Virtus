@@ -21,6 +21,7 @@
         public int EnderecoId => EnderecoSelecionadoId;     // mapeia automaticamente
         public int? CartaoId => MetodoPagamento == "Cartão" ? CartaoSelecionadoId : null;
         public int MetodoPagamentoId => MetodoPagamento == "Pix" ? 2 : 1; // 1=Cartão, 2=Pix
+        public decimal ValorTotal   { get; set; }
 
         public decimal Subtotal { get; set; }
         public decimal TaxaEntrega { get; set; } = 10m;

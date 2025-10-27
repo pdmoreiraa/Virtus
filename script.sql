@@ -71,6 +71,7 @@ CREATE TABLE pedidos (
     TaxaEntrega DECIMAL(10,2) DEFAULT 0.00,
     StatusPedido VARCHAR(50) DEFAULT 'Pendente',
     CriadoEm DATETIME DEFAULT CURRENT_TIMESTAMP,
+    DataPagamento DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (UsuarioId) REFERENCES usuarios(Id)
         ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (EnderecoId) REFERENCES enderecos(Id)
@@ -93,8 +94,6 @@ CREATE TABLE itensPedido (
     FOREIGN KEY (ProdutoId) REFERENCES produtos(Id)
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
-
-select * from pedidos;
 
 INSERT INTO metodosPagamento (Descricao) 
 VALUES ('Cartão'),

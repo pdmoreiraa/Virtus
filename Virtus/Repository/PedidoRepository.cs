@@ -22,57 +22,41 @@ namespace Virtus.Repository
 
             try
             {
-                // 1️⃣ Inserir o pedido
+                // Inserir o pedido
                 var sqlPedido = @"
             INSERT INTO pedidos 
-                (UsuarioId, EnderecoId, MetodoPagamentoId, CartaoId, TaxaEntrega, StatusPedido, CriadoEm)
+            (UsuarioId, EnderecoId, MetodoPagamentoId, CartaoId, TaxaEntrega, ValorTotal, StatusPedido, CriadoEm)
             VALUES 
-                (@UsuarioId, @EnderecoId, @MetodoPagamentoId, @CartaoId, @TaxaEntrega, @StatusPedido, @CriadoEm);
-            SELECT LAST_INSERT_ID();";
+            (@UsuarioId, @EnderecoId, @MetodoPagamentoId, @CartaoId, @TaxaEntrega, @ValorTotal, @StatusPedido, @CriadoEm);
+        ";
 
-                pedido.Id = await connection.ExecuteScalarAsync<int>(sqlPedido, pedido, transaction);
+                await connection.ExecuteAsync(sqlPedido, pedido, transaction);
 
-                // 2️⃣ Inserir os itens do pedido (se houver)
-                if (pedido.Itens != null && pedido.Itens.Any())
+                // Recuperar o último ID inserido — precisa ser uma query separada!
+                var pedidoId = await connection.ExecuteScalarAsync<int>("SELECT LAST_INSERT_ID();", transaction: transaction);
+                pedido.Id = pedidoId;
+
+                // Inserir itens do pedido
+                var sqlItem = @"
+            INSERT INTO itenspedido (PedidoId, ProdutoId, Quantidade, PrecoUnitario)
+            VALUES (@PedidoId, @ProdutoId, @Quantidade, @PrecoUnitario);
+        ";
+
+                foreach (var item in pedido.Itens)
                 {
-                    var sqlItens = @"
-                INSERT INTO itenspedido (PedidoId, ProdutoId, Quantidade, PrecoUnitario)
-                VALUES (@PedidoId, @ProdutoId, @Quantidade, @PrecoUnitario);";
-
-                    foreach (var item in pedido.Itens)
-                    {
-                        // Validação extra para garantir que não quebre o insert
-                        if (item.ProdutoId <= 0 && item.Produto != null)
-                            item.ProdutoId = item.Produto.Id;
-
-                        if (item.ProdutoId <= 0)
-                            throw new Exception("ProdutoId inválido ao tentar inserir um item do pedido.");
-
-                        await connection.ExecuteAsync(sqlItens, new
-                        {
-                            PedidoId = pedido.Id,
-                            ProdutoId = item.ProdutoId,
-                            Quantidade = item.Quantidade,
-                            PrecoUnitario = item.PrecoUnitario
-                        }, transaction);
-                    }
-                }
-                else
-                {
-                    throw new Exception("Nenhum item encontrado no pedido.");
+                    item.PedidoId = pedidoId;
+                    await connection.ExecuteAsync(sqlItem, item, transaction);
                 }
 
-                // 3️⃣ Commit final — tudo deu certo
                 await transaction.CommitAsync();
             }
             catch (Exception ex)
             {
-                // 4️⃣ Rollback em caso de falha
                 await transaction.RollbackAsync();
-                Console.WriteLine($"Erro ao adicionar pedido: {ex.Message}");
-                throw new Exception("Erro ao salvar pedido e itens no banco: " + ex.Message, ex);
+                throw new Exception("Erro ao salvar pedido e itens no banco: " + ex.Message);
             }
         }
+
 
 
 
@@ -112,5 +96,27 @@ namespace Virtus.Repository
 
             return pedidos.ToList();
         }
+
+        public async Task<int> AtualizarStatusPagamento(Pedido pedido)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+
+            var sql = @"
+        UPDATE pedidos
+        SET StatusPedido = @StatusPedido,
+            DataPagamento = @DataPagamento
+        WHERE Id = @Id;
+    ";
+
+            var linhas = await connection.ExecuteAsync(sql, new
+            {
+                Id = pedido.Id,
+                StatusPedido = pedido.StatusPedido,
+                DataPagamento = pedido.DataPagamento
+            });
+
+            return linhas;
+        }
+
     }
 }
