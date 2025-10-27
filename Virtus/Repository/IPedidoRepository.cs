@@ -4,9 +4,9 @@ namespace Virtus.Repository
 {
     public interface IPedidoRepository
     {
-        Task CriarPedidoAsync(Pedido pedido);
-        Task<Pedido?> ObterPedidoPorIdAsync(int pedidoId);
-        Task<List<Pedido>> ObterPedidosPorUsuarioAsync(int usuarioId);
+        Task AdicionarPedido(Pedido pedido);
+        Task<Pedido?> ObterPedidoPorId(int pedidoId);
+        Task<List<Pedido>> ObterPedidosPorUsuario(int usuarioId);
     }
 
 }

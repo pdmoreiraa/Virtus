@@ -8,13 +8,16 @@ namespace Virtus.Controllers
     public class CarrinhoController : Controller
     {
         private readonly IProdutoRepository _produtoRepository;
+        private readonly IPedidoRepository _pedidoRepository;
         private readonly CarrinhoRepository _carrinhoRepository;
         private readonly decimal taxaEntrega = 30.00m;
 
-        public CarrinhoController(IProdutoRepository produtoRepository, IConfiguration configuracao, CarrinhoRepository carrinhoRepository)
+        public CarrinhoController(IProdutoRepository produtoRepository, IConfiguration configuracao, 
+            CarrinhoRepository carrinhoRepository, IPedidoRepository pedidoRepository)
         {
             _produtoRepository = produtoRepository;
             _carrinhoRepository = carrinhoRepository;
+            _pedidoRepository = pedidoRepository;
  
         }
 
@@ -230,8 +233,66 @@ namespace Virtus.Controllers
 
                 return View("Infos", carrinho);
             }
+
+
         }
 
+        [HttpPost]
+        public async Task<IActionResult> FinalizarPedido(int EnderecoSelecionadoId, string MetodoPagamento, int? CartaoSelecionadoId)
+        {
+            // Validar endereço
+            if (EnderecoSelecionadoId <= 0)
+                TempData["Erro"] = "Selecione um endereço antes de continuar.";
+
+            // Obter usuário logado
+            var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
+            if (string.IsNullOrEmpty(usuarioIdStr))
+                return RedirectToAction("Login", "Usuario");
+
+            int usuarioId = Convert.ToInt32(usuarioIdStr);
+
+            if (string.IsNullOrEmpty(MetodoPagamento))
+            {
+                ViewBag.ErroPagamento = "Por favor, selecione um método de pagamento antes de continuar.";
+            }
+
+            // Obter itens do carrinho
+            var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository);
+            if (itensCarrinho == null || !itensCarrinho.Any())
+                TempData["Erro"] = "Seu carrinho está vazio."; // carrinho vazio
+
+            // Criar pedido
+            var pedido = new Pedido
+            {
+                UsuarioId = usuarioId,
+                EnderecoId = EnderecoSelecionadoId,
+                MetodoPagamentoId = MetodoPagamento == "Pix" ? 2 : 1, // 1 = Cartão, 2 = Pix
+                CartaoId = CartaoSelecionadoId,
+                TaxaEntrega = 10m,
+                StatusPedido = "Aguardando Pagamento",
+                CriadoEm = DateTime.Now,
+                Itens = itensCarrinho
+            };
+
+            try
+            {
+                await _pedidoRepository.AdicionarPedido(pedido);
+
+                // Limpar carrinho
+                AuxiliarCarrinho.SalvarCarrinho(Response, new Dictionary<int, int>());
+
+                if (MetodoPagamento == "Pix")
+                    return RedirectToAction("Pix", "Carrinho", new { pedidoId = pedido.Id });
+                else
+                    return RedirectToAction("ConfirmarCartao", "Carrinho", new { pedidoId = pedido.Id });
+            }
+            catch (Exception ex)
+            {
+                // Tratar erro
+                TempData["Erro"] = "Erro ao finalizar pedido: " + ex.Message;
+                return RedirectToAction("Index");
+            }
+        }
 
     }
 }

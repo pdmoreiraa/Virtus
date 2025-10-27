@@ -10,28 +10,26 @@ namespace Virtus.Services
         /// <summary>
         /// Lê o cookie "shopping_cart" e retorna um dicionário com os produtos e suas quantidades.
         /// </summary>
-        public static Dictionary<int, int> ObterDicionarioCarrinho(HttpRequest requisicao, HttpResponse resposta)
+        public static async Task<List<ItemPedido>> ObterItensCarrinho(HttpRequest requisicao, HttpResponse resposta, IProdutoRepository produtoRepository)
         {
-            string valorCookie = requisicao.Cookies["shopping_cart"] ?? "";
+            var itens = new List<ItemPedido>();
+            var dicionario = ObterDicionarioCarrinho(requisicao, resposta);
 
-            try
+            foreach (var par in dicionario)
             {
-                string json = Encoding.UTF8.GetString(Convert.FromBase64String(valorCookie));
-                var dicionario = JsonConvert.DeserializeObject<Dictionary<int, int>>(json);
-                if (dicionario != null)
-                    return dicionario;
-            }
-            catch
-            {
-                // Cookie inválido -> deletar
-            }
+                var produto = await produtoRepository.ProdutosPorId(par.Key);
+                if (produto == null) continue;
 
-            if (!string.IsNullOrEmpty(valorCookie))
-            {
-                resposta.Cookies.Delete("shopping_cart");
+                itens.Add(new ItemPedido
+                {
+                    ProdutoId = produto.Id,
+                    Produto = produto,
+                    Quantidade = par.Value,
+                    PrecoUnitario = produto.Preco
+                });
             }
 
-            return new Dictionary<int, int>();
+            return itens;
         }
 
         /// <summary>
@@ -48,30 +46,6 @@ namespace Virtus.Services
             }
 
             return tamanho;
-        }
-
-        /// <summary>
-        /// Monta a lista de itens do carrinho com base nos produtos do banco (async).
-        /// </summary>
-        public static async Task<List<ItemPedido>> ObterItensCarrinho(HttpRequest requisicao, HttpResponse resposta, IProdutoRepository produtoRepository)
-        {
-            var itens = new List<ItemPedido>();
-            var dicionario = ObterDicionarioCarrinho(requisicao, resposta);
-
-            foreach (var par in dicionario)
-            {
-                var produto = await produtoRepository.ProdutosPorId(par.Key);
-                if (produto == null) continue;
-
-                itens.Add(new ItemPedido
-                {
-                    Produto = produto,
-                    Quantidade = par.Value,
-                    PrecoUnitario = produto.Preco
-                });
-            }
-
-            return itens;
         }
 
         /// <summary>
@@ -152,6 +126,33 @@ namespace Virtus.Services
             {
                 carrinho.Remove(produtoId);
                 SalvarCarrinho(resposta, carrinho);
+            }
+        }
+
+        /// <summary>
+        /// Recupera o cookie e converte de Base64 + JSON para dicionário de produtos.
+        /// </summary>
+        private static Dictionary<int, int> ObterDicionarioCarrinho(HttpRequest requisicao, HttpResponse resposta)
+        {
+            try
+            {
+                // Verifica se o cookie existe
+                if (!requisicao.Cookies.TryGetValue("shopping_cart", out string? valorBase64) || string.IsNullOrEmpty(valorBase64))
+                {
+                    return new Dictionary<int, int>();
+                }
+
+                // Decodifica de Base64 e depois desserializa de JSON
+                string json = Encoding.UTF8.GetString(Convert.FromBase64String(valorBase64));
+                var dicionario = JsonConvert.DeserializeObject<Dictionary<int, int>>(json);
+
+                // Se deu erro ou está nulo, devolve dicionário vazio
+                return dicionario ?? new Dictionary<int, int>();
+            }
+            catch
+            {
+                // Em caso de erro, retorna carrinho vazio
+                return new Dictionary<int, int>();
             }
         }
     }

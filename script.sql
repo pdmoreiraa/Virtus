@@ -94,8 +94,12 @@ CREATE TABLE itensPedido (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+select * from pedidos;
 
-select * from cartoes;
+INSERT INTO metodosPagamento (Descricao) 
+VALUES ('Cartão'),
+('Pix');
+
 
 insert into produtos (Nome, Marca, Categoria, Tipo, Descricao, Preco, ImageUrl, Estoque)
 values ('Carrinhos', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Pacote com 5 Carros', 67.90, '/img/01.jpg', 5),
