@@ -64,12 +64,7 @@
                                 var cartao = Model.Cartoes[i];
                                 <tr>
                                     <td>
-                                        <input class="form-check-input"
-                                               type="radio"
-                                               name="CartaoSelecionado"
-                                               value="@cartao.Id"
-                                               id="cartao_@cartao.Id"
-                                               @(i == 0 ? "checked" : "") />
+                                        <input class="form-check-input" type="radio" name="CartaoSelecionado" value="@cartao.Id" id="cartao_@cartao.Id" />
                                     </td>
                                     <td>
                                         <img src="/img/cartao.png" width="60" alt="Cartão" class="rounded" />
@@ -96,7 +91,10 @@
 
 
             <!-- Pagamento com PIX -->
-            <h6 class="fw-bold mt-4 mb-3">Pagar com pix <img src="/img/pix-icon.png" width="18" alt="pix" /></h6>
+            <h6 class="fw-bold mt-4 mb-3">
+                <input class="form-check-input me-2" type="radio" name="MetodoPagamento" id="pixRadio" value="Pix" checked>
+                Pagar com Pix <img src="/img/pix-icon.png" width="18" alt="pix" />
+            </h6>
             <div class="border rounded-3 p-3">
                 <div class="p-2">
                     <h6 class="fw-bold">Ganhe 5% de desconto</h6>
@@ -107,7 +105,7 @@
                     <button id="btnPix" class="btn btn-dark w-100">Finalizar compra com Pix</button>
                 </div>
             </div>
-        </div>
+
 
         <!-- Coluna direita -->
         <div class="col-md-4">

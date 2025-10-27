@@ -21,6 +21,7 @@ builder.Services.AddSingleton<string>(builder.Configuration.GetConnectionString(
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<CarrinhoRepository>();
+builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 
 
 var app = builder.Build();

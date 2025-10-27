@@ -94,6 +94,7 @@ CREATE TABLE itensPedido (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+
 select * from cartoes;
 
 insert into produtos (Nome, Marca, Categoria, Tipo, Descricao, Preco, ImageUrl, Estoque)
