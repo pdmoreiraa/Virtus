@@ -20,6 +20,7 @@ builder.Services.AddSingleton<string>(builder.Configuration.GetConnectionString(
 // Registrar Repositórios
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
+builder.Services.AddScoped<CarrinhoRepository>();
 
 
 var app = builder.Build();
