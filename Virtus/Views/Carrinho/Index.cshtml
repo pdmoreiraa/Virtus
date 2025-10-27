@@ -1,4 +1,7 @@
-﻿<div class="row border rounded-3">
+﻿@model Virtus.Models.Carrinho
+
+
+<div class="row border rounded-3">
     <div class="col-md-8 p-3">
         <h4>Carrinho de Compras</h4>
         <hr />
@@ -13,7 +16,7 @@
 
         <table class="table align-middle">
             <tbody>
-                @foreach (var item in ViewBag.ItensCarrinho)
+                @foreach (var item in Model.Itens)
                 {
                     <tr>
                         <td>
@@ -68,7 +71,7 @@
                             <p>Subtotal:</p>
                         </div>
                         <div class="col">
-                            <p class="text-end">R$ @(ViewBag.Subtotal)</p>
+                            <p class="text-end">R$ @Model.Subtotal.ToString("F2")</p>
                         </div>
                     </div>
 

@@ -1,12 +1,4 @@
-﻿@model Carrinho
-@{
-    var enderecos = ViewBag.Enderecos as List<Endereco> ?? new List<Endereco>();
-    decimal? taxaEntrega = ViewBag.TaxaEntrega as decimal?;
-    decimal? subtotal = ViewBag.Subtotal as decimal?;
-    decimal? total = ViewBag.Total as decimal?;
-    string pix = ViewBag.Pix;
-    var novoEndereco = ViewBag.NovoEndereco as Endereco ?? new Endereco();
-}
+﻿@model Virtus.Models.Carrinho
 
 <div class="container my-4">
     <h3 class="fw-bold mb-4">Frete e pagamento</h3>
@@ -18,10 +10,10 @@
             <div class="border rounded-3 mb-4 p-3 bg-light">
                 <h6 class="fw-bold">Endereço de Entrega</h6>
 
-                @if (enderecos.Count > 0)
+                @if (Model.Enderecos.Count > 0)
                 {
                     int index = 0;
-                    foreach (var endereco in enderecos)
+                    foreach (var endereco in Model.Enderecos)
                     {
                         <div class="form-check mb-2">
                             <input class="form-check-input"
@@ -54,29 +46,54 @@
 
             <!-- Pagamento com cartão -->
             <h6 class="fw-bold mt-4 mb-3">Pagar com cartão</h6>
-            <div class="border rounded-3 mb-4 p-3">
+            <div class="border rounded-3 mb-4 p-3 bg-light">
                 <table class="table table-borderless align-middle mb-0">
                     <thead>
                         <tr class="text-muted small">
-                            <th>Cartão</th>
+                            <th>Selecionar</th>
+                            <th>Bandeira</th>
                             <th>Nome no cartão</th>
                             <th>Vencimento</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                <img src="/img/cartao.png" width="60" alt="Cartão" class="rounded">
-                                (Crédito) Mastercard
-                            </td>
-                            <td>Pedro Henrique</td>
-                            <td>08/25</td>
-                        </tr>
+                        @if (Model.Cartoes != null && Model.Cartoes.Any())
+                        {
+                            for (int i = 0; i < Model.Cartoes.Count; i++)
+                            {
+                                var cartao = Model.Cartoes[i];
+                                <tr>
+                                    <td>
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="CartaoSelecionado"
+                                               value="@cartao.Id"
+                                               id="cartao_@cartao.Id"
+                                               @(i == 0 ? "checked" : "") />
+                                    </td>
+                                    <td>
+                                        <img src="/img/cartao.png" width="60" alt="Cartão" class="rounded" />
+                                        @($" ({cartao.Tipo}) {cartao.Bandeira}")
+                                    </td>
+                                    <td>@cartao.NomeTitular</td>
+                                    <td>@cartao.Validade</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-muted">Nenhum cartão cadastrado.</td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
 
-                <button class="btn btn-dark mt-3">Adicionar outro cartão</button>
+                <button class="btn btn-dark mt-3" data-bs-toggle="modal" data-bs-target="#AdicionarCartao">
+                    Adicionar outro cartão
+                </button>
             </div>
+
 
             <!-- Pagamento com PIX -->
             <h6 class="fw-bold mt-4 mb-3">Pagar com pix <img src="/img/pix-icon.png" width="18" alt="pix" /></h6>
@@ -100,20 +117,20 @@
 
                 <div class="d-flex justify-content-between">
                     <span>Subtotal:</span>
-                    <span id="subtotal">R$ @(ViewBag.Subtotal)</span>
+                    <span id="subtotal">R$ @Model.Subtotal.ToString("F2")</span>
                 </div>
                 <div class="d-flex justify-content-between">
                     <span>Frete:</span>
-                    <span id="frete">@(ViewBag.TaxaEntrega)</span>
+                    <span id="frete">R$ @Model.TaxaEntrega.ToString("F2")</span>
                 </div>
                 <hr>
                 <div class="d-flex justify-content-between fw-bold">
                     <span>Valor total:</span>
-                    <span id="total">R$ @(ViewBag.Total)</span>
+                    <span id="total">R$ @Model.Total.ToString("F2")</span>
                 </div>
 
                 <small class="text-muted">
-                    ou R$ <span id="pixPrice">@(ViewBag.Pix)</span> no pix com desconto de 5%
+                    ou R$ <span id="pixPrice">@Model.Pix.ToString("F2")</span> no pix com desconto de 5%
                 </small>
 
                 <button class="btn btn-dark w-100 mt-3">Usar esse método de pagamento</button>
@@ -122,7 +139,6 @@
     </div>
 </div>
 
-<!-- Modal para adicionar endereço -->
 <!-- Modal para adicionar endereço -->
 <div class="modal fade" id="AdicionarEndereco" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -134,61 +150,61 @@
 
             <div class="modal-body">
                 <form asp-action="SalvarEndereco" method="post">
-                    <input type="hidden" name="Id" value="@novoEndereco.Id" />
+                    <input type="hidden" name="Id" value="@Model.NovoEndereco.Id" />
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Nome Completo</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="NomeCompleto" value="@novoEndereco.NomeCompleto" />
+                            <input class="form-control" name="NomeCompleto" value="@Model.NovoEndereco.NomeCompleto" />
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Logradouro</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="Logradouro" value="@novoEndereco.Logradouro" />
+                            <input class="form-control" name="Logradouro" value="@Model.NovoEndereco.Logradouro" />
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Número</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="Numero" value="@novoEndereco.Numero" />
+                            <input class="form-control" name="Numero" value="@Model.NovoEndereco.Numero" />
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Bairro</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="Bairro" value="@novoEndereco.Bairro" />
+                            <input class="form-control" name="Bairro" value="@Model.NovoEndereco.Bairro" />
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Cidade</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="Cidade" value="@novoEndereco.Cidade" />
+                            <input class="form-control" name="Cidade" value="@Model.NovoEndereco.Cidade" />
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Estado</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="Estado" value="@novoEndereco.Estado" />
+                            <input class="form-control" name="Estado" value="@Model.NovoEndereco.Estado" />
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">CEP</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="CEP" value="@novoEndereco.CEP" />
+                            <input class="form-control" name="CEP" value="@Model.NovoEndereco.CEP" />
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Complemento</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="Complemento" value="@novoEndereco.Complemento" />
+                            <input class="form-control" name="Complemento" value="@Model.NovoEndereco.Complemento" />
                         </div>
                     </div>
 
@@ -196,6 +212,71 @@
                         <div class="offset-sm-4 col-sm-8">
                             <button type="submit" class="btn btn-primary">Salvar</button>
                         </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal para adicionar cartão -->
+<div class="modal fade" id="AdicionarCartao" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Adicionar Cartão</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <div class="modal-body">
+                <form asp-action="SalvarCartao" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <select name="Tipo" class="form-select" value="@Model.NovoCartao.Tipo" required>
+                            <option value="">Selecione...</option>
+                            <option>Crédito</option>
+                            <option>Débito</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nome no cartão</label>
+                        <input type="text" name="NomeTitular" class="form-control" value="@Model.NovoCartao.NomeTitular" required  />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Número do cartão</label>
+                        <input type="text" name="Numero" maxlength="16" class="form-control" value="@Model.NovoCartao.Numero" required />
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Validade (MM/AA)</label>
+                            <input type="text" name="Validade" maxlength="5" class="form-control" placeholder="MM/AA" value="@Model.NovoCartao.Validade" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">CVV</label>
+                            <input type="text" name="CVV" maxlength="3" class="form-control" value="@Model.NovoCartao.CVV" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Bandeira</label>
+                        <select name="Bandeira" class="form-select" value="@Model.NovoCartao.Bandeira" required>
+                            <option value="">Selecione...</option>
+                            <option>Mastercard</option>
+                            <option>Visa</option>
+                            <option>Elo</option>
+                            <option>Hipercard</option>
+                        </select>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">Salvar cartão</button>
                     </div>
                 </form>
             </div>

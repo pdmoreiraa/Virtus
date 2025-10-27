@@ -9,12 +9,10 @@
         public string NomeTitular { get; set; } = string.Empty;
         public string Numero { get; set; } = string.Empty;
         public string Bandeira { get; set; } = string.Empty;
-        public int ValidadeMes { get; set; }
-        public int ValidadeAno { get; set; }
+        public string Validade { get; set; } = string.Empty;
         public string CVV { get; set; } = string.Empty;
 
         // Navegação
         public Usuario? Usuario { get; set; }
-        public MetodoPagamento? MetodoPagamento { get; set; }
     }
 }

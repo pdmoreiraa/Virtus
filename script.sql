@@ -31,7 +31,7 @@ CREATE TABLE enderecos (
     Id INT AUTO_INCREMENT PRIMARY KEY,
     UsuarioId INT NOT NULL,
     NomeCompleto VARCHAR(100) NOT NULL,
-    Rua VARCHAR(150) NOT NULL,
+    Logradouro VARCHAR(150) NOT NULL,
     Numero VARCHAR(10),
     Bairro VARCHAR(80),
     Cidade VARCHAR(100),
@@ -51,18 +51,14 @@ CREATE TABLE metodosPagamento (
 CREATE TABLE cartoes (
     Id INT AUTO_INCREMENT PRIMARY KEY,
     UsuarioId INT NOT NULL,
-    MetodoPagamentoId INT NOT NULL,
     Tipo varchar(20) NOT NULL,
     NomeTitular VARCHAR(100) NOT NULL,
     Numero VARCHAR(25) NOT NULL, 
     Bandeira VARCHAR(30) NOT NULL,
-    ValidadeMes INT NOT NULL,
-    ValidadeAno INT NOT NULL,
+    Validade VARCHAR(10) NOT NULL,
     CVV VARCHAR(3) NOT NULL,
     FOREIGN KEY (UsuarioId) REFERENCES usuarios(Id)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (MetodoPagamentoId) REFERENCES metodosPagamento(Id)
-        ON DELETE RESTRICT ON UPDATE CASCADE
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -98,7 +94,7 @@ CREATE TABLE itensPedido (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-select * from usuarios;
+select * from cartoes;
 
 insert into produtos (Nome, Marca, Categoria, Tipo, Descricao, Preco, ImageUrl, Estoque)
 values ('Carrinhos', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Pacote com 5 Carros', 67.90, '/img/01.jpg', 5),
@@ -110,3 +106,47 @@ values ('Carrinhos', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Pacote com 5 Carros
 
 insert into usuarios(Nome, Sobrenome, Email, Senha, CPF, Telefone, Tipo)
 values ('Admin', 'Admin', 'admin@gmail.com', 'admin123', '11111111111', '11999999999', 'admin');
+
+INSERT INTO enderecos (
+    UsuarioId,
+    NomeCompleto,
+    Rua,
+    Numero,
+    Bairro,
+    Cidade,
+    Estado,
+    CEP,
+    Complemento
+) VALUES (
+    1,
+    'Pedro Henrique',
+    'Rua das Flores',
+    '123',
+    'Jardim Primavera',
+    'São Paulo',
+    'SP',
+    '01234-567',
+    'Apartamento 45'
+);
+
+INSERT INTO enderecos (
+    UsuarioId,
+    NomeCompleto,
+    Rua,
+    Numero,
+    Bairro,
+    Cidade,
+    Estado,
+    CEP,
+    Complemento
+) VALUES (
+    1,
+    'Pedro Henrique',
+    'Rua das Árvores',
+    '123',
+    'Osasco',
+    'São Paulo',
+    'SP',
+    '01234-555',
+    'Apartamento 46'
+);

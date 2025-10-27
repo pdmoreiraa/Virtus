@@ -28,5 +28,21 @@ namespace Virtus.Repository
                 VALUES (@UsuarioId, @NomeCompleto, @Logradouro, @Numero, @Bairro, @Cidade, @Estado, @CEP, @Complemento)";
             connection.Execute(sql, endereco);
         }
+        public IEnumerable<Cartao> ObterCartoesPorUsuario(int usuarioId)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            string sql = "SELECT * FROM cartoes WHERE UsuarioId = @UsuarioId";
+            return connection.Query<Cartao>(sql, new { UsuarioId = usuarioId });
+        }
+
+        public void AdicionarCartao(Cartao cartao)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            var sql = @"INSERT INTO cartoes 
+                (UsuarioId, Tipo, NomeTitular, Numero, Validade, CVV, Bandeira)
+                VALUES (@UsuarioId, @Tipo, @NomeTitular, @Numero, @Validade, @CVV, @Bandeira)";
+            connection.Execute(sql, cartao);
+        }
+
     }
 }
