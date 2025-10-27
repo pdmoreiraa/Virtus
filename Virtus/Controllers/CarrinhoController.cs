@@ -442,7 +442,35 @@ namespace Virtus.Controllers
             return View(carrinho); // continua usando @model Carrinho
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ConfirmarPagamentoCartao(int pedidoId)
+        {
+            var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
+            if (string.IsNullOrEmpty(usuarioIdStr))
+                return RedirectToAction("Login", "Usuario");
 
+            int usuarioId = Convert.ToInt32(usuarioIdStr);
+
+            var pedido = await _pedidoRepository.ObterPedidoPorId(pedidoId);
+            if (pedido == null)
+            {
+                TempData["Erro"] = "Pedido não encontrado.";
+                return RedirectToAction("Index");
+            }
+
+            pedido.StatusPedido = "Pago";
+            pedido.DataPagamento = DateTime.Now;
+
+            var linhas = await _pedidoRepository.AtualizarStatusPagamento(pedido);
+            if (linhas <= 0)
+            {
+                TempData["Erro"] = "Não foi possível atualizar o status do pagamento.";
+                return RedirectToAction("ConfirmarCartao", new { pedidoId });
+            }
+
+            TempData["Sucesso"] = "Pagamento confirmado com sucesso!";
+            return RedirectToAction("Index", "Home");
+        }
 
     }
 }
