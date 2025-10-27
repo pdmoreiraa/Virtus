@@ -293,5 +293,56 @@ namespace Virtus.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Pix(int pedidoId)
+        {
+            var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
+            if (string.IsNullOrEmpty(usuarioIdStr))
+            {
+                return RedirectToAction("Login", "Usuario");
+            }
+            int usuarioId = Convert.ToInt32(usuarioIdStr);
+
+            var pedido = await _pedidoRepository.ObterPedidoPorId(pedidoId);
+            if (pedido == null)
+            {
+                TempData["Erro"] = "Pedido não encontrado.";
+                return RedirectToAction("Index");
+            }
+
+            var itensCarrinho = pedido.Itens?.ToList() ?? new List<ItemPedido>();
+            decimal subtotal = itensCarrinho.Sum(i => i.PrecoUnitario * i.Quantidade);
+            decimal taxaEntrega = pedido.TaxaEntrega;
+
+            // Buscar endereços e cartões do usuário
+            var enderecos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId) ?? new List<Endereco>();
+            var cartoes = _carrinhoRepository.ObterCartoesPorUsuario(usuarioId)?.ToList() ?? new List<Cartao>();
+
+            // Montar o carrinho completo
+            var carrinho = new Carrinho
+            {
+                Itens = itensCarrinho,
+                Enderecos = enderecos,
+                Cartoes = cartoes,
+                Subtotal = subtotal,
+                TaxaEntrega = taxaEntrega,
+                NovoEndereco = new Endereco(),
+                NovoCartao = new Cartao(),
+                MetodoPagamento = "Pix",
+                CriadoEm = pedido.CriadoEm,
+                Expiracao = pedido.CriadoEm.AddMinutes(30)
+            };
+
+            // Gerar código Pix fictício
+            ViewBag.CodigoPix = $"PIX-{pedido.Id}-{Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper()}";
+
+            return View(carrinho);
+        }
+
+
+
+
+
+
     }
 }

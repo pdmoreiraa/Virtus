@@ -10,6 +10,7 @@
         public decimal TaxaEntrega { get; set; }
         public string StatusPedido { get; set; } = "Pendente";
         public DateTime CriadoEm { get; set; }
+        public DateTime Expiracao { get; set; }
 
         // Navegação
         public Usuario? Usuario { get; set; }

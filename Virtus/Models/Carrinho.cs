@@ -14,6 +14,9 @@
         public int? CartaoSelecionadoId { get; set; }       // opcional, se for Pix
         public string MetodoPagamento { get; set; } = string.Empty;
 
+        public DateTime CriadoEm { get; set; }
+        public DateTime Expiracao { get; set; }
+
         // Propriedades calculadas
         public int EnderecoId => EnderecoSelecionadoId;     // mapeia automaticamente
         public int? CartaoId => MetodoPagamento == "Cartão" ? CartaoSelecionadoId : null;
