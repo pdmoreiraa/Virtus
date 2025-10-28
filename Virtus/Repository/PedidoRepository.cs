@@ -257,6 +257,52 @@ WHERE i.PedidoId IN @PedidoIds;";
             await connection.ExecuteAsync(sql, parameters);
         }
 
+        public async Task<List<Pedido>> ObterPedidosDoUsuario(int usuarioId)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+
+            var sqlPedidos = @"
+        SELECT 
+            p.Id, p.UsuarioId, p.CriadoEm, p.ValorTotal, p.StatusPedido, p.DataPagamento,
+            p.MetodoPagamentoId,
+            m.Id AS MpId, m.Descricao
+        FROM pedidos p
+        LEFT JOIN metodosPagamento m ON p.MetodoPagamentoId = m.Id
+        WHERE p.UsuarioId = @UsuarioId
+        ORDER BY p.CriadoEm DESC";
+
+            var pedidos = await connection.QueryAsync<Pedido, MetodoPagamento, Pedido>(
+                sqlPedidos,
+                (pedido, metodoPagamento) =>
+                {
+                    pedido.MetodoPagamento = metodoPagamento ?? new MetodoPagamento { Descricao = "Desconhecido" };
+                    return pedido;
+                },
+                new { UsuarioId = usuarioId },
+                splitOn: "MpId"
+            );
+
+            var listaPedidos = pedidos.ToList();
+
+            if (listaPedidos.Count > 0)
+            {
+                var pedidoIds = listaPedidos.Select(p => p.Id).ToArray(); // <--- usa Id
+                var sqlItens = @"
+            SELECT PedidoId, Quantidade
+            FROM itensPedido
+            WHERE PedidoId IN @PedidoIds";
+
+                var itens = await connection.QueryAsync<ItemPedido>(sqlItens, new { PedidoIds = pedidoIds });
+
+                foreach (var pedido in listaPedidos)
+                {
+                    pedido.Itens = itens.Where(i => i.PedidoId == pedido.Id).ToList();
+                }
+            }
+
+            return listaPedidos;
+        }
+
 
     }
 }
