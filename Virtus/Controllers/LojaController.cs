@@ -53,5 +53,11 @@ namespace Virtus.Controllers
 
             return View(produtos);
         }
+
+        public async Task<IActionResult> Filtro()
+        {
+            var categoriasETipos = await _produtoRepository.ObterCategoriasTipos();
+            return View(categoriasETipos);
+        }
     }
 }

@@ -59,6 +59,18 @@
             </div>
 
             <div class="row mb-3">
+                <label for="Tipo" class="col-sm-4 col-form-label">Esporte</label>
+                <div class="col-sm-8">
+                    <select id="Esporte" name="Esporte" class="form-select" asp-for="Esporte">
+                        <option value='Corrida'>Corrida</option>
+                        <option value='Futebol'>Futebol</option>
+                        <option value='Vôlei'>Vôlei</option>
+                        <option value='Basquete'>Basquete</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
                 <label for="Preco" class="col-sm-4 col-form-label">Preço (R$)</label>
                 <div class="col-sm-8">
                     <input id="Preco" name="Preco" asp-for="Preco" class="form-control" type="text" placeholder="0,00" />

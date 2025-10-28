@@ -23,6 +23,10 @@ namespace Virtus.Models
         [StringLength(70)]
         public string Tipo { get; set; }
 
+        [Required(ErrorMessage = "O esporte do produto é obrigatório.")]
+        [StringLength(70)]
+        public string Esporte { get; set; }
+
         [Required(ErrorMessage = "A descrição do produto é obrigatória.")]
         public string Descricao { get; set; }
 

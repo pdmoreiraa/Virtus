@@ -10,5 +10,6 @@ namespace Virtus.Repository
         Task AdicionarProduto(Produto produto);
         Task AtualizarProduto(Produto produto);
         Task DeletarProduto(int id);
+        Task<Dictionary<string, List<string>>> ObterCategoriasTipos();
     }
 }
