@@ -1,0 +1,88 @@
+﻿@model List<Virtus.Models.Pedido>
+
+@{
+    ViewData["Title"] = "Pedidos";
+}
+
+<h3 class="text-center mb-4">Lista de Pedidos</h3>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Cliente</th>
+            <th>Unidades</th>
+            <th>Total</th>
+            <th>Método Pagamento</th>
+            <th>Status Pagamento</th>
+            <th>Status Pedido</th>
+            <th>Data</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pedido in Model)
+        {
+            // Total de unidades
+            int unidades = pedido.Itens?.Sum(i => i.Quantidade) ?? 0;
+
+            // Valor total do pedido (Itens + TaxaEntrega)
+            decimal total = (pedido.Itens?.Sum(i => i.Quantidade * i.PrecoUnitario) ?? 0) + pedido.TaxaEntrega;
+
+            // Nome do cliente
+            string nomeCliente = pedido.Usuario != null ? $"{pedido.Usuario.Nome} {pedido.Usuario.Sobrenome}" : "Desconhecido";
+
+            // Nome do método de pagamento
+            string metodoPagamento = pedido.MetodoPagamento != null ? pedido.MetodoPagamento.Nome ?? pedido.MetodoPagamento.Descricao : "Desconhecido";
+
+            // Badges de Status Pagamento
+            string statusPagamentoBadge = pedido.DataPagamento > DateTime.MinValue ? "bg-success" : "bg-warning text-dark";
+
+            // Badges de Status Pedido
+            string statusPedidoBadge = pedido.StatusPedido.ToLower() switch
+            {
+                "pendente" => "bg-warning text-dark",
+                "pago" => "bg-success",
+                "cancelado" => "bg-danger",
+                _ => "bg-secondary"
+            };
+
+            <tr>
+                <td>@pedido.Id</td>
+                <td>@nomeCliente</td>
+                <td>@unidades</td>
+                <td>@total.ToString("C")</td>
+                <td>@metodoPagamento</td>
+                <td>
+                    <span class="badge rounded-pill @statusPagamentoBadge">
+                        @(pedido.DataPagamento > DateTime.MinValue ? "Pago" : "Pendente")
+                    </span>
+                </td>
+                <td><span class="badge rounded-pill @statusPedidoBadge">@pedido.StatusPedido</span></td>
+                <td>@pedido.CriadoEm.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <a class="btn btn-primary btn-sm" asp-controller="AdminPedido" asp-action="Detalhes" asp-route-id="@pedido.Id">Detalhes</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+
+
+
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            string active = "";
+            if (i == ViewBag.PageIndex) active = "active";
+
+            <li class="page-item @active">
+                <a class="page-link" asp-route-pageIndex=@i>@i</a>
+            </li>
+        }
+    </ul>
+</nav>

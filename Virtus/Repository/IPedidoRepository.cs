@@ -8,6 +8,7 @@ namespace Virtus.Repository
         Task<Pedido?> ObterPedidoPorId(int pedidoId);
         Task<List<Pedido>> ObterPedidosPorUsuario(int usuarioId);
         Task<int> AtualizarStatusPagamento(Pedido pedido);
+        Task<List<Pedido>> ObterTodosPedidos();
     }
 
 }

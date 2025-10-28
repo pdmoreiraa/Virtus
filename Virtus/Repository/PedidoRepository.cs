@@ -113,5 +113,71 @@ namespace Virtus.Repository
             return pedidos.ToList();
         }
 
+
+        public async Task<List<Pedido>> ObterTodosPedidos()
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            // 🔹 Obter todos os pedidos com joins para Usuario, Endereco, MetodoPagamento e Cartao
+            var sqlPedidos = @"
+        SELECT 
+            p.*, 
+            u.Id, u.Nome, u.Sobrenome, u.Email, u.CPF, u.Telefone, u.Tipo,
+            e.Id, e.NomeCompleto, e.Logradouro, e.Numero, e.Bairro, e.Cidade, e.Estado, e.CEP, e.Complemento,
+            m.Id, m.Descricao AS Nome,
+            c.Id, c.NomeTitular, c.Numero AS NumeroCartao, c.Bandeira, c.Validade, c.Tipo AS TipoCartao
+        FROM pedidos p
+        LEFT JOIN usuarios u ON p.UsuarioId = u.Id
+        LEFT JOIN enderecos e ON p.EnderecoId = e.Id
+        LEFT JOIN metodosPagamento m ON p.MetodoPagamentoId = m.Id
+        LEFT JOIN cartoes c ON p.CartaoId = c.Id
+        ORDER BY p.CriadoEm DESC;";
+
+            // 🔹 Mapear pedidos e objetos de navegação
+            var pedidos = (await connection.QueryAsync<Pedido, Usuario, Endereco, MetodoPagamento, Cartao, Pedido>(
+                sqlPedidos,
+                (pedido, usuario, endereco, metodoPagamento, cartao) =>
+                {
+                    pedido.Usuario = usuario;
+                    pedido.Endereco = endereco;
+                    pedido.MetodoPagamento = metodoPagamento;
+                    pedido.Cartao = cartao;
+                    return pedido;
+                },
+                splitOn: "Id,Id,Id,Id" // Cada "Id" indica o início da próxima entidade no SELECT
+            )).ToList();
+
+            if (!pedidos.Any())
+                return pedidos;
+
+            // 🔹 Obter todos os itens de todos os pedidos
+            var sqlItens = @"
+        SELECT i.*, p.Id AS ProdutoId, p.Nome, p.Marca, p.Categoria, p.Tipo, p.Descricao, p.Preco, p.ImageUrl, p.Estoque, p.DataCriada
+        FROM itensPedido i
+        INNER JOIN produtos p ON i.ProdutoId = p.Id
+        WHERE i.PedidoId IN @PedidoIds;";
+
+            var itens = await connection.QueryAsync<ItemPedido, Produto, ItemPedido>(
+                sqlItens,
+                (item, produto) =>
+                {
+                    item.Produto = produto;
+                    return item;
+                },
+                new { PedidoIds = pedidos.Select(p => p.Id).ToArray() },
+                splitOn: "ProdutoId" // Indica onde começa o Produto no SELECT
+            );
+
+            // 🔹 Associar os itens aos pedidos correspondentes
+            foreach (var pedido in pedidos)
+            {
+                pedido.Itens = itens.Where(i => i.PedidoId == pedido.Id).ToList();
+            }
+
+            return pedidos;
+        }
+
+
     }
 }
