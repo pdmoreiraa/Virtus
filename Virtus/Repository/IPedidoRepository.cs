@@ -10,6 +10,7 @@ namespace Virtus.Repository
         Task<int> AtualizarStatusPagamento(Pedido pedido);
         Task<List<Pedido>> ObterTodosPedidos();
         Task<Pedido?> ObterPedidoPorIdAdm(int pedidoId);
+        Task AtualizarStatus(int pedidoId, string statusPedido);
     }
 
 }

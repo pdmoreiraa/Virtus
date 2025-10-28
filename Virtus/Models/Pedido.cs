@@ -8,7 +8,8 @@
         public int? MetodoPagamentoId { get; set; }
         public int? CartaoId { get; set; }
         public decimal TaxaEntrega { get; set; }
-        public string StatusPedido { get; set; } = "Pendente";
+        public string StatusPagamento { get; set; } = "Aguardando Pagamento";
+        public string StatusPedido { get; set; } = "Criado";
         public decimal ValorTotal { get; set; }
         public DateTime CriadoEm { get; set; }
         public DateTime DataPagamento { get; set; }

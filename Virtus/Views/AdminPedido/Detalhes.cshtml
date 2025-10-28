@@ -3,13 +3,13 @@
 @{
     // Badge cores
     string paymentBadgeColor = "bg-danger";
-    if (Model.StatusPedido == "Pendente") paymentBadgeColor = "bg-warning text-dark";
-    else if (Model.StatusPedido == "Pago") paymentBadgeColor = "bg-success";
-    else if (Model.StatusPedido == "Cancelado") paymentBadgeColor = "bg-secondary";
+    if (Model.StatusPagamento == "Pendente") paymentBadgeColor = "bg-warning text-dark";
+    else if (Model.StatusPagamento == "Pago") paymentBadgeColor = "bg-success";
+    else if (Model.StatusPagamento == "Cancelado") paymentBadgeColor = "bg-secondary";
 
     string orderBadgeColor = "bg-danger";
-    if (Model.StatusPedido == "Pendente") orderBadgeColor = "bg-warning text-dark";
-    else if (Model.StatusPedido == "Pago") orderBadgeColor = "bg-success";
+    if (Model.StatusPedido == "Criado") orderBadgeColor = "bg-warning text-dark";
+    else if (Model.StatusPedido == "Aceito") orderBadgeColor = "bg-success";
     else if (Model.StatusPedido == "Cancelado") orderBadgeColor = "bg-secondary";
 }
 
@@ -44,7 +44,18 @@
             <div class="row mb-2 pb-2 border-bottom">
                 <div class="col">Status do Pagamento</div>
                 <div class="col">
-                    <span class="badge rounded-pill @paymentBadgeColor">@Model.StatusPedido</span>
+                    <span class="badge rounded-pill @paymentBadgeColor">@Model.StatusPagamento</span>
+                </div>
+            </div>
+
+            <div class="row mb-2 pb-2 border-bottom">
+                <div class="col">Status do Pagamento</div>
+                <div class="col">
+                    <span class="badge rounded-pill @orderBadgeColor">@Model.StatusPedido</span>
+                    <a href="#" class="ms-2 editar-status" data-bs-toggle="modal" data-bs-target="#StatusPedidoModal" data-id="@Model.Id" 
+                       data-status="@Model.StatusPedido">
+                        Editar
+                    </a>
                 </div>
             </div>
 
@@ -112,17 +123,27 @@
     </tbody>
 </table>
 
-<div class="ms-auto mb-3" style="width: 250px">
-    <div class="row">
-        <div class="col fw-bold">Subtotal:</div>
-        <div class="col text-end">@subtotal.ToString("F2")</div>
-    </div>
-    <div class="row">
-        <div class="col fw-bold">Taxa de Entrega:</div>
-        <div class="col text-end">@Model.TaxaEntrega.ToString("F2")</div>
-    </div>
-    <div class="row">
-        <div class="col fw-bold">Total:</div>
-        <div class="col text-end">@Model.ValorTotal.ToString("F2")</div>
+<div class="modal fade" id="StatusPedidoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Atualizar Status do Pedido</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <form method="post" asp-controller="AdminPedido" asp-action="Editar">
+                <input type="hidden" name="id" id="pedidoId" value="@Model.Id" />
+                <select name="status_Pedido" id="status_Pedido" class="form-select">
+                    <option value="Criado">Criado</option>
+                    <option value="Aceito">Aceito</option>
+                    <option value="Cancelado">Cancelado</option>
+                </select>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

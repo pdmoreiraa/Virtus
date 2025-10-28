@@ -64,6 +64,27 @@ namespace Virtus.Controllers
             return View(pedido);
         }
 
+        // POST para salvar as alterações
+        [HttpPost]
+        public async Task<IActionResult> Editar(int id, string? status_Pedido)
+        {
+            var pedido = await _pedidoRepository.ObterPedidoPorIdAdm(id);
 
+            if (pedido == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Atualiza somente os campos enviados
+            if (!string.IsNullOrEmpty(status_Pedido))
+            {
+                await _pedidoRepository.AtualizarStatus(id, status_Pedido);
+            }
+
+            // Redireciona para detalhes
+            return RedirectToAction("Detalhes", new { id });
+        }
     }
+
+
 }

@@ -286,7 +286,7 @@ namespace Virtus.Controllers
                 CartaoId = cartaoIdFinal,
                 TaxaEntrega = taxaEntrega,
                 ValorTotal = valorTotal,
-                StatusPedido = "Aguardando Pagamento",
+                StatusPagamento = "Aguardando Pagamento",
                 CriadoEm = DateTime.Now,
                 Itens = itensCarrinho
             };
@@ -298,7 +298,7 @@ namespace Virtus.Controllers
 
                 // Limpar carrinho após finalizar pedido
                 AuxiliarCarrinho.SalvarCarrinho(Response, new Dictionary<int, int>());
-                Console.WriteLine($"✅ Pedido criado com ID: {pedidoId}");
+                Console.WriteLine($"Pedido criado com ID: {pedidoId}");
 
                 // Redirecionar para a tela correta de pagamento
                 if (MetodoPagamento == "Pix")
@@ -389,7 +389,7 @@ namespace Virtus.Controllers
                 }
 
                 // Atualizar status e data do pagamento
-                pedido.StatusPedido = "Pago";
+                pedido.StatusPagamento = "Pago";
                 pedido.DataPagamento = DateTime.Now;
 
                 var linhas = await _pedidoRepository.AtualizarStatusPagamento(pedido);
@@ -458,7 +458,7 @@ namespace Virtus.Controllers
                 return RedirectToAction("Index");
             }
 
-            pedido.StatusPedido = "Pago";
+            pedido.StatusPagamento = "Pago";
             pedido.DataPagamento = DateTime.Now;
 
             var linhas = await _pedidoRepository.AtualizarStatusPagamento(pedido);

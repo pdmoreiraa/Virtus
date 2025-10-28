@@ -43,8 +43,8 @@
             // Badges de Status Pedido
             string statusPedidoBadge = pedido.StatusPedido.ToLower() switch
             {
-                "pendente" => "bg-warning text-dark",
-                "pago" => "bg-success",
+                "Criado" => "bg-warning text-dark",
+                "Aceito" => "bg-success",
                 "cancelado" => "bg-danger",
                 _ => "bg-secondary"
             };

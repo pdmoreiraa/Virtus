@@ -18,26 +18,26 @@ namespace Virtus.Repository
             using var connection = new MySqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            // 1️⃣ Inserir o pedido
+            // Inserir o pedido
             var sqlInsert = @"
-        INSERT INTO pedidos (UsuarioId, EnderecoId, MetodoPagamentoId, CartaoId, TaxaEntrega, StatusPedido, CriadoEm, ValorTotal)
-        VALUES (@UsuarioId, @EnderecoId, @MetodoPagamentoId, @CartaoId, @TaxaEntrega, @StatusPedido, @CriadoEm, @ValorTotal);
+        INSERT INTO pedidos (UsuarioId, EnderecoId, MetodoPagamentoId, CartaoId, TaxaEntrega, StatusPagamento, StatusPedido, CriadoEm, ValorTotal)
+        VALUES (@UsuarioId, @EnderecoId, @MetodoPagamentoId, @CartaoId, @TaxaEntrega, @StatusPagamento, @StatusPedido, @CriadoEm, @ValorTotal);
     ";
 
 
             await connection.ExecuteAsync(sqlInsert, pedido);
 
-            // 2️⃣ Obter o ID gerado
+            // Obter o ID gerado
             int pedidoId = await connection.ExecuteScalarAsync<int>("SELECT LAST_INSERT_ID();");
 
             pedido.Id = pedidoId;
 
-            // 3️⃣ Inserir itens
+            // Inserir itens
             const string sqlItem = @"
         INSERT INTO itensPedido (PedidoId, ProdutoId, Quantidade, PrecoUnitario)
         VALUES (@PedidoId, @ProdutoId, @Quantidade, @PrecoUnitario);
     ";
-            Console.WriteLine($"🟢 ID gerado (pedidoId): {pedidoId}");
+            Console.WriteLine($"ID gerado (pedidoId): {pedidoId}");
 
             foreach (var item in pedido.Itens)
             {
@@ -58,16 +58,16 @@ namespace Virtus.Repository
         {
             using var connection = new MySqlConnection(_connectionString);
 
-            // 🔹 Buscar pedido pelo Id
+            // Buscar pedido pelo Id
             var sqlPedido = "SELECT * FROM pedidos WHERE Id = @Id";
             var pedido = await connection.QueryFirstOrDefaultAsync<Pedido>(
                 sqlPedido,
-                new { Id = pedidoId }  // ✅ o nome do parâmetro deve coincidir com o @Id
+                new { Id = pedidoId }  // o nome do parâmetro deve coincidir com o @Id
             );
 
             if (pedido != null)
             {
-                // 🔹 Buscar itens do pedido junto com os produtos
+                // Buscar itens do pedido junto com os produtos
                 var sqlItens = @"
             SELECT i.*, p.*
             FROM itensPedido i
@@ -78,7 +78,7 @@ namespace Virtus.Repository
                 var itens = await connection.QueryAsync<ItemPedido, Produto, ItemPedido>(
                     sqlItens,
                     (item, produto) => { item.Produto = produto; return item; },
-                    new { PedidoId = pedidoId }  // ✅ aqui o nome deve coincidir com @PedidoId
+                    new { PedidoId = pedidoId } 
                 );
 
                 pedido.Itens = itens.ToList();
@@ -93,11 +93,11 @@ namespace Virtus.Repository
 
             string sql = @"
         UPDATE pedidos 
-        SET StatusPedido = @StatusPedido, DataPagamento = @DataPagamento 
+        SET StatusPagamento = @StatusPagamento, DataPagamento = @DataPagamento 
         WHERE Id = @Id
     ";
 
-            return await connection.ExecuteAsync(sql, new { pedido.StatusPedido, pedido.DataPagamento, pedido.Id });
+            return await connection.ExecuteAsync(sql, new { pedido.StatusPagamento, pedido.DataPagamento, pedido.Id });
         }
 
 
@@ -122,7 +122,7 @@ namespace Virtus.Repository
             var sqlPedidos = @"
 SELECT 
     p.Id, p.UsuarioId, p.EnderecoId, p.MetodoPagamentoId, p.CartaoId, 
-    p.TaxaEntrega, p.StatusPedido, p.CriadoEm, p.DataPagamento, p.ValorTotal,
+    p.TaxaEntrega, p.StatusPagamento, p.StatusPedido, p.CriadoEm, p.DataPagamento, p.ValorTotal,
     u.Id, u.Nome, u.Sobrenome, u.Email, u.CPF, u.Telefone, u.Tipo,
     e.Id, e.NomeCompleto, e.Logradouro, e.Numero, e.Bairro, e.Cidade, e.Estado, e.CEP, e.Complemento,
     m.Id, m.Descricao,
@@ -185,7 +185,7 @@ WHERE i.PedidoId IN @PedidoIds;";
             var sql = @"
     SELECT 
         p.Id, p.UsuarioId, p.EnderecoId, p.MetodoPagamentoId, p.CartaoId,
-        p.ValorTotal, p.TaxaEntrega, p.StatusPedido, p.CriadoEm, p.DataPagamento,
+        p.ValorTotal, p.TaxaEntrega, p.StatusPagamento, p.StatusPedido, p.CriadoEm, p.DataPagamento,
         u.Id AS UsuarioId, u.Nome, u.Sobrenome, u.Email, u.Telefone,
         e.Id AS EnderecoId, e.NomeCompleto, e.Logradouro, e.Numero, e.Bairro, e.Cidade, e.Estado, e.CEP, e.Complemento,
         m.Id AS MetodoPagamentoId, m.Descricao,
@@ -246,6 +246,17 @@ WHERE i.PedidoId IN @PedidoIds;";
 
             return pedidoResult;
         }
+
+        public async Task AtualizarStatus(int pedidoId, string statusPedido)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+
+            var sql = "UPDATE pedidos SET StatusPedido = @StatusPedido WHERE Id = @Id";
+            var parameters = new { Id = pedidoId, StatusPedido = statusPedido };
+
+            await connection.ExecuteAsync(sql, parameters);
+        }
+
 
     }
 }
