@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Pedidos";
+
+    int pagIndex = (int)ViewData["PagIndex"];
+    int totalPag = (int)ViewData["TotalPag"];
 }
 
 <h3 class="text-center mb-4">Lista de Pedidos</h3>
@@ -33,7 +36,7 @@
             string nomeCliente = pedido.Usuario != null ? $"{pedido.Usuario.Nome} {pedido.Usuario.Sobrenome}" : "Desconhecido";
 
             // Nome do método de pagamento
-            string metodoPagamento = pedido.MetodoPagamento != null ? pedido.MetodoPagamento.Nome ?? pedido.MetodoPagamento.Descricao : "Desconhecido";
+            string metodoPagamento = pedido.MetodoPagamento != null ? pedido.MetodoPagamento.Descricao : "Desconhecido";
 
             // Badges de Status Pagamento
             string statusPagamentoBadge = pedido.DataPagamento > DateTime.MinValue ? "bg-success" : "bg-warning text-dark";
@@ -68,20 +71,13 @@
     </tbody>
 </table>
 
-
-
-
-
-
 <nav>
     <ul class="pagination">
-        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        @for (int i = 1; i <= totalPag; i++)
         {
-            string active = "";
-            if (i == ViewBag.PageIndex) active = "active";
-
-            <li class="page-item @active">
-                <a class="page-link" asp-route-pageIndex=@i>@i</a>
+            string ativo = i == pagIndex ? "active" : "";
+            <li class="page-item @ativo">
+                <a class="page-link" href="?pagIndex=@i">@i</a>
             </li>
         }
     </ul>

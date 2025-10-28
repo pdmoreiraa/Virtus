@@ -7,10 +7,10 @@ namespace Virtus.Controllers
     public class LojaController : Controller
     {
 
-        private readonly ProdutoRepository _produtoRepository;
+        private readonly IProdutoRepository _produtoRepository;
         private readonly int pagTam = 8;
 
-        public LojaController(ProdutoRepository produtoRepository)
+        public LojaController(IProdutoRepository produtoRepository)
         {
             _produtoRepository = produtoRepository;
         }
