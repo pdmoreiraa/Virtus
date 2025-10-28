@@ -30,7 +30,6 @@
             int unidades = pedido.Itens?.Sum(i => i.Quantidade) ?? 0;
 
             // Valor total do pedido (Itens + TaxaEntrega)
-            decimal total = (pedido.Itens?.Sum(i => i.Quantidade * i.PrecoUnitario) ?? 0) + pedido.TaxaEntrega;
 
             // Nome do cliente
             string nomeCliente = pedido.Usuario != null ? $"{pedido.Usuario.Nome} {pedido.Usuario.Sobrenome}" : "Desconhecido";
@@ -54,7 +53,7 @@
                 <td>@pedido.Id</td>
                 <td>@nomeCliente</td>
                 <td>@unidades</td>
-                <td>@total.ToString("C")</td>
+                <td>@pedido.ValorTotal.ToString("F2")</td>
                 <td>@metodoPagamento</td>
                 <td>
                     <span class="badge rounded-pill @statusPagamentoBadge">

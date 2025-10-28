@@ -99,7 +99,8 @@
                     decimal itemTotal = item.PrecoUnitario * item.Quantidade;
                     subtotal += itemTotal;
                     <tr>
-                        <td>@item.Produto.Nome</td>
+                        <td><img src="@item.Produto.ImageUrl" width="100" />
+                        @item.Produto.Nome</td>
                         <td>@item.Produto.Categoria</td>
                         <td>@item.Quantidade</td>
                         <td>@item.PrecoUnitario.ToString("F2")</td>
@@ -122,6 +123,6 @@
     </div>
     <div class="row">
         <div class="col fw-bold">Total:</div>
-        <div class="col text-end">@((subtotal + Model.TaxaEntrega).ToString("F2"))</div>
+        <div class="col text-end">@Model.ValorTotal.ToString("F2")</div>
     </div>
 </div>

@@ -119,22 +119,21 @@ namespace Virtus.Repository
             using var connection = new MySqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            // 🔹 Obter todos os pedidos com joins para Usuario, Endereco, MetodoPagamento e Cartao
             var sqlPedidos = @"
-        SELECT 
-            p.*, 
-            u.Id, u.Nome, u.Sobrenome, u.Email, u.CPF, u.Telefone, u.Tipo,
-            e.Id, e.NomeCompleto, e.Logradouro, e.Numero, e.Bairro, e.Cidade, e.Estado, e.CEP, e.Complemento,
-            m.Id, m.Descricao AS Nome,
-            c.Id, c.NomeTitular, c.Numero AS NumeroCartao, c.Bandeira, c.Validade, c.Tipo AS TipoCartao
-        FROM pedidos p
-        LEFT JOIN usuarios u ON p.UsuarioId = u.Id
-        LEFT JOIN enderecos e ON p.EnderecoId = e.Id
-        LEFT JOIN metodosPagamento m ON p.MetodoPagamentoId = m.Id
-        LEFT JOIN cartoes c ON p.CartaoId = c.Id
-        ORDER BY p.CriadoEm DESC;";
+SELECT 
+    p.Id, p.UsuarioId, p.EnderecoId, p.MetodoPagamentoId, p.CartaoId, 
+    p.TaxaEntrega, p.StatusPedido, p.CriadoEm, p.DataPagamento, p.ValorTotal,
+    u.Id, u.Nome, u.Sobrenome, u.Email, u.CPF, u.Telefone, u.Tipo,
+    e.Id, e.NomeCompleto, e.Logradouro, e.Numero, e.Bairro, e.Cidade, e.Estado, e.CEP, e.Complemento,
+    m.Id, m.Descricao,
+    c.Id, c.NomeTitular, c.Numero, c.Bandeira, c.Validade, c.Tipo
+FROM pedidos p
+LEFT JOIN usuarios u ON p.UsuarioId = u.Id
+LEFT JOIN enderecos e ON p.EnderecoId = e.Id
+LEFT JOIN metodosPagamento m ON p.MetodoPagamentoId = m.Id
+LEFT JOIN cartoes c ON p.CartaoId = c.Id
+ORDER BY p.CriadoEm DESC;";
 
-            // 🔹 Mapear pedidos e objetos de navegação
             var pedidos = (await connection.QueryAsync<Pedido, Usuario, Endereco, MetodoPagamento, Cartao, Pedido>(
                 sqlPedidos,
                 (pedido, usuario, endereco, metodoPagamento, cartao) =>
@@ -145,18 +144,17 @@ namespace Virtus.Repository
                     pedido.Cartao = cartao;
                     return pedido;
                 },
-                splitOn: "Id,Id,Id,Id" // Cada "Id" indica o início da próxima entidade no SELECT
+                splitOn: "Id,Id,Id,Id"
             )).ToList();
 
-            if (!pedidos.Any())
-                return pedidos;
+            if (!pedidos.Any()) return pedidos;
 
-            // 🔹 Obter todos os itens de todos os pedidos
+            // Obter itens e produtos
             var sqlItens = @"
-        SELECT i.*, p.Id AS ProdutoId, p.Nome, p.Marca, p.Categoria, p.Tipo, p.Descricao, p.Preco, p.ImageUrl, p.Estoque, p.DataCriada
-        FROM itensPedido i
-        INNER JOIN produtos p ON i.ProdutoId = p.Id
-        WHERE i.PedidoId IN @PedidoIds;";
+SELECT i.*, p.Id AS ProdutoId, p.Nome, p.Marca, p.Categoria, p.Tipo, p.Descricao, p.Preco, p.ImageUrl, p.Estoque, p.DataCriada
+FROM itensPedido i
+INNER JOIN produtos p ON i.ProdutoId = p.Id
+WHERE i.PedidoId IN @PedidoIds;";
 
             var itens = await connection.QueryAsync<ItemPedido, Produto, ItemPedido>(
                 sqlItens,
@@ -166,10 +164,9 @@ namespace Virtus.Repository
                     return item;
                 },
                 new { PedidoIds = pedidos.Select(p => p.Id).ToArray() },
-                splitOn: "ProdutoId" // Indica onde começa o Produto no SELECT
+                splitOn: "ProdutoId"
             );
 
-            // 🔹 Associar os itens aos pedidos correspondentes
             foreach (var pedido in pedidos)
             {
                 pedido.Itens = itens.Where(i => i.PedidoId == pedido.Id).ToList();
@@ -178,34 +175,41 @@ namespace Virtus.Repository
             return pedidos;
         }
 
+
+
+
         public async Task<Pedido?> ObterPedidoPorIdAdm(int pedidoId)
         {
             using var connection = new MySqlConnection(_connectionString);
 
             var sql = @"
-        SELECT 
-            p.Id, p.UsuarioId, p.EnderecoId, p.MetodoPagamentoId, p.CartaoId, p.TaxaEntrega, p.StatusPedido, p.CriadoEm, p.DataPagamento,
-            u.Id as UsuarioId, u.Nome, u.Sobrenome, u.Email, u.Telefone,
-            e.Id as EnderecoId, e.NomeCompleto, e.Logradouro, e.Numero, e.Bairro, e.Cidade, e.Estado, e.CEP, e.Complemento,
-            m.Id as MetodoPagamentoId, m.Descricao
-        FROM pedidos p
-        LEFT JOIN usuarios u ON p.UsuarioId = u.Id
-        LEFT JOIN enderecos e ON p.EnderecoId = e.Id
-        LEFT JOIN metodosPagamento m ON p.MetodoPagamentoId = m.Id
-        WHERE p.Id = @PedidoId;
-    ";
+    SELECT 
+        p.Id, p.UsuarioId, p.EnderecoId, p.MetodoPagamentoId, p.CartaoId,
+        p.ValorTotal, p.TaxaEntrega, p.StatusPedido, p.CriadoEm, p.DataPagamento,
+        u.Id AS UsuarioId, u.Nome, u.Sobrenome, u.Email, u.Telefone,
+        e.Id AS EnderecoId, e.NomeCompleto, e.Logradouro, e.Numero, e.Bairro, e.Cidade, e.Estado, e.CEP, e.Complemento,
+        m.Id AS MetodoPagamentoId, m.Descricao,
+        c.Id AS CartaoId, c.NomeTitular, c.Numero AS NumeroCartao, c.Bandeira, c.Validade, c.Tipo AS TipoCartao
+    FROM pedidos p
+    LEFT JOIN usuarios u ON p.UsuarioId = u.Id
+    LEFT JOIN enderecos e ON p.EnderecoId = e.Id
+    LEFT JOIN metodosPagamento m ON p.MetodoPagamentoId = m.Id
+    LEFT JOIN cartoes c ON p.CartaoId = c.Id
+    WHERE p.Id = @PedidoId;
+";
 
-            var pedido = await connection.QueryAsync<Pedido, Usuario, Endereco, MetodoPagamento, Pedido>(
+            var pedido = await connection.QueryAsync<Pedido, Usuario, Endereco, MetodoPagamento, Cartao, Pedido>(
                 sql,
-                (p, u, e, m) =>
+                (p, u, e, m, c) =>
                 {
                     p.Usuario = u ?? new Usuario { Nome = "Desconhecido", Sobrenome = "" };
                     p.Endereco = e ?? new Endereco { NomeCompleto = "Desconhecido" };
                     p.MetodoPagamento = m ?? new MetodoPagamento { Descricao = "Desconhecido" };
+                    p.Cartao = c; // pode ser null
                     return p;
                 },
                 new { PedidoId = pedidoId },
-                splitOn: "UsuarioId,EnderecoId,MetodoPagamentoId"
+                splitOn: "UsuarioId,EnderecoId,MetodoPagamentoId,CartaoId"
             );
 
             var pedidoResult = pedido.FirstOrDefault();
@@ -214,10 +218,10 @@ namespace Virtus.Repository
             {
                 // Carregar itens e produtos
                 var sqlItens = @"
-            SELECT i.*, pr.*
-            FROM itensPedido i
-            INNER JOIN produtos pr ON i.ProdutoId = pr.Id
-            WHERE i.PedidoId = @PedidoId;
+        SELECT i.*, pr.*
+        FROM itensPedido i
+        INNER JOIN produtos pr ON i.ProdutoId = pr.Id
+        WHERE i.PedidoId = @PedidoId;
         ";
 
                 var itens = await connection.QueryAsync<ItemPedido, Produto, ItemPedido>(
@@ -232,9 +236,16 @@ namespace Virtus.Repository
                 );
 
                 pedidoResult.Itens = itens.ToList();
+
+                // Garantir ValorTotal consistente caso precise recalcular
+                if (pedidoResult.ValorTotal == 0 && pedidoResult.Itens.Any())
+                {
+                    pedidoResult.ValorTotal = pedidoResult.Itens.Sum(x => x.Quantidade * x.PrecoUnitario) + pedidoResult.TaxaEntrega;
+                }
             }
 
             return pedidoResult;
         }
+
     }
 }
