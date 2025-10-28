@@ -41,5 +41,29 @@ namespace Virtus.Controllers
             ViewData["TotalPag"] = totalPag;
             return View(pedidosPaginados);
         }
+        public async Task<IActionResult> Detalhes(int id)
+        {
+            // Obter o pedido pelo Id com itens e produtos
+            var pedido = await _pedidoRepository.ObterPedidoPorIdAdm(id);
+
+            if (pedido == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            // Contar todos os pedidos do mesmo usuário
+            int numPedidos = 0;
+            if (pedido.UsuarioId > 0)
+            {
+                var pedidosDoUsuario = await _pedidoRepository.ObterPedidosPorUsuario(pedido.UsuarioId);
+                numPedidos = pedidosDoUsuario.Count;
+            }
+
+            ViewBag.NumPedidos = numPedidos;
+
+            return View(pedido);
+        }
+
+
     }
 }

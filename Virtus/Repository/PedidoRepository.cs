@@ -178,6 +178,63 @@ namespace Virtus.Repository
             return pedidos;
         }
 
+        public async Task<Pedido?> ObterPedidoPorIdAdm(int pedidoId)
+        {
+            using var connection = new MySqlConnection(_connectionString);
 
+            var sql = @"
+        SELECT 
+            p.Id, p.UsuarioId, p.EnderecoId, p.MetodoPagamentoId, p.CartaoId, p.TaxaEntrega, p.StatusPedido, p.CriadoEm, p.DataPagamento,
+            u.Id as UsuarioId, u.Nome, u.Sobrenome, u.Email, u.Telefone,
+            e.Id as EnderecoId, e.NomeCompleto, e.Logradouro, e.Numero, e.Bairro, e.Cidade, e.Estado, e.CEP, e.Complemento,
+            m.Id as MetodoPagamentoId, m.Descricao
+        FROM pedidos p
+        LEFT JOIN usuarios u ON p.UsuarioId = u.Id
+        LEFT JOIN enderecos e ON p.EnderecoId = e.Id
+        LEFT JOIN metodosPagamento m ON p.MetodoPagamentoId = m.Id
+        WHERE p.Id = @PedidoId;
+    ";
+
+            var pedido = await connection.QueryAsync<Pedido, Usuario, Endereco, MetodoPagamento, Pedido>(
+                sql,
+                (p, u, e, m) =>
+                {
+                    p.Usuario = u ?? new Usuario { Nome = "Desconhecido", Sobrenome = "" };
+                    p.Endereco = e ?? new Endereco { NomeCompleto = "Desconhecido" };
+                    p.MetodoPagamento = m ?? new MetodoPagamento { Descricao = "Desconhecido" };
+                    return p;
+                },
+                new { PedidoId = pedidoId },
+                splitOn: "UsuarioId,EnderecoId,MetodoPagamentoId"
+            );
+
+            var pedidoResult = pedido.FirstOrDefault();
+
+            if (pedidoResult != null)
+            {
+                // Carregar itens e produtos
+                var sqlItens = @"
+            SELECT i.*, pr.*
+            FROM itensPedido i
+            INNER JOIN produtos pr ON i.ProdutoId = pr.Id
+            WHERE i.PedidoId = @PedidoId;
+        ";
+
+                var itens = await connection.QueryAsync<ItemPedido, Produto, ItemPedido>(
+                    sqlItens,
+                    (i, pr) =>
+                    {
+                        i.Produto = pr ?? new Produto { Nome = "Desconhecido", Categoria = "Desconhecido" };
+                        return i;
+                    },
+                    new { PedidoId = pedidoId },
+                    splitOn: "Id"
+                );
+
+                pedidoResult.Itens = itens.ToList();
+            }
+
+            return pedidoResult;
+        }
     }
 }
