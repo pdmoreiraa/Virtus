@@ -56,5 +56,19 @@ namespace Virtus.Controllers
                 return View(new List<Pedido>());
             }
         }
+
+        public async Task<IActionResult> Detalhes(int id)
+        {
+            // Obter o pedido pelo Id com itens e produtos
+            var pedido = await _pedidoRepository.ObterPedidoPorIdAdm(id);
+
+            if (pedido == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(pedido);
+        }
+
     }
 }
