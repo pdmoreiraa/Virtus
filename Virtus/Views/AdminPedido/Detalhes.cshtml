@@ -110,7 +110,8 @@
                     decimal itemTotal = item.PrecoUnitario * item.Quantidade;
                     subtotal += itemTotal;
                     <tr>
-                        <td><img src="@item.Produto.ImageUrl" width="100" />
+                        <td>
+                            <img src="@Url.Content("~/img/" + Model.Imagens.FirstOrDefault()?.Url)" width="100" />
                         @item.Produto.Nome</td>
                         <td>@item.Produto.Categoria</td>
                         <td>@item.Quantidade</td>

@@ -83,7 +83,7 @@
                     subtotal += itemTotal;
                     <tr>
                         <td>
-                            <img src="@item.Produto.ImageUrl" width="100" />
+                                <img src="@Url.Content("~/img/" + Model.Imagens.FirstOrDefault()?.Url)" width="100" />
                             @item.Produto.Nome
                         </td>
                         <td>@item.Produto.Categoria</td>

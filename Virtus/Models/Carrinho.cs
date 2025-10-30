@@ -8,6 +8,7 @@
 
         public Endereco NovoEndereco { get; set; } = new Endereco();
         public Cartao NovoCartao { get; set; } = new Cartao();
+        public List<ProdutoImagem> Imagens { get; set; } = new List<ProdutoImagem>();
 
         // Id selecionados no form
         public int EnderecoSelecionadoId { get; set; }       // obrigatório

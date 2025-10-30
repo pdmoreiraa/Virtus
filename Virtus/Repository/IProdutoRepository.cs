@@ -1,15 +1,19 @@
-﻿using Virtus.Models;
+﻿using System.Threading.Tasks;
+using Virtus.Models;
 
 namespace Virtus.Repository
 {
     public interface IProdutoRepository
     {
-        Task<IEnumerable<Produto>> TodosProdutos();
-        Task<IEnumerable<Produto>> ProdutosOrdenados();
+        Task<List<Produto>> TodosProdutos();
+        Task<List<Produto>> ProdutosOrdenados();
         Task<Produto?> ProdutosPorId(int id);
-        Task AdicionarProduto(Produto produto);
+        Task<int> AdicionarProduto(Produto produto);
         Task AtualizarProduto(Produto produto);
         Task DeletarProduto(int id);
+        Task DeletarImagem(int imagemId);
+        Task<ProdutoImagem?> ImagemPorId(int id);
         Task<Dictionary<string, List<string>>> ObterCategoriasTipos();
+
     }
 }

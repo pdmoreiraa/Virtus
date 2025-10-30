@@ -21,5 +21,6 @@
         public MetodoPagamento? MetodoPagamento { get; set; }
         public Cartao? Cartao { get; set; }
         public List<ItemPedido>? Itens { get; set; }
+        public List<ProdutoImagem> Imagens { get; set; } = new List<ProdutoImagem>();
     }
 }

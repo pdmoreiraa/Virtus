@@ -20,7 +20,7 @@
                 {
                     <tr>
                         <td>
-                            <img src="@item.Produto.ImageUrl" width="100" class="rounded" alt="@item.Produto.Nome">
+                            <img src="@Url.Content("~/img/" + item.Imagem?.Url)" width="100" class="rounded" alt="@item.Produto.Nome">
                         </td>
                         <td>
                             <h4>@item.Produto.Nome</h4>

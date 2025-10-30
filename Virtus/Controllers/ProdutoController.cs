@@ -17,6 +17,7 @@ namespace Virtus.Controllers
         {
             _produtoRepository = produtoRepository;
         }
+
         public async Task<IActionResult> Index(int pagIndex, string? buscar = null, string? coluna = "Id", string? ordPor = "desc")
         {
             var produtos = await _produtoRepository.ProdutosOrdenados();
@@ -85,104 +86,120 @@ namespace Virtus.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Criar(Produto produto, IFormFile imagemArquivo)
+        public async Task<IActionResult> Criar(Produto produto, IFormFile[] imagensArquivo)
         {
             if (!ModelState.IsValid)
                 return View(produto);
 
-            if (imagemArquivo == null || imagemArquivo.Length == 0)
-                ModelState.AddModelError("ImageUrl", "A imagem é obrigatória.");
-
-
-            if (imagemArquivo != null && imagemArquivo.Length > 0)
+            if (imagensArquivo == null || imagensArquivo.Length == 0)
             {
-                // Define o caminho para salvar
-                var caminhoPasta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img");
-
-                // Garante que a pasta exista
-                if (!Directory.Exists(caminhoPasta))
-                    Directory.CreateDirectory(caminhoPasta);
-
-                // Gera um nome único para o arquivo
-                var nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(imagemArquivo.FileName);
-                var caminhoCompleto = Path.Combine(caminhoPasta, nomeArquivo);
-
-                // Salva o arquivo
-                using (var stream = new FileStream(caminhoCompleto, FileMode.Create))
-                {
-                    await imagemArquivo.CopyToAsync(stream);
-                }
-
-                // Atualiza o campo ImageUrl com o caminho público
-                produto.ImageUrl = "/img/" + nomeArquivo;
+                ModelState.AddModelError("Imagens", "Pelo menos uma imagem é obrigatória.");
+                return View(produto);
             }
 
-            // Chama o método de repositório para salvar no banco
+            produto.Imagens = new List<ProdutoImagem>();
+            int ordem = 1;
+
+            foreach (var imagemArquivo in imagensArquivo)
+            {
+                if (imagemArquivo != null && imagemArquivo.Length > 0)
+                {
+                    // Define o caminho para salvar
+                    var caminhoPasta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img");
+
+                    // Garante que a pasta exista
+                    if (!Directory.Exists(caminhoPasta))
+                        Directory.CreateDirectory(caminhoPasta);
+
+                    // Gera um nome único para o arquivo
+                    var nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(imagemArquivo.FileName);
+                    var caminhoCompleto = Path.Combine(caminhoPasta, nomeArquivo);
+
+                    // Salva o arquivo
+                    using (var stream = new FileStream(caminhoCompleto, FileMode.Create))
+                    {
+                        await imagemArquivo.CopyToAsync(stream);
+                    }
+
+                    // Adiciona à lista de imagens do produto com ordem
+                    produto.Imagens.Add(new ProdutoImagem
+                    {
+                        Url = nomeArquivo,
+                        OrdemImagem = ordem
+                    });
+
+                    ordem++;
+                }
+            }
+
+            // Chama o repositório para salvar o produto e suas imagens
             await _produtoRepository.AdicionarProduto(produto);
 
             return RedirectToAction("Index");
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> Editar(int id)
         {
             var produto = await _produtoRepository.ProdutosPorId(id);
             if (produto == null)
-            {
                 return RedirectToAction("Index", "Produto");
-            }
 
             return View(produto);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Editar(Produto produto, IFormFile imagemArquivo)
+        public async Task<IActionResult> Editar(Produto produto, IFormFile[] imagensArquivo)
         {
-            var produtos = await _produtoRepository.ProdutosPorId(produto.Id);
-
-            if (produtos == null)
-            {
+            var produtoExistente = await _produtoRepository.ProdutosPorId(produto.Id);
+            if (produtoExistente == null)
                 return RedirectToAction("Index", "Produto");
-            }
 
             var caminhoPasta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img");
 
-            if (imagemArquivo != null && imagemArquivo.Length > 0)
+            // Criar pasta se necessário
+            if (!Directory.Exists(caminhoPasta))
+                Directory.CreateDirectory(caminhoPasta);
+
+            // Lista de imagens atualizada
+            produto.Imagens = produtoExistente.Imagens ?? new List<ProdutoImagem>();
+            int ordem = produto.Imagens.Any() ? produto.Imagens.Max(i => i.OrdemImagem) + 1 : 1;
+
+            if (imagensArquivo != null && imagensArquivo.Length > 0)
             {
-                // Apagar imagem antiga
-                if (!string.IsNullOrEmpty(produtos.ImageUrl))
+                foreach (var imagemArquivo in imagensArquivo)
                 {
-                    var caminhoAntigo = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", produtos.ImageUrl.TrimStart('/'));
-                    if (System.IO.File.Exists(caminhoAntigo))
+                    if (imagemArquivo != null && imagemArquivo.Length > 0)
                     {
-                        System.IO.File.Delete(caminhoAntigo);
+                        // Salvar nova imagem
+                        var nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(imagemArquivo.FileName);
+                        var caminhoCompleto = Path.Combine(caminhoPasta, nomeArquivo);
+
+                        using (var stream = new FileStream(caminhoCompleto, FileMode.Create))
+                        {
+                            await imagemArquivo.CopyToAsync(stream);
+                        }
+
+                        // Adiciona à lista de imagens
+                        produto.Imagens.Add(new ProdutoImagem
+                        {
+                            Url = nomeArquivo,
+                            OrdemImagem = ordem
+                        });
+
+                        ordem++;
                     }
                 }
-
-                // Criar pasta se necessário
-                if (!Directory.Exists(caminhoPasta))
-                    Directory.CreateDirectory(caminhoPasta);
-
-                // Salvar nova imagem
-                var nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(imagemArquivo.FileName);
-                var caminhoCompleto = Path.Combine(caminhoPasta, nomeArquivo);
-
-                using (var stream = new FileStream(caminhoCompleto, FileMode.Create))
-                {
-                    await imagemArquivo.CopyToAsync(stream);
-                }
-
-                produto.ImageUrl = "/img/" + nomeArquivo;
-            }
-            else
-            {
-                produto.ImageUrl = produtos.ImageUrl;
             }
 
+            // Atualiza os dados do produto (nome, preço, etc.) e mantém a lista de imagens
             await _produtoRepository.AtualizarProduto(produto);
 
             return RedirectToAction("Index");
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Deletar(int id)
@@ -193,19 +210,64 @@ namespace Virtus.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Apaga imagem associada, se existir
-            if (!string.IsNullOrEmpty(produto.ImageUrl))
+            // Apaga todas as imagens associadas (se existirem)
+            if (produto.Imagens != null && produto.Imagens.Any())
             {
-                var caminhoImagem = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", produto.ImageUrl.TrimStart('/'));
-                if (System.IO.File.Exists(caminhoImagem))
+                foreach (var imagem in produto.Imagens)
                 {
-                    System.IO.File.Delete(caminhoImagem);
+                    if (!string.IsNullOrWhiteSpace(imagem.Url))
+                    {
+                        // Garante que o caminho esteja correto (sem barras duplicadas)
+                        var caminhoImagem = Path.Combine(
+                            Directory.GetCurrentDirectory(),
+                            "wwwroot",
+                            imagem.Url.TrimStart('/', '\\')
+                        );
+
+                        if (System.IO.File.Exists(caminhoImagem))
+                        {
+                            try
+                            {
+                                System.IO.File.Delete(caminhoImagem);
+                            }
+                            catch (Exception ex)
+                            {
+                                // Logar ou ignorar falha ao deletar imagem específica
+                                Console.WriteLine($"Erro ao deletar imagem {caminhoImagem}: {ex.Message}");
+                            }
+                        }
+                    }
                 }
             }
 
+            // Exclui o produto e suas imagens do banco
             await _produtoRepository.DeletarProduto(id);
 
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoverImagem(int id)
+        {
+            var imagem = await _produtoRepository.ImagemPorId(id); // funciona com ImagemId
+            if (imagem == null)
+                return Json(new { sucesso = false, mensagem = "Imagem não encontrada." });
+
+            try
+            {
+                var caminho = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imagem.Url.TrimStart('/'));
+                if (System.IO.File.Exists(caminho))
+                    System.IO.File.Delete(caminho);
+
+                await _produtoRepository.DeletarImagem(id);
+            }
+            catch
+            {
+                return Json(new { sucesso = false, mensagem = "Erro ao remover imagem." });
+            }
+
+            return Json(new { sucesso = true });
+        }
+
     }
 }

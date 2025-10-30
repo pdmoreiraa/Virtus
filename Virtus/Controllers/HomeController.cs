@@ -16,7 +16,7 @@ namespace Virtus.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var produtos = await _produtoRepository.ProdutosOrdenados();
+            var produtos = await _produtoRepository.TodosProdutos();
             return View(produtos);
         }
 

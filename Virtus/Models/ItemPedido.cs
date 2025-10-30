@@ -11,5 +11,6 @@
         // Navegação
         public Pedido? Pedido { get; set; }
         public Produto? Produto { get; set; }
+        public ProdutoImagem? Imagem { get; set; }
     }
 }

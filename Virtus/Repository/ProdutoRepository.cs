@@ -14,50 +14,230 @@ namespace Virtus.Repository
             _connectionString = connectionString;
         }
 
-        public async Task<IEnumerable<Produto>> TodosProdutos()
+        public async Task<List<Produto>> TodosProdutos()
         {
-            using var connection = new MySqlConnection(_connectionString);
-            var sql = "SELECT Id, Nome, Marca, Categoria, Tipo, Esporte, Descricao, Preco, ImageUrl, Estoque FROM Produtos";
-            return await connection.QueryAsync<Produto>(sql);
+            using var conn = new MySqlConnection(_connectionString);
+            await conn.OpenAsync();
+
+            var sql = @"
+SELECT 
+    p.Id, p.Nome, p.Marca, p.Categoria, p.Tipo, p.Esporte, p.Descricao, p.Preco, p.Estoque, p.DataCriada,
+    pi.Id AS ImagemId, pi.ProdutoId AS ImagemProdutoId, pi.Url, pi.OrdemImagem
+FROM produtos p
+LEFT JOIN produtoImagens pi ON pi.ProdutoId = p.Id
+ORDER BY p.Id, pi.OrdemImagem;
+";
+
+            var produtoDict = new Dictionary<int, Produto>();
+
+            var produtos = await conn.QueryAsync<Produto, ProdutoImagem, Produto>(
+                sql,
+                (p, img) =>
+                {
+                    if (!produtoDict.TryGetValue(p.Id, out var produtoEntry))
+                    {
+                        produtoEntry = p;
+                        produtoEntry.Imagens = new List<ProdutoImagem>();
+                        produtoDict.Add(p.Id, produtoEntry);
+                    }
+
+                    // Note: ProdutoImagem.ImagemId mapped from pi.Id AS ImagemId
+                    if (img != null && img.ImagemId != 0)
+                        produtoEntry.Imagens.Add(img);
+
+                    return produtoEntry;
+                },
+                splitOn: "ImagemId"
+            );
+
+            // já tem debug console — bom para confirmar
+            foreach (var p in produtoDict.Values)
+            {
+                Console.WriteLine($"Produto {p.Nome} tem {p.Imagens.Count} imagens");
+                foreach (var img in p.Imagens)
+                {
+                    Console.WriteLine($" - {img.Url} (ImagemId={img.ImagemId})");
+                }
+            }
+
+            return produtoDict.Values.ToList();
         }
 
-        public async Task<IEnumerable<Produto>> ProdutosOrdenados()
+        public async Task<List<Produto>> ProdutosOrdenados()
         {
-            using var connection = new MySqlConnection(_connectionString);
-            var sql = "SELECT Id, Nome, Marca, Categoria, Tipo, Esporte, Descricao, Preco, ImageUrl, Estoque FROM Produtos ORDER BY Id DESC";
-            return await connection.QueryAsync<Produto>(sql);
+            using var conn = new MySqlConnection(_connectionString);
+            await conn.OpenAsync();
+
+            var sql = @"
+SELECT 
+    p.Id, p.Nome, p.Marca, p.Categoria, p.Tipo, p.Esporte, p.Descricao, p.Preco, p.Estoque, p.DataCriada,
+    pi.Id AS ImagemId, pi.ProdutoId AS ImagemProdutoId, pi.Url, pi.OrdemImagem
+FROM produtos p
+LEFT JOIN produtoImagens pi ON pi.ProdutoId = p.Id
+ORDER BY p.Id DESC, pi.OrdemImagem;
+";
+
+            var produtoDict = new Dictionary<int, Produto>();
+
+            var produtos = await conn.QueryAsync<Produto, ProdutoImagem, Produto>(
+                sql,
+                (p, img) =>
+                {
+                    if (!produtoDict.TryGetValue(p.Id, out var produtoEntry))
+                    {
+                        produtoEntry = p;
+                        produtoEntry.Imagens = new List<ProdutoImagem>();
+                        produtoDict.Add(p.Id, produtoEntry);
+                    }
+
+                    // Note: ProdutoImagem.ImagemId mapped from pi.Id AS ImagemId
+                    if (img != null && img.ImagemId != 0)
+                        produtoEntry.Imagens.Add(img);
+
+                    return produtoEntry;
+                },
+                splitOn: "ImagemId"
+            );
+
+            // já tem debug console — bom para confirmar
+            foreach (var p in produtoDict.Values)
+            {
+                Console.WriteLine($"Produto {p.Nome} tem {p.Imagens.Count} imagens");
+                foreach (var img in p.Imagens)
+                {
+                    Console.WriteLine($" - {img.Url} (ImagemId={img.ImagemId})");
+                }
+            }
+
+            return produtoDict.Values.ToList();
         }
 
-        public async Task AdicionarProduto(Produto produto)
+        public async Task<int> AdicionarProduto(Produto produto)
         {
-            using var connection = new MySqlConnection(_connectionString);
+            using var conn = new MySqlConnection(_connectionString);
+            await conn.OpenAsync();
 
-            var sql = @"INSERT INTO Produtos (Nome, Marca, Categoria, Tipo, Esporte, Descricao, Preco, ImageUrl, Estoque)
-                VALUES (@Nome, @Marca, @Categoria, @Tipo, @Esporte, @Descricao, @Preco, @ImageUrl, @Estoque);";
+            using var transaction = conn.BeginTransaction();
 
-            await connection.ExecuteAsync(sql, produto);
+            try
+            {
+                // Inserir produto (sem ImageUrl)
+                var sqlProduto = @"
+            INSERT INTO Produtos (Nome, Marca, Categoria, Tipo, Esporte, Preco, Descricao, Estoque, DataCriada)
+            VALUES (@Nome, @Marca, @Categoria, @Tipo, @Esporte, @Preco, @Descricao, @Estoque, @DataCriada);
+            SELECT LAST_INSERT_ID();";
+
+                produto.Id = await conn.ExecuteScalarAsync<int>(sqlProduto, produto, transaction);
+
+                // Inserir imagens (se existirem)
+                if (produto.Imagens != null && produto.Imagens.Count > 0)
+                {
+                    var sqlImagem = @"
+                INSERT INTO ProdutoImagens (ProdutoId, Url, OrdemImagem)
+                VALUES (@ProdutoId, @Url, @OrdemImagem);";
+
+                    foreach (var img in produto.Imagens)
+                    {
+                        img.ProdutoId = produto.Id; // garante FK correta
+                                                    // Se OrdemImagem não estiver setada, coloca 1 como default
+                        if (img.OrdemImagem == 0) img.OrdemImagem = 1;
+
+                        await conn.ExecuteAsync(sqlImagem, new
+                        {
+                            ProdutoId = img.ProdutoId,
+                            Url = img.Url,
+                            OrdemImagem = img.OrdemImagem
+                        }, transaction);
+                    }
+                }
+
+                transaction.Commit();
+                return produto.Id;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
+
 
         public async Task<Produto?> ProdutosPorId(int id)
         {
             using var connection = new MySqlConnection(_connectionString);
-            var sql = "select Id, Nome, Marca, Categoria, Tipo, Esporte, Descricao, Preco, ImageUrl, Estoque FROM produtos WHERE Id = @Id";
-            return await connection.QueryFirstOrDefaultAsync<Produto>(sql, new { Id = id });
+
+            var sql = @"
+        SELECT p.*, pi.Id AS ImagemId, pi.ProdutoId, pi.Url, pi.OrdemImagem
+        FROM produtos p
+        LEFT JOIN produtoImagens pi ON pi.ProdutoId = p.Id
+        WHERE p.Id = @Id
+        ORDER BY pi.OrdemImagem;";
+
+            var produtoDict = new Dictionary<int, Produto>();
+
+            var resultado = await connection.QueryAsync<Produto, ProdutoImagem, Produto>(
+                sql,
+                (p, img) =>
+                {
+                    if (!produtoDict.TryGetValue(p.Id, out var produtoEntry))
+                    {
+                        produtoEntry = p;
+                        produtoEntry.Imagens = new List<ProdutoImagem>();
+                        produtoDict.Add(p.Id, produtoEntry);
+                    }
+
+                    if (img != null && img.ImagemId != 0)
+                        produtoEntry.Imagens.Add(img);
+
+                    return produtoEntry;
+                },
+                new { Id = id },
+                splitOn: "ImagemId"
+            );
+
+            return produtoDict.Values.FirstOrDefault();
         }
+
 
         public async Task AtualizarProduto(Produto produto)
         {
             using var connection = new MySqlConnection(_connectionString);
 
+            // Atualiza os campos do produto
             var sql = @"
-            UPDATE Produtos
-            SET Nome = @Nome, Marca = @Marca, Categoria = @Categoria, Tipo = @Tipo, Esporte = @Esporte, Descricao = @Descricao, 
-            Preco = @Preco, ImageUrl = @ImageUrl, Estoque = @Estoque
-            WHERE Id = @Id;
-            ";
+        UPDATE Produtos
+        SET Nome = @Nome, Marca = @Marca, Categoria = @Categoria, Tipo = @Tipo, Esporte = @Esporte, Descricao = @Descricao, 
+            Preco = @Preco, Estoque = @Estoque
+        WHERE Id = @Id;
+    ";
 
             await connection.ExecuteAsync(sql, produto);
+
+            // Atualiza / insere imagens
+            if (produto.Imagens != null && produto.Imagens.Count > 0)
+            {
+                foreach (var img in produto.Imagens)
+                {
+                    // Se a imagem já existe no banco (tem Id), podemos atualizar a URL ou ordem
+                    if (img.ImagemId > 0)
+                    {
+                        var sqlImgUpdate = @"
+                    UPDATE ProdutoImagens SET Url = @Url WHERE Id = @ImagemId";
+                        await connection.ExecuteAsync(sqlImgUpdate, img);
+                    }
+                    else
+                    {
+                        // Nova imagem
+                        var sqlImgInsert = @"
+                    INSERT INTO ProdutoImagens (ProdutoId, Url, OrdemImagem)
+                    VALUES (@ProdutoId, @Url, @OrdemImagem)";
+                        img.ProdutoId = produto.Id;
+                        await connection.ExecuteAsync(sqlImgInsert, img);
+                    }
+                }
+            }
         }
+
 
         public async Task DeletarProduto(int id)
         {
@@ -98,6 +278,22 @@ namespace Virtus.Repository
                 );
 
             return resultado;
+        }
+
+        public async Task<ProdutoImagem?> ImagemPorId(int id)
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            var sql = "SELECT * FROM produtoImagens WHERE Id = @Id";
+            return await connection.QueryFirstOrDefaultAsync<ProdutoImagem>(sql, new { Id = id });
+        }
+
+        public async Task DeletarImagem(int imagemId)
+        {
+            using (var connection = new MySqlConnection(_connectionString))
+            {
+                string sql = "DELETE FROM produtoImagens WHERE Id = @Id";
+                await connection.ExecuteAsync(sql, new { Id = imagemId });
+            }
         }
 
 

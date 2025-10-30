@@ -12,10 +12,20 @@ Tipo VARCHAR(70),
 Esporte VARCHAR(70),
 Descricao VARCHAR(500),
 Preco DECIMAL(10,2),
-ImageUrl VARCHAR(255),
 Estoque INT,
 DataCriada DATE DEFAULT (CURRENT_DATE)
 );
+
+CREATE TABLE produtoImagens (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    ProdutoId INT NOT NULL,
+    Url VARCHAR(255) NOT NULL,
+    OrdemImagem INT DEFAULT 1,
+    FOREIGN KEY (ProdutoId) REFERENCES produtos(Id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
 
 CREATE TABLE usuarios(
 Id INT PRIMARY KEY AUTO_INCREMENT,
@@ -102,18 +112,21 @@ INSERT INTO metodosPagamento (Descricao)
 VALUES ('Cartão'),
 ('Pix');
 
-SELECT * FROM produtos;
+SELECT * FROM produtoImagens;
 
-insert into produtos (Nome, Marca, Categoria, Tipo, Esporte, Descricao, Preco, ImageUrl, Estoque)
-values ('Carrinhos', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Futebol',  'Pacote com 5 Carros', 67.90, '/img/01.jpg', 5),
-('Guincho Tubarão',  'Hot Wheels', 'Brinquedo', 'Infantil', 'Futebol',  'Conjunto de Guincho Tubarão', 172.90, '/img/02.jpg', 5),
-('Pista de Percurso T-Rex X', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Futebol',  'Quartel de Bombeiros', 286.90, '/img/03.jpg', 10),
-('Pista de Percurso e Mini Veículo',  'Hot Wheels', 'Brinquedo', 'Infantil',  'Esporte', 'City - Lava-Rápido', 109.90, '/img/04.jpg', 15),
-('City Nemesis - Gorila', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Futebol',  'Pista de Percurso e Mini Veículo', 161.90, '/img/05.jpg', 20),
-('Reboque e Mini Veículo', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Futebol',  'City - Reboque de Dragão', 127.90, '/img/06.jpg', 25);
+INSERT INTO produtos (Nome, Marca, Categoria, Tipo, Esporte, Descricao, Preco, Estoque)
+VALUES ('Carrinhos', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Futebol',  'Pacote com 5 Carros', 67.90, 5),
+('Guincho Tubarão',  'Hot Wheels', 'Brinquedo', 'Infantil', 'Futebol',  'Conjunto de Guincho Tubarão', 172.90, 5),
+('Pista de Percurso T-Rex X', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Futebol',  'Quartel de Bombeiros', 286.90, 10),
+('Pista de Percurso e Mini Veículo',  'Hot Wheels', 'Brinquedo', 'Infantil',  'Esporte', 'City - Lava-Rápido', 109.90, 15),
+('City Nemesis - Gorila', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Futebol',  'Pista de Percurso e Mini Veículo', 161.90, 20),
+('Reboque e Mini Veículo', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Futebol',  'City - Reboque de Dragão', 127.90, 25);
 
-insert into usuarios(Nome, Sobrenome, Email, Senha, CPF, Telefone, Tipo)
-values ('Admin', 'Admin', 'admin@gmail.com', 'admin@', '11111111111', '11999999999', 'admin'),
+INSERT INTO produtoImagens (ProdutoId, Url) VALUES
+(1, '01.jpg'),(2, '02.jpg'),(3, '03.jpg'),(4, '04.jpg'),(5, '05.jpg'),(6, '06.jpg');
+
+INSERT INTO usuarios(Nome, Sobrenome, Email, Senha, CPF, Telefone, Tipo)
+VALUES ('Admin', 'Admin', 'admin@gmail.com', 'admin@', '11111111111', '11999999999', 'admin'),
 ('Pedro', 'Moreira', 'ph@123.com', '123', '11111111112', '11999999998', 'cliente');
 
 INSERT INTO enderecos (

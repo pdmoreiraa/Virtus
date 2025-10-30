@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Html
-@model IEnumerable<Virtus.Models.Produto>
+@model List<Virtus.Models.Produto>
 
 @{
     int pagIndex = (int)ViewData["PagIndex"];
@@ -40,7 +40,6 @@
     </div>
 </div>
 
-
 <script>
     function sortTable(coluna) {
         let ordPor = "desc"
@@ -64,7 +63,7 @@
             <th style="cursor: pointer;" onclick="sortTable('Marca')">Marca @getArrow("Marca")</th>
             <th style="cursor: pointer;" onclick="sortTable('Categoria')">Categoria @getArrow("Categoria")</th>
             <th style="cursor: pointer;" onclick="sortTable('Tipo')">Tipo @getArrow("Tipo")</th>
-            <th style="cursor: pointer;" onclick="sortTable('Tipo')">Tipo @getArrow("Esporte")</th>
+            <th style="cursor: pointer;" onclick="sortTable('Tipo')">Esporte @getArrow("Esporte")</th>
             <th style="cursor: pointer;" onclick="sortTable('Preco')">Preço @getArrow("Preco")</th>
             <th>Imagem</th>
             <th style="cursor: pointer;" onclick="sortTable('Estoque')">Estoque @getArrow("Estoque")</th>
@@ -84,7 +83,7 @@
                 <td>@produto.Tipo</td>
                 <td>@produto.Esporte</td>
                 <td>R$ @produto.Preco.ToString("F2")</td>
-                <td><img src="@produto.ImageUrl" width="100" /></td>
+                <td><img src="@Url.Content("~/img/" + produto.Imagens.FirstOrDefault()?.Url)" width="100" /></td>
                 <td>@produto.Estoque</td>
                 <td>@produto.DataCriada.ToString("dd/MM/yyyy")</td>
                 <td style="white-space:nowrap">

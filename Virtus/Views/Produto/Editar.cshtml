@@ -87,16 +87,32 @@
             </div>
 
             <div class="row mb-3">
-                <div class="offset-sm-4 col-sm-8">
-                    <img src="@Model.ImageUrl" width="150" alt="Imagem atual do produto">
-                </div>
+            @foreach (var img in Model.Imagens.OrderBy(i => i.OrdemImagem))
+            {
+                    <div class="card" data-imagem-id="@img.ImagemId" style="width: 10rem;">
+                        <img src="@Url.Content("~/img/" + img.Url)" class="card-img-top" alt="Imagem do produto">
+                        <div class="card-body text-center">
+                            <button type="button" class="btn btn-sm btn-danger mt-1" onclick="removerImagem(@img.ImagemId)">
+                                Remover
+                            </button>
+                        </div>
+                    </div>
+                }
             </div>
 
             <div class="row mb-3">
                 <label for="imagemArquivo" class="col-sm-4 col-form-label">Imagem</label>
                 <div class="col-sm-8">
-                    <input id="imagemArquivo" type="file" class="form-control" name="imagemArquivo" accept="image/*">
-                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                    <input id="imagensArquivo" type="file" class="form-control" name="imagensArquivo" multiple accept="image/*">
+                    <span asp-validation-for="Imagens" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="Descricao" class="col-sm-4 col-form-label">Estoque</label>
+                <div class="col-sm-8">
+                    <input class="form-control" id="Estoque" name="Estoque" class="form-control" asp-for="Estoque" />
+                    <span asp-validation-for="Estoque" class="text-danger"></span>
                 </div>
             </div>
 
@@ -159,5 +175,30 @@
                 }
             });
         });
+
+                function removerImagem(imagemId) {
+            if (!confirm("Deseja realmente remover esta imagem?")) return;
+
+            const formData = new FormData();
+            formData.append("id", imagemId); // parâmetro enviado ao controller
+
+            fetch('@Url.Action("RemoverImagem", "Produto")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.sucesso) {
+                    const imgCard = document.querySelector(`[data-imagem-id='${imagemId}']`);
+                    if (imgCard) imgCard.remove(); // remove só o card da imagem
+                } else {
+                    alert(data.mensagem || "Erro ao remover imagem.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Erro de comunicação com o servidor.");
+            });
+        }
     </script>
 }

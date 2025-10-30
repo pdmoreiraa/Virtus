@@ -35,10 +35,6 @@ namespace Virtus.Models
         [Range(0.01, double.MaxValue, ErrorMessage = "O preço deve ser maior que zero.")]
         public decimal Preco { get; set; }
 
-        [StringLength(255)]
-        [Display(Name = "URL da Imagem")]
-        public string? ImageUrl { get; set; }
-
         [Required(ErrorMessage = "A quantidade em estoque é obrigatória.")]
         [Range(0, int.MaxValue, ErrorMessage = "A quantidade deve ser um número positivo.")]
         public int? Estoque { get; set; }
@@ -46,5 +42,7 @@ namespace Virtus.Models
         [Display(Name = "Data de Criação")]
         [DataType(DataType.Date)]
         public DateTime DataCriada { get; set; } = DateTime.Now;
+
+        public List<ProdutoImagem> Imagens { get; set; } = new List<ProdutoImagem>();
     }
 }

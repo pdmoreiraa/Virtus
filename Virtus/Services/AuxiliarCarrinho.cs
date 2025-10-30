@@ -25,7 +25,8 @@ namespace Virtus.Services
                     ProdutoId = produto.Id,
                     Produto = produto,
                     Quantidade = par.Value,
-                    PrecoUnitario = produto.Preco
+                    PrecoUnitario = produto.Preco,
+                    Imagem = produto.Imagens.FirstOrDefault()
                 });
             }
 
