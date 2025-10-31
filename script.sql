@@ -112,7 +112,7 @@ INSERT INTO metodosPagamento (Descricao)
 VALUES ('Cartão'),
 ('Pix');
 
-SELECT * FROM produtoImagens;
+SELECT * FROM usuarios;
 
 INSERT INTO produtos (Nome, Marca, Categoria, Tipo, Esporte, Descricao, Preco, Estoque)
 VALUES ('Carrinhos', 'Hot Wheels', 'Brinquedo', 'Infantil', 'Futebol',  'Pacote com 5 Carros', 67.90, 5),

@@ -43,6 +43,7 @@ namespace Virtus.Models
         [DataType(DataType.Date)]
         public DateTime DataCriada { get; set; } = DateTime.Now;
 
+
         public List<ProdutoImagem> Imagens { get; set; } = new List<ProdutoImagem>();
     }
 }

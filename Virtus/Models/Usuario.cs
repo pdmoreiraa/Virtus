@@ -22,13 +22,13 @@ namespace Virtus.Models
         [Compare("Senha", ErrorMessage = "As senhas não coincidem")]
         public string ConfirmarSenha { get; set; } = "";
 
-
+        [Required(ErrorMessage = "O CPF é obrigatório.")]
         [RegularExpression(@"^\d{11}$", ErrorMessage = "O CPF deve conter 11 números.")]
-        public string CPF { get; set; }
+        public string CPF { get; set; } = "";
 
-
+        [Required(ErrorMessage = "O telefone é obrigatório.")]
         [RegularExpression(@"^\d{11}$", ErrorMessage = "O telefone deve conter 11 números (DDD + número).")]
-        public string Telefone { get; set; }
+        public string Telefone { get; set; } = "";
 
         public string Tipo { get; set; } = "cliente";
 

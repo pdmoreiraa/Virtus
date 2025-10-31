@@ -46,7 +46,7 @@ namespace Virtus.Repository
         public async Task<Usuario?> ObterPorEmailESenha(string email, string senha)
         {
             using var connection = new MySqlConnection(_connectionString);
-            string sql = "SELECT * FROM Usuarios WHERE Email = @Email AND Senha = @Senha";
+            string sql = "SELECT * FROM usuarios WHERE Email = @Email AND Senha = @Senha";
             return await connection.QueryFirstOrDefaultAsync<Usuario>(sql, new { Email = email, Senha = senha });
         }
 
@@ -54,7 +54,7 @@ namespace Virtus.Repository
         public async Task<Usuario?> ObterPorId(int id)
         {
             using var connection = new MySqlConnection(_connectionString);
-            string sql = "SELECT * FROM Usuarios WHERE Id = @Id";
+            string sql = "SELECT * FROM usuarios WHERE Id = @Id";
             return await connection.QueryFirstOrDefaultAsync<Usuario>(sql, new { Id = id });
         }
 
@@ -63,7 +63,7 @@ namespace Virtus.Repository
             using var connection = new MySqlConnection(_connectionString);
 
             var sql = @"
-            UPDATE Usuarios
+            UPDATE usuarios
             SET Nome = @Nome, Sobrenome = @Sobrenome, Email = @Email, Telefone = @Telefone, 
             CPF = @CPF, Tipo = @Tipo WHERE Id = @Id;";
 
@@ -74,7 +74,7 @@ namespace Virtus.Repository
         public async Task<bool> AtualizarSenha(Usuario usuario)
         {
             using var connection = new MySqlConnection(_connectionString);
-            string sql = "UPDATE Usuarios SET Senha = @Senha WHERE Id = @Id";
+            string sql = "UPDATE usuarios SET Senha = @Senha WHERE Id = @Id";
             var linhas = await connection.ExecuteAsync(sql, new { usuario.Senha, usuario.Id });
             return linhas > 0;
         }

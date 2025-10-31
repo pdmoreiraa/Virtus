@@ -151,10 +151,29 @@ ORDER BY p.CriadoEm DESC;";
 
             // Obter itens e produtos
             var sqlItens = @"
-SELECT i.*, p.Id AS ProdutoId, p.Nome, p.Marca, p.Categoria, p.Tipo, p.Descricao, p.Preco, p.ImageUrl, p.Estoque, p.DataCriada
-FROM itensPedido i
-INNER JOIN produtos p ON i.ProdutoId = p.Id
-WHERE i.PedidoId IN @PedidoIds;";
+SELECT 
+    ip.Id AS ItemPedidoId,
+    ip.PedidoId,
+    ip.ProdutoId,
+    ip.Quantidade,
+    ip.PrecoUnitario,
+    p.Id AS ProdutoId,
+    p.Nome,
+    p.Marca,
+    p.Categoria,
+    p.Tipo,
+    p.Esporte,
+    p.Preco,
+    (
+        SELECT pi.Url
+        FROM produtoImagens pi
+        WHERE pi.ProdutoId = p.Id
+        ORDER BY pi.OrdemImagem ASC
+        LIMIT 1
+    ) AS ImagemUrl
+FROM itensPedido ip
+INNER JOIN produtos p ON ip.ProdutoId = p.Id
+WHERE ip.PedidoId IN @PedidoIds;";
 
             var itens = await connection.QueryAsync<ItemPedido, Produto, ItemPedido>(
                 sqlItens,
@@ -167,6 +186,7 @@ WHERE i.PedidoId IN @PedidoIds;";
                 splitOn: "ProdutoId"
             );
 
+            // 3️⃣ Atribuir itens a cada pedido
             foreach (var pedido in pedidos)
             {
                 pedido.Itens = itens.Where(i => i.PedidoId == pedido.Id).ToList();
@@ -218,26 +238,45 @@ WHERE i.PedidoId IN @PedidoIds;";
             {
                 // Carregar itens e produtos
                 var sqlItens = @"
-        SELECT i.*, pr.*
-        FROM itensPedido i
-        INNER JOIN produtos pr ON i.ProdutoId = pr.Id
-        WHERE i.PedidoId = @PedidoId;
-        ";
+SELECT 
+    i.*, 
+    pr.*, 
+    pi.Id AS ImagemId, pi.Url, pi.OrdemImagem
+FROM itensPedido i
+INNER JOIN produtos pr ON i.ProdutoId = pr.Id
+LEFT JOIN produtoImagens pi ON pr.Id = pi.ProdutoId
+WHERE i.PedidoId = @PedidoId
+ORDER BY pi.OrdemImagem ASC;
+";
 
-                var itens = await connection.QueryAsync<ItemPedido, Produto, ItemPedido>(
+                var itemDict = new Dictionary<int, ItemPedido>();
+
+                var itens = await connection.QueryAsync<ItemPedido, Produto, ProdutoImagem, ItemPedido>(
                     sqlItens,
-                    (i, pr) =>
+                    (i, pr, pi) =>
                     {
-                        i.Produto = pr ?? new Produto { Nome = "Desconhecido", Categoria = "Desconhecido" };
-                        return i;
+                        if (!itemDict.TryGetValue(i.Id, out var item))
+                        {
+                            item = i;
+                            item.Produto = pr;
+                            item.Produto.Imagens = new List<ProdutoImagem>();
+                            itemDict.Add(item.Id, item);
+                        }
+
+                        if (pi != null)
+                            item.Produto.Imagens.Add(pi);
+
+                        return item;
                     },
                     new { PedidoId = pedidoId },
-                    splitOn: "Id"
+                    splitOn: "Id,ImagemId"
                 );
+
+                pedidoResult.Itens = itemDict.Values.ToList();
 
                 pedidoResult.Itens = itens.ToList();
 
-                // Garantir ValorTotal consistente caso precise recalcular
+                // Garante valor total consistente
                 if (pedidoResult.ValorTotal == 0 && pedidoResult.Itens.Any())
                 {
                     pedidoResult.ValorTotal = pedidoResult.Itens.Sum(x => x.Quantidade * x.PrecoUnitario) + pedidoResult.TaxaEntrega;

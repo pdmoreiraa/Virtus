@@ -1,4 +1,5 @@
 ﻿@model Virtus.Models.Pedido
+@using Virtus.Services;
 
 @{
     // Badge cores
@@ -84,7 +85,7 @@
 
             <div class="row mb-2 pb-2 border-bottom">
                 <div class="col">Telefone</div>
-                <div class="col">@Model.Usuario?.Telefone</div>
+                <div class="col">@Model.Usuario?.Telefone.FormatarTelefone()</div>
             </div>
         </div>
     </div>
@@ -111,7 +112,7 @@
                     subtotal += itemTotal;
                     <tr>
                         <td>
-                            <img src="@Url.Content("~/img/" + Model.Imagens.FirstOrDefault()?.Url)" width="100" />
+                            <img src="@Url.Content("~/img/" + item.Produto.Imagens.FirstOrDefault()?.Url)" width="100" />
                         @item.Produto.Nome</td>
                         <td>@item.Produto.Categoria</td>
                         <td>@item.Quantidade</td>

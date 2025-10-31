@@ -1,4 +1,5 @@
 ﻿@model Perfil
+@using Virtus.Services;
 
 @{
     ViewData["Title"] = "Perfil";
@@ -41,12 +42,12 @@
 
         <div class="row mb-2">
             <div class="col-sm-4 fw-bold">Telefone</div>
-            <div class="col-sm-8">@Model.Telefone</div>
+            <div class="col-sm-8">@Model.Telefone.FormatarTelefone()</div>
         </div>
 
         <div class="row mb-2">
             <div class="col-sm-4 fw-bold">CPF</div>
-            <div class="col-sm-8">@Model.CPF</div>
+            <div class="col-sm-8">@Model.CPF.FormatarCPF()</div>
         </div>
 
         <div class="row mb-2">
