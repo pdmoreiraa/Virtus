@@ -1,57 +1,87 @@
 ﻿@model Virtus.Models.Produto
 
+<div class="container my-5">
+    <div class="row g-5">
+        <div class="col-lg-6">
+            <div class="d-flex">
+                <!-- Imagem principal -->
+                <div class="flex-grow-1">
+                    <img src="/img/@Model.Imagens.FirstOrDefault()?.Url"
+                         id="produto-@Model.Id"
+                         class="img-fluid rounded shadow produto-img"
+                         style="width:500px; height:auto; object-fit: contain;">
+                </div>
 
-<div class="row">
-    <div class="col-md-4 text-center">
-        <img src="@Url.Content("~/img/" + Model.Imagens.FirstOrDefault()?.Url)" class="img-fluid mb-3" alt="..." width="250" />
-    </div>
-    <div class="col-md-8">
-        <h3 class="mb-3">@Model.Nome</h3>
-        <h3 class="mb-3">R$ @Model.Preco.ToString("F2")</h3>
-        <button type="button" class="btn btn-warning btn-sm" onclick="adicionarAoCarrinho(this, @Model.Id)">
-            Adicionar ao Carrinho <i class="bi bi-cart4"></i>
-        </button>
-
-        <hr />
-
-        <div class="row mb-3">
-            <div class="col-sm-3 fw-bold">
-                Marca
-            </div>
-            <div class="col-sm-9">
-                @Model.Marca
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-sm-3 fw-bold">
-                Categoria
-            </div>
-            <div class="col-sm-9">
-                @Model.Categoria
+                <!-- Miniaturas -->
+                <div class="d-flex flex-column ms-3">
+                    @foreach (var img in Model.Imagens.Take(4))
+                    {
+                        <img src="/img/@img.Url" class="img-thumbnail mb-2 thumb" data-id="@Model.Id" style="width:80px; height:80px; object-fit: contain; cursor:pointer;">
+                    }
+                </div>
             </div>
         </div>
 
-        <div class="row mb-3">
-            <div class="col-sm-3 fw-bold">
-                Tipo
+        <!-- Informações -->
+        <div class="col-lg-6">
+            <h3 class="fw-bold">@Model.Nome</h3>
+            <p class="text-muted mb-1">@Model.Tipo</p>
+            <p class="text-secondary">@Model.Descricao</p>
+
+            <div class="mb-3">
+                <p class="h4 text-primary fw-bold mb-0">R$ @Model.Preco.ToString("F2") à vista</p>
             </div>
-            <div class="col-sm-9">
-                @Model.Tipo
-            </div>
+
+            <button type="button" class="btn btn-dark smooth-btn btn-sm" onclick="adicionarAoCarrinho(this, @Model.Id)">
+                Adicionar ao Carrinho <i class="bi bi-cart4"></i>
+            </button>
         </div>
 
-        <div class="row mb-3">
-            <div class="col-sm-3 fw-bold">
-                Esporte
-            </div>
-            <div class="col-sm-9">
-                @Model.Esporte
-            </div>
-        </div>
-
-
-        <div class="fw-bold">Descrição</div>
-        <div style="white-space: pre-line">@Model.Descricao</div>
     </div>
 </div>
+
+
+<div class="bg-light">
+    <div class="container py-4">
+        <h2 class="pb-4 text-center">Produtos Parecidos</h2>
+
+        <div class="row mb-5 g-3">
+            @foreach (var produto in Model)
+            {
+                <div class="col-lg-3 col-md-6 d-flex justify-content-center">
+                    <div class="rounded border shadow p-3 text-center h-100 border border-dark rounded-3 p-3 d-flex flex-column"
+                         onclick="window.location='@Url.Action("Detalhes", "Loja", new { id = produto.Id })'" style="width:90%; cursor: pointer">
+                        <img src="/img/@produto.Imagens.FirstOrDefault()?.Url" class="img-fluid produto-img" id="produto-@produto.Id" alt="..."
+                             style="height: 180px; object-fit: contain" />
+                        <div class="flex-grow-1 mt-2">
+                            <h5 class="py-2">@produto.Nome</h5>
+                            <p>
+                                Marca: @produto.Marca, Categoria: @produto.Categoria
+                            </p>
+
+                            <h4 class="mb-3">R$ @produto.Preco.ToString("F2")</h4>
+                        </div>
+                        <div class="mt-auto p-1">
+                            <button type="button" class="btn btn-dark smooth-btn btn-sm w-100" onclick="event.stopPropagation(); adicionarAoCarrinho(this, @produto.Id)">
+                                Adicionar ao Carrinho <i class="bi bi-cart4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.querySelectorAll('.thumb').forEach(t => {
+        t.addEventListener('click', e => {
+            let produtoId = e.target.dataset.id;
+            let mainImg = document.getElementById(`produto-${produtoId}`);
+                if (mainImg) {
+                    mainImg.src = e.target.src;
+                }
+        });
+    });
+</script>

@@ -9,7 +9,13 @@ html {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.2rem #000;
+}
+
+.form-control {
+    box-shadow: none;
+    border: 1px solid #ced4da;
+    transition: all 0.2s ease;
 }
 
 html {
@@ -25,6 +31,7 @@ body {
 
 main {
     flex: 1;
+    min-height: 100vh;
 }
 
 .navbar {
@@ -75,7 +82,14 @@ main {
     color: #888;
 }
 
+.smooth-btn {
+    transition: all 0.3s ease;
+}
 
+    .smooth-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
 
 .menu-categorias {
     background-color: #f4f4f4;
@@ -111,6 +125,15 @@ main {
     margin-top:5px;
 }
 
+.fly-img {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    transition: all 0.8s ease-in-out;
+    z-index: 1000;
+    pointer-events: none;
+    border-radius: 10%;
+}
 
 .footer {
     background-color: #232323;

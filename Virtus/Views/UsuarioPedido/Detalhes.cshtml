@@ -15,11 +15,11 @@
 
 <h3 class="text-center mb-4">Detalhes do Pedido</h3>
 
-<a class="btn btn-link" asp-controller="UsuarioPedido" asp-action="Index">Voltar para Pedidos</a>
+<a class="btn btn-link shadow-none" asp-controller="UsuarioPedido" asp-action="Index">Voltar para Pedidos</a>
 
 <div class="row mb-4">
     <div class="col">
-        <div class="border rounded py-3 px-4 h-100">
+        <div class="border rounded border-dark py-3 px-4 h-100">
             <h3 class="mb-4">Pedido</h3>
 
             <div class="row mb-2 pb-2 border-bottom">
@@ -30,7 +30,7 @@
             <div class="row mb-2 pb-2 border-bottom">
                 <div class="col">Endereço de Entrega</div>
                 <div class="col">
-                    @(Model.Endereco != null ? $"{Model.Endereco.NomeCompleto}, {Model.Endereco.Logradouro}, {Model.Endereco.Numero}" : "Desconhecido")
+                    @Model.Endereco
                 </div>
             </div>
 
@@ -62,7 +62,7 @@
         </div>
     </div>
 
-<table class="table">
+    <table class="table mt-3">
     <thead>
         <tr>
             <th>Produto</th>

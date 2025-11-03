@@ -26,10 +26,11 @@
                 <label class="col-sm-4 col-form-label">Categoria</label>
                 <div class="col-sm-8">
                     <select class="form-select" asp-for="Categoria">
+                        <option value="">Selecione...</option>
                         <option value='Masculino'>Masculino</option>
                         <option value='Feminino'>Feminino</option>
                         <option value='Infantil'>Infantil</option>
-                        <option value='Esportes'>Esportes</option>
+                        <option value='Unissex'>Unissex</option>
                     </select>
                 </div>
             </div>
@@ -38,14 +39,16 @@
                 <label class="col-sm-4 col-form-label">Tipo</label>
                 <div class="col-sm-8">
                     <select class="form-select" asp-for="Tipo">
+                        <option value="">Selecione...</option>
                         <option value='Acessório'>Acessório</option>
                         <option value='Agasalho'>Agasalho</option>
                         <option value='Bermuda'>Bermuda</option>
                         <option value='Calça'>Calça</option>
+                        <option value='Calçado'>Calçado</option>
+                        <option value='Camisa de Time'>Camisa de Time</option>
                         <option value='Camiseta'>Camiseta</option>
-                        <option value='Esporte'>Esporte</option>
-                        <option value='Tenis'>Tênis</option>
-
+                        <option value='Equipamento'>Equipamento</option>
+                        <option value='Shorts'>Shorts</option>
                     </select>
                 </div>
             </div>
@@ -54,6 +57,7 @@
                 <label class="col-sm-4 col-form-label">Esporte</label>
                 <div class="col-sm-8">
                     <select class="form-select" asp-for="Esporte">
+                        <option value="">Selecione...</option>
                         <option value='Corrida'>Corrida</option>
                         <option value='Futebol'>Futebol</option>
                         <option value='Vôlei'>Vôlei</option>

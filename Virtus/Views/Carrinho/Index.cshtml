@@ -1,7 +1,7 @@
 ﻿@model Virtus.Models.Carrinho
 
 
-<div class="row border rounded-3">
+<div class="row min-vh-100">
     <div class="col-md-8 p-3">
         <h4>Carrinho de Compras</h4>
         <hr />
@@ -14,11 +14,11 @@
             </div>
         }
 
-        <table class="table align-middle ">
-            <tbody>
+        <table class="table align-middle">
+            <tbody class="carrinho">
                 @foreach (var item in Model.Itens)
                 {
-                    <tr>
+                    <tr class="border border-dark rounded-3 p-3 mt-3">
                         <td>
                             <img src="@Url.Content("~/img/" + item.Imagem?.Url)" width="100" class="rounded" alt="@item.Produto.Nome">
                         </td>
@@ -43,7 +43,7 @@
                         </td>
                         <td>R$ @(item.PrecoUnitario * item.Quantidade)</td>
                         <td>
-                            <i class="bi bi-trash text-danger h4" style="cursor: pointer" onclick="remover(@item.Produto.Id)"></i>
+                            <i class="bi bi-trash h4" style="cursor: pointer" onclick="remover(@item.Produto.Id)"></i>
                         </td>
                     </tr>
                 }
@@ -52,7 +52,7 @@
     </div>
 
     <div class="col-md-4">
-        <div class="text-white rounded my-2 p-3" style="background-color: #232323;">
+        <div class="border rounded-3 p-3 bg-light sticky-top slide-left" >
             <h4>Resumo do Pedido</h4>
             <hr />
 
@@ -75,8 +75,11 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-outline-light" asp-controller="Carrinho" asp-action="Infos">
+                    <button type="submit" class="btn btn-dark w-100 mt-3 smooth-btn" asp-controller="Carrinho" asp-action="Infos">
                         Finalizar Compra
+                    </button>
+                    <button class="btn btn-light border border-dark rounded w-100 mt-3 smooth-btn" asp-controller="Home" asp-action="Index">
+                        Continuar Olhando
                     </button>
                 </form>
             }
@@ -84,10 +87,10 @@
             {
                 <div class="row">
                     <div class="col d-grid">
-                        <a class="btn btn-light" asp-controller="Usuario" asp-action="Cadastrar">Cadastrar</a>
+                        <a class="btn btn-dark w-100 mt-3 smooth-btn" asp-controller="Usuario" asp-action="Cadastrar">Cadastrar</a>
                     </div>
                     <div class="col d-grid">
-                        <a class="btn btn-outline-light" asp-controller="Usuario" asp-action="Login">Login</a>
+                        <a class="btn btn-light border border-dark rounded w-100 mt-3 smooth-btn" asp-controller="Usuario" asp-action="Login">Login</a>
                     </div>
                 </div>
             }
@@ -97,3 +100,4 @@
         </div>
     </div>
 </div>
+    

@@ -24,7 +24,7 @@
             <!-- Coluna esquerda -->
             <div class="col-md-8">
                 <!-- Endereço -->
-                <div class="mb-4 section-animate">
+                <div class="mb-4 section-animate border border-dark rounded-3 p-3">
                     <h6 class="fw-bold">Endereço de Entrega</h6>
                     <div class="d-flex flex-column gap-2">
                         @if (Model.Enderecos.Count > 0)
@@ -58,7 +58,7 @@
 
                 <!-- Pagamento com cartão -->
                 <h6 class="fw-bold mt-4 mb-3 slide-right">Pagar com cartão</h6>
-                <div class="d-flex flex-column gap-2 mb-4 section-animate">
+                <div class="d-flex flex-column gap-2 mb-4 section-animate border border-dark rounded-3 p-3">
                     @if (Model.Cartoes != null && Model.Cartoes.Any())
                     {
                         foreach (var cartao in Model.Cartoes)
@@ -97,8 +97,8 @@
 
 
                 <!-- PIX -->
-                <h6 class="fw-bold mt-4 mb-3 slide-right">
-                    <label class="d-flex justify-content-beetween align-items-center gap-2 card p-3 border rounded-3 pix-card hover-zoom">
+                <h6 class="fw-bold mt-4 mb-3 slide-right ">
+                    <label class="d-flex justify-content-beetween align-items-center gap-2 card p-3 border border-dark rounded-3 p-3 pix-card hover-zoom">
                         <input class="form-check-input me-2 metodo-pagamento" type="radio" name="MetodoPagamento" id="pixRadio" value="Pix"
                                onclick="selecionarPix()" />
                         Pagar com Pix <img src="/img/pix-icon.png" width="18" alt="pix" />
@@ -237,15 +237,6 @@
         .hover-zoom:hover {
             transform: scale(1.03);
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-    .smooth-btn {
-        transition: all 0.3s ease;
-    }
-
-        .smooth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
         }
 
     /* Efeito de destaque no card selecionado */

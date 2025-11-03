@@ -13,21 +13,24 @@
         <div class="row mb-5 g-3">
             @foreach (var produto in Model)
             {
-                <div class="col-lg-3 col-md-6">
-                    <div class="rounded border shadow p-3 text-center h-100">
-                        <img src="@Url.Content("~/img/" + produto.Imagens.FirstOrDefault()?.Url)" class="img-fluid" alt="..."
+                <div class="col-lg-3 col-md-6 d-flex justify-content-center">
+                    <div class="rounded border shadow p-3 text-center h-100 border border-dark rounded-3 p-3 d-flex flex-column" 
+                    onclick="window.location='@Url.Action("Detalhes", "Loja", new { id = produto.Id })'" style="width:90%; cursor: pointer">
+                        <img src="/img/@produto.Imagens.FirstOrDefault()?.Url" class="img-fluid produto-img" id="produto-@produto.Id" alt="..."
                              style="height: 180px; object-fit: contain" />
-                        <hr />
+                        <div class="flex-grow-1 mt-2">
                         <h5 class="py-2">@produto.Nome</h5>
                         <p>
                             Marca: @produto.Marca, Categoria: @produto.Categoria
                         </p>
+
                         <h4 class="mb-3">R$ @produto.Preco.ToString("F2")</h4>
-                        <a class="btn btn-primary btn-sm mb-2" asp-controller="Loja"
-                           asp-action="Detalhes" asp-route-id="@produto.Id" role="button">Detalhes</a>
-                        <button type="button" class="btn btn-warning btn-sm mb-2" onclick="adicionarAoCarrinho(this, @produto.Id)">
+                        </div>
+                        <div class="mt-auto p-1">
+                        <button type="button" class="btn btn-dark smooth-btn btn-sm w-100" onclick="event.stopPropagation(); adicionarAoCarrinho(this, @produto.Id)">
                             Adicionar ao Carrinho <i class="bi bi-cart4"></i>
                         </button>
+                        </div>
                     </div>
                 </div>
             }

@@ -48,7 +48,7 @@ namespace Virtus.Controllers
             var produtos = await _produtoRepository.ProdutosPorId(produto.Id);
             if (produtos == null)
             {
-                return RedirectToAction("index", "Store");
+                return RedirectToAction("Index", "Loja");
             }
 
             return View(produtos);

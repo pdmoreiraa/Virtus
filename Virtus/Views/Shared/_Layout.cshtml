@@ -38,8 +38,6 @@
 
             salvarCarrinho(carrinho);
 
-            botao.innerHTML = "Adicionado <i class='bi bi-check-lg'></i>";
-
             let tamanhoCarrinho = 0;
             for (var item of Object.entries(carrinho)) {
                 quantidade = item[1];
@@ -48,7 +46,59 @@
             }
 
             document.getElementById("CartSize").innerHTML = tamanhoCarrinho;
+
+                let produtoImg = document.getElementById(`produto-${id}`);
+        let cartIcon = document.getElementById("cartIcon");
+
+        if (!produtoImg) return;
+
+        if (!produtoImg.complete) {
+            produtoImg.onload = () => animarProduto(produtoImg, cartIcon);
+        } else {
+            animarProduto(produtoImg, cartIcon);
         }
+        }
+
+                function animarProduto(produtoImg, cartIcon) {
+            const imgClone = produtoImg.cloneNode(true);
+            document.body.appendChild(imgClone);
+
+            // pega posições relativas à página
+            const produtoRect = produtoImg.getBoundingClientRect();
+            const cartRect = cartIcon.getBoundingClientRect();
+
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+            const startX = produtoRect.left + scrollLeft;
+            const startY = produtoRect.top + scrollTop;
+            const endX = cartRect.left + scrollLeft;
+            const endY = cartRect.top + scrollTop;
+
+            imgClone.style.position = "absolute";
+            imgClone.style.left = startX + "px";
+            imgClone.style.top = startY + "px";
+            imgClone.style.width = produtoRect.width + "px";
+            imgClone.style.height = produtoRect.height + "px";
+            imgClone.style.transition = "all 0.8s cubic-bezier(0.4, 0, 0.2, 1)";
+            imgClone.style.zIndex = 9999;
+            imgClone.style.pointerEvents = "none";
+            imgClone.style.borderRadius = "10%";
+
+            // força layout
+            requestAnimationFrame(() => {
+                imgClone.style.left = endX + "px";
+                imgClone.style.top = endY + "px";
+                imgClone.style.width = "0px";
+                imgClone.style.height = "0px";
+                imgClone.style.opacity = 0.5;
+            });
+
+            setTimeout(() => {
+                imgClone.remove();
+            }, 800);
+        }
+
 
         // Função para aumentar a quantidade de um item no carrinho
         function aumentar(id) {
@@ -116,6 +166,7 @@
         }
 
     </script>
+
     <header>
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark border-bottom box-shadow py-2">
             <div class="container d-flex align-items-center justify-content-between">
@@ -131,8 +182,10 @@
                 <ul class="navbar-nav d-flex align-items-center">
                     <li class="nav-item me-3">
                         <a class="nav-link text-white position-relative" asp-area="" asp-controller="Carrinho" asp-action="Index">
+                            <div id="cartIcon">
                             <img src="~/img/bag.png" height="24" />
                             <span id="CartSize" class="badge rounded-pill bg-light text-dark position-absolute top-2 start-100 translate-middle">0</span>
+                            </div>
                         </a>
                     </li>
 
