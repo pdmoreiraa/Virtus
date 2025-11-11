@@ -16,14 +16,18 @@
         <form asp-action="Login" asp-controller="Usuario" method="post">
             <div class="mb-3">
                 <label class="form-label">Email</label>
-                <input asp-for="Email" class="form-control" />
+                <input asp-for="Email" class="form-control" placeholder="Digite seu email" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-3 password-container">
                 <label class="form-label">Senha</label>
-                <input asp-for="Senha" type="password" class="form-control" />
+                <div class="password-container">
+                <input asp-for="Senha" type="password" id="senha" class="form-control" placeholder="Digite sua senha"/>
+                    <i class="bi bi-eye toggle-visibility" id="toggleSenha"></i>
+                </div>
                 <span asp-validation-for="Senha" class="text-danger"></span>
+
             </div>
 
             <div class="row mb-3">
@@ -46,4 +50,23 @@
     </div>
 </div>
 
+<script>
+    function togglePassword(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
 
+      icon.addEventListener("mousedown", (e) => {
+        e.preventDefault(); // impede o blur (perder foco)
+      });
+
+      icon.addEventListener("click", () => {
+        const isPassword = input.type === "password";
+        input.type = isPassword ? "text" : "password";
+        icon.classList.toggle("bi-eye", !isPassword);
+        icon.classList.toggle("bi-eye-slash", isPassword);
+        input.focus(); // mantém o foco no campo
+      });
+    }
+
+    togglePassword("senha", "toggleSenha");
+</script>

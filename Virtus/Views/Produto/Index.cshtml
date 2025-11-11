@@ -30,7 +30,7 @@
 
 <div class="row mb-5">
     <div class="col">
-        <a class="btn btn-primary" asp-controller="Produto" asp-action="Criar">Novo Produto</a>
+        <a class="btn btn-dark smooth-btn" asp-controller="Produto" asp-action="Criar">Novo Produto</a>
     </div>
     <div class="col">
         <form class="d-flex" role="search">
@@ -87,10 +87,10 @@
                 <td>@produto.Estoque</td>
                 <td>@produto.DataCriada.ToString("dd/MM/yyyy")</td>
                 <td style="white-space:nowrap">
-                    <a class="btn btn-primary btn-sm" asp-controller="Produto" asp-action="Editar"
+                    <a class="btn btn-light border border-dark rounded smooth-btn" asp-controller="Produto" asp-action="Editar"
                        asp-route-id="@produto.Id">Editar</a>
                     <form asp-action="Deletar" asp-route-id="@produto.Id" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este produto?')">
+                        <button type="submit" class="btn btn-dark smooth-btn" onclick="return confirm('Tem certeza que deseja excluir este produto?')">
                             Excluir
                         </button>
                     </form>

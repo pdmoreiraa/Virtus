@@ -20,30 +20,32 @@
                 {
                     <tr class="border border-dark rounded-3 p-3 mt-3">
                         <td>
-                            <img src="@Url.Content("~/img/" + item.Imagem?.Url)" width="100" class="rounded" alt="@item.Produto.Nome">
-                        </td>
-                        <td>
+                            <div class="d-flex justify-content-between">
+                            <img src="@Url.Content("~/img/" + item.Imagem?.Url)" width="100" class="rounded" alt="@item.Produto.Nome"/>
+
                             <h4>@item.Produto.Nome</h4>
                             <p>
                                 Marca: @item.Produto.Marca<br>
                                 Categoria: @item.Produto.Categoria<br>
                                 Preço: R$ @item.PrecoUnitario
                             </p>
-                        </td>
-                        <td style="white-space:nowrap">
-                            <button type="button" class="btn btn-outline-secondary btn-sm"
+                            </div>
+                        <div style="white-space:nowrap">
+                                <button type="button" class="btn btn-light border border-dark rounded smooth-btn btn-sm"
                                     onclick="diminuir(@item.Produto.Id)">
                                 -
                             </button>
                             <span class="border rounded-3 p-2 m-1">@item.Quantidade</span>
-                            <button type="button" class="btn btn-outline-secondary btn-sm"
+                                <button type="button" class="btn btn-light border border-dark rounded smooth-btn btn-sm"
                                     onclick="aumentar(@item.Produto.Id)">
                                 +
                             </button>
+                        </div>
                         </td>
-                        <td>R$ @(item.PrecoUnitario * item.Quantidade)</td>
+
                         <td>
                             <i class="bi bi-trash h4" style="cursor: pointer" onclick="remover(@item.Produto.Id)"></i>
+                            R$ @(item.PrecoUnitario * item.Quantidade)
                         </td>
                     </tr>
                 }

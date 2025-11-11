@@ -92,7 +92,7 @@
                     <div class="card" data-imagem-id="@img.ImagemId" style="width: 10rem;">
                         <img src="@Url.Content("~/img/" + img.Url)" class="card-img-top" alt="Imagem do produto">
                         <div class="card-body text-center">
-                            <button type="button" class="btn btn-sm btn-danger mt-1" onclick="removerImagem(@img.ImagemId)">
+                            <button type="button" class="btn btn-dark smooth-btn mt-1" onclick="removerImagem(@img.ImagemId)">
                                 Remover
                             </button>
                         </div>
@@ -125,11 +125,11 @@
 
             <div class="row">
                 <div class="offset-sm-4 col-sm-4 d-grid">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-dark w-100 mt-3 smooth-btn">Salvar</button>
                 </div>
                 <div class="col-sm-4 d-grid">
-                    <a class="btn btn-outline-primary" asp-controller="Produto" asp-action="Index" role="button">
-                        Cancel
+                    <a class="btn btn-light border border-dark rounded w-100 mt-3 smooth-btn" asp-controller="Produto" asp-action="Index" role="button">
+                        Cancelar
                     </a>
                 </div>
             </div>

@@ -135,6 +135,29 @@ main {
     border-radius: 10%;
 }
 
+.password-container {
+    position: relative;
+}
+
+    .password-container input {
+        width: 100%;
+        padding-right: 40px; /* espaço para o ícone */
+    }
+
+    .password-container .toggle-visibility {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+        user-select: none; /* evita seleção acidental */
+    }
+
+        .password-container .toggle-visibility:hover {
+            color: #000;
+        }
+
 .footer {
     background-color: #232323;
     margin-top: auto;

@@ -218,22 +218,22 @@ namespace Virtus.Controllers
                     if (!string.IsNullOrWhiteSpace(imagem.Url))
                     {
                         // Garante que o caminho esteja correto (sem barras duplicadas)
-                        var caminhoImagem = Path.Combine(
+                        var caminho= Path.Combine(
                             Directory.GetCurrentDirectory(),
-                            "wwwroot",
-                            imagem.Url.TrimStart('/', '\\')
-                        );
+                            "wwwroot", "img",
+                            imagem.Url);
 
-                        if (System.IO.File.Exists(caminhoImagem))
+                        if (System.IO.File.Exists(caminho))
                         {
                             try
                             {
-                                System.IO.File.Delete(caminhoImagem);
+                                System.IO.File.Delete(caminho);
+                                Console.WriteLine("Imagem apagada: " + caminho);
                             }
                             catch (Exception ex)
                             {
                                 // Logar ou ignorar falha ao deletar imagem específica
-                                Console.WriteLine($"Erro ao deletar imagem {caminhoImagem}: {ex.Message}");
+                                Console.WriteLine($"Erro ao deletar imagem {caminho}: {ex.Message}");
                             }
                         }
                     }
@@ -255,11 +255,18 @@ namespace Virtus.Controllers
 
             try
             {
-                var caminho = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imagem.Url.TrimStart('/'));
-                if (System.IO.File.Exists(caminho))
+                var caminho = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", imagem.Url);
+                if (System.IO.File.Exists(caminho)) { 
+
                     System.IO.File.Delete(caminho);
 
                 await _produtoRepository.DeletarImagem(id);
+                Console.WriteLine("Imagem apagada: " + caminho);
+            }
+                else
+                {
+                    Console.WriteLine("Imagem não encontrada: " + caminho);
+                }
             }
             catch
             {

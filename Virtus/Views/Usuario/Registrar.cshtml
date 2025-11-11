@@ -13,7 +13,7 @@
             <div class="row mb-3">
                 <label class="col-sm-4 col-form-label">Email*</label>
                 <div class="col-sm-8">
-                    <input class="form-control" asp-for="Email">
+                    <input class="form-control" asp-for="Email" placeholder="Digite seu email">
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
             </div>
@@ -21,7 +21,7 @@
             <div class="row mb-3">
                 <label class="col-sm-4 col-form-label">Nome*</label>
                 <div class="col-sm-8">
-                    <input class="form-control" asp-for="Nome">
+                    <input class="form-control" asp-for="Nome" placeholder="Digite seu nome">
                     <span asp-validation-for="Nome" class="text-danger"></span>
                 </div>
             </div>
@@ -29,7 +29,7 @@
             <div class="row mb-3">
                 <label class="col-sm-4 col-form-label">Sobrenome*</label>
                 <div class="col-sm-8">
-                    <input class="form-control" asp-for="Sobrenome">
+                    <input class="form-control" asp-for="Sobrenome" placeholder="Digite seu sobrenome">
                     <span asp-validation-for="Sobrenome" class="text-danger"></span>
                 </div>
             </div>
@@ -53,16 +53,22 @@
             <div class="row mb-3">
                 <label class="col-sm-4 col-form-label">Senha*</label>
                 <div class="col-sm-8">
-                    <input class="form-control" type="password" asp-for="Senha">
-                    <span asp-validation-for="Senha" class="text-danger"></span>
+                    <div class="password-container">
+                    <input class="form-control" type="password" id="senha" asp-for="Senha" placeholder="Digite sua senha">
+                        <i class="bi bi-eye toggle-visibility" id="toggleSenha"></i>
+                    </div>
+                        <span asp-validation-for="Senha" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-sm-4 col-form-label">Confirmar Senha*</label>
                 <div class="col-sm-8">
-                    <input class="form-control" type="password" asp-for="ConfirmarSenha">
-                    <span asp-validation-for="ConfirmarSenha" class="text-danger"></span>
+                    <div class="password-container">
+                    <input class="form-control" id="confirmarSenha" type="password" asp-for="ConfirmarSenha" placeholder="Digite sua senha novamente">
+                        <i class="bi bi-eye toggle-visibility" id="toggleConfirmarSenha"></i>
+                    </div>
+                        <span asp-validation-for="ConfirmarSenha" class="text-danger"></span>
                 </div>
             </div>
 
@@ -96,5 +102,28 @@
                 $('#CPF').val($('#CPF').val().replace(/\D/g, ''));
             });
         });
+
+
+        function togglePassword(inputId, iconId) {
+          const input = document.getElementById(inputId);
+          const icon = document.getElementById(iconId);
+
+          icon.addEventListener("mousedown", (e) => {
+            e.preventDefault(); // impede o blur (perder foco)
+          });
+
+          icon.addEventListener("click", () => {
+            const isPassword = input.type === "password";
+            input.type = isPassword ? "text" : "password";
+            icon.classList.toggle("bi-eye", !isPassword);
+            icon.classList.toggle("bi-eye-slash", isPassword);
+            input.focus(); // mantém o foco no campo
+          });
+        }
+
+        togglePassword("senha", "toggleSenha");
+        togglePassword("confirmarSenha", "toggleConfirmarSenha");
     </script>
+
 }
+
