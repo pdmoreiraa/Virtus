@@ -15,9 +15,20 @@ namespace Virtus.Controllers
             _produtoRepository = produtoRepository;
         }
 
-        public async Task<IActionResult> Index(int pagIndex)
+        public async Task<IActionResult> Index(int pagIndex, string? buscar)
         {
             var produtos = await _produtoRepository.ProdutosOrdenados();
+
+            // Busca
+            if (!string.IsNullOrEmpty(buscar))
+            {
+                produtos = produtos
+                    .Where(p => p.Nome.Contains(buscar, StringComparison.OrdinalIgnoreCase)
+                             )
+                    .ToList();
+
+                pagIndex = 1; // reset para página 1
+            }
 
             if (pagIndex < 1) pagIndex = 1;
 

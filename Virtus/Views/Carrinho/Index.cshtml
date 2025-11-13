@@ -20,9 +20,9 @@
                 {
                     <tr class="border border-dark rounded-3 p-3 mt-3">
                         <td>
-                            <div class="d-flex justify-content-between">
-                            <img src="@Url.Content("~/img/" + item.Imagem?.Url)" width="100" class="rounded" alt="@item.Produto.Nome"/>
-
+                            <div class="d-flex">
+                            <img src="@Url.Content("~/img/" + item.Imagem?.Url)" width="150" class="rounded" alt="@item.Produto.Nome"/>
+                            <div class="ms-3">
                             <h4>@item.Produto.Nome</h4>
                             <p>
                                 Marca: @item.Produto.Marca<br>
@@ -30,22 +30,33 @@
                                 Preço: R$ @item.PrecoUnitario
                             </p>
                             </div>
+                            </div>
                         <div style="white-space:nowrap">
-                                <button type="button" class="btn btn-light border border-dark rounded smooth-btn btn-sm"
+                            Quantidade: 
+                            <button type="button" class="btn btn-light border border-dark rounded smooth-btn btn-sm"
                                     onclick="diminuir(@item.Produto.Id)">
                                 -
                             </button>
                             <span class="border rounded-3 p-2 m-1">@item.Quantidade</span>
-                                <button type="button" class="btn btn-light border border-dark rounded smooth-btn btn-sm"
+                            <button type="button" class="btn btn-light border border-dark rounded smooth-btn btn-sm"
                                     onclick="aumentar(@item.Produto.Id)">
                                 +
                             </button>
                         </div>
                         </td>
 
-                        <td>
-                            <i class="bi bi-trash h4" style="cursor: pointer" onclick="remover(@item.Produto.Id)"></i>
-                            R$ @(item.PrecoUnitario * item.Quantidade)
+                        <td class="position-relative">
+                            <div class="position-absolute top-0 end-0 m-1 mt-2">
+                            <i class="bi bi-trash h4" style="cursor: pointer; font-size:30px;" onclick="remover(@item.Produto.Id)"></i>
+                            </div>
+
+                            <div class="position-absolute bottom-0 end-0 m-1 fw-bold d-flex align-items-end">
+                                <div class="me-1">R$ </div>
+                                <div>@(item.PrecoUnitario * item.Quantidade)
+                                </div>
+
+                               
+                            </div>
                         </td>
                     </tr>
                 }
@@ -54,7 +65,7 @@
     </div>
 
     <div class="col-md-4">
-        <div class="border rounded-3 p-3 bg-light sticky-top slide-left" >
+        <div class="border rounded-3 p-3 bg-light slide-left" >
             <h4>Resumo do Pedido</h4>
             <hr />
 

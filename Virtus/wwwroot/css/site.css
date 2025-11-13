@@ -158,6 +158,19 @@ main {
             color: #000;
         }
 
+.btn-reset {
+    all: unset; /* Remove absolutamente todos os estilos */
+    cursor: pointer; /* Mostra o cursor de clique */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .btn-reset i {
+        font-size: 1.2rem; /* Ajuste o tamanho do ícone */
+    }
+
+
 .footer {
     background-color: #232323;
     margin-top: auto;
@@ -167,8 +180,6 @@ main {
 }
 
 .footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
     padding: 30px 20px;
 }
 

@@ -1,4 +1,6 @@
-﻿namespace Virtus.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Virtus.Models
 {
     public class Cartao
     {
@@ -10,6 +12,9 @@
         public string Numero { get; set; } = string.Empty;
         public string Bandeira { get; set; } = string.Empty;
         public string Validade { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "O CVV é obrigatório.")]
+        [RegularExpression(@"^\d{3}$", ErrorMessage = "O CVV deve ter 3 dígitos numéricos.")]
         public string CVV { get; set; } = string.Empty;
 
         // Navegação

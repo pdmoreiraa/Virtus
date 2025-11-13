@@ -32,7 +32,7 @@
                             int index = 0;
                             foreach (var endereco in Model.Enderecos)
                             {
-                                <label class="card endereco-card p-3 border rounded-3 d-flex justify-content-between align-items-center hover-zoom">
+                                <label class="card endereco-card p-3 border rounded-3 d-flex justify-content-between align-items-center hover-zoom border border-dark rounded-3 p-3">
                                     <div>
                                         <input class="form-check-input me-2" type="radio" name="EnderecoSelecionadoId" value="@endereco.Id" @(index == 0 ? "checked" : "") />
                                         <strong>@endereco.NomeCompleto</strong>: @($"{endereco.Logradouro}, {endereco.Numero} - {endereco.Cidade}/{endereco.Estado} - CEP {endereco.CEP}")
@@ -64,15 +64,18 @@
                         foreach (var cartao in Model.Cartoes)
                         {
                             <label id="cartao-@cartao.Id"
-                                   class="card cartao-card p-3 border rounded-3 d-flex justify-content-between align-items-center hover-zoom mb-2"
+                                   class="card cartao-card p-3 d-flex justify-content-between align-items-center border border-dark rounded-3 hover-zoom mb-2"
                                    onclick="selecionarCartao('@cartao.Id')">
                                 <div class="d-flex align-items-center gap-3">
-                                    <input class="form-check-input me-2 metodo-pagamento"
-                                           type="radio"
-                                           name="MetodoPagamento"
-                                           value="Cartão"
-                                           required />
-                                    <img src="/img/cartao.png" width="50" alt="Cartão" class="rounded" />
+                                    <input class="form-check-input me-2 metodo-pagamento" type="radio" name="MetodoPagamento" value="Cartão" />
+                                    @if (cartao.Tipo == "Débito")
+                                    {
+                                        <i class="bi bi-credit-card-2-front-fill" title="Cartão de Débito" style="font-size:2rem;"></i>
+                                    }
+                                    else if (cartao.Tipo == "Crédito")
+                                    {
+                                        <i class="bi bi-credit-card-2-front" title="Cartão de Crédito" style="font-size:2rem;"></i>
+                                    }
                                     <div>
                                         <div>@cartao.NomeTitular</div>
                                         <div class="text-muted small">@cartao.Bandeira - @cartao.Validade</div>
@@ -101,7 +104,7 @@
                     <label class="d-flex justify-content-beetween align-items-center gap-2 card p-3 border border-dark rounded-3 p-3 pix-card hover-zoom">
                         <input class="form-check-input me-2 metodo-pagamento" type="radio" name="MetodoPagamento" id="pixRadio" value="Pix"
                                onclick="selecionarPix()" />
-                        Pagar com Pix <img src="/img/pix-icon.png" width="18" alt="pix" />
+                        Pagar com Pix <img src="/img/pixl.png" width="18" alt="pix" />
                         <div class="p-2">
                             <h6 class="fw-bold">Ganhe 5% de desconto</h6>
                             <p class="small mb-1">1. Após a finalização do pedido, abra o app do seu banco e escolha pagar com Pix.</p>
@@ -115,7 +118,7 @@
 
             <!-- Coluna direita -->
             <div class="col-md-4">
-                <div class="border rounded-3 p-3 bg-light sticky-top slide-left" style="top:20px">
+                <div class="border rounded-3 p-3 bg-light slide-left" style="top:20px">
                     <h6 class="fw-bold">Resumo do pedido</h6>
                     <hr />
 
@@ -242,9 +245,25 @@
     /* Efeito de destaque no card selecionado */
     input[type="radio"]:checked + strong,
     input[type="radio"]:checked ~ div {
-        color: #0d6efd;
+        color: #000;
         font-weight: 600;
     }
+
+    .cartao-card {
+        border: 1px solid #343a40 !important; /* mantém a borda escura do Bootstrap */
+        border-radius: 0.5rem; /* equivalente a rounded-3 */
+        box-shadow: none !important;
+    }
+
+        /* remove qualquer foco azul do Bootstrap */
+        .cartao-card:focus,
+        .cartao-card:active,
+        .cartao-card:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            border-color: #343a40 !important; /* mantém a cor normal */
+        }
+
 
     .section-animate {
         animation: fadeIn 1s ease both;
@@ -272,12 +291,6 @@
             background-color: #157347 !important;
             transform: scale(1.02);
         }
-
-    .selected {
-        border-color: #0d6efd !important;
-        box-shadow: 0 0 10px rgba(13,110,253,0.4);
-        transition: 0.3s;
-    }
 
 </style>
 
@@ -480,17 +493,18 @@
 
                     <div class="mb-3">
                         <label class="form-label">Número do cartão</label>
-                        <input type="text" name="Numero" maxlength="16" class="form-control" value="@Model.NovoCartao.Numero" required />
+                        <input type="text" id="Numero" name="Numero" inputmode="numeric" placeholder="0000 0000 0000 0000"
+                            autocomplete="cc-number" maxlength="19" class="form-control" value="@Model.NovoCartao.Numero" required />
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Validade (MM/AA)</label>
-                            <input type="text" name="Validade" maxlength="5" class="form-control" placeholder="MM/AA" value="@Model.NovoCartao.Validade" required />
+                            <input type="text" name="Validade" id="Validade" class="form-control" placeholder="MM/AA" value="@Model.NovoCartao.Validade" required />
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">CVV</label>
-                            <input type="text" name="CVV" maxlength="3" class="form-control" value="@Model.NovoCartao.CVV" required />
+                            <input type="text" id="CVV" name="CVV" placeholder="123" class="form-control" value="@Model.NovoCartao.CVV" required />
                         </div>
                     </div>
 
@@ -506,14 +520,54 @@
                     </div>
 
                     <div class="text-end">
-                        <button type="submit" class="btn btn-primary">Salvar cartão</button>
+                        <button type="submit" class="btn btn-dark smooth-btn">Salvar cartão</button>
                     </div>
                 </form>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-light border border-dark rounded smooth-btn" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#Validade').mask('00/00');
+
+        });
+
+            document.addEventListener("DOMContentLoaded", function () {
+            const cvv = document.getElementById("CVV");
+
+            cvv.addEventListener("input", function (e) {
+                // remove tudo que não for número
+                e.target.value = e.target.value.replace(/\D/g, '');
+                // limita a 3 caracteres
+                if (e.target.value.length > 3) {
+                    e.target.value = e.target.value.slice(0, 3);
+                }
+            });
+        });
+
+                document.addEventListener("DOMContentLoaded", function () {
+            const campo = document.getElementById("Numero");
+
+            campo.addEventListener("input", function (e) {
+                // Remove tudo que não for número
+                let valor = e.target.value.replace(/\D/g, '');
+
+                // Limita a 16 dígitos
+                valor = valor.substring(0, 16);
+
+                // Agrupa de 4 em 4 dígitos
+                let formatado = valor.replace(/(\d{4})(?=\d)/g, '$1 ');
+                e.target.value = formatado.trim();
+            });
+        });
+    </script>
+}
