@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using Virtus.Models;
 using Virtus.Repository;
 using Virtus.Services;
@@ -236,7 +237,7 @@ namespace Virtus.Controllers
 
         }
         [HttpPost]
-        public async Task<IActionResult> FinalizarPedido(int EnderecoSelecionadoId, string MetodoPagamento, int? CartaoId)
+        public async Task<IActionResult> FinalizarPedido(int EnderecoSelecionadoId, string MetodoPagamento, int? CartaoId, int ParcelasSelecionadas, decimal ValorParcela)
         {
             // Validar endereço
             if (EnderecoSelecionadoId <= 0)
@@ -251,6 +252,8 @@ namespace Virtus.Controllers
                 return RedirectToAction("Login", "Usuario");
 
             int usuarioId = Convert.ToInt32(usuarioIdStr);
+
+
 
             // Validar método de pagamento
             if (string.IsNullOrEmpty(MetodoPagamento))
@@ -307,6 +310,15 @@ namespace Virtus.Controllers
                 }
                 else
                 {
+                    HttpContext.Session.SetInt32("Parcelas", ParcelasSelecionadas);
+
+                    ValorParcela = ValorParcela / 100m;
+
+
+                    HttpContext.Session.SetString("ValorParcela",
+                        ValorParcela.ToString(CultureInfo.InvariantCulture));
+
+
                     return RedirectToAction("ConfirmarCartao", "Carrinho", new { pedidoId = pedidoId });
                 }
             }
@@ -412,11 +424,29 @@ namespace Virtus.Controllers
         [HttpGet]
         public async Task<IActionResult> ConfirmarCartao(int pedidoId)
         {
+
             if (pedidoId <= 0)
             {
                 TempData["Erro"] = "Pedido inválido.";
                 return RedirectToAction("Index");
             }
+
+            int parcelas = HttpContext.Session.GetInt32("Parcelas") ?? 1;
+
+            string valorStr = HttpContext.Session.GetString("ValorParcela");
+
+            decimal valorParcela = 0m;
+
+            if (!string.IsNullOrEmpty(valorStr))
+            {
+                valorParcela = decimal.Parse(valorStr, CultureInfo.InvariantCulture);
+            }
+            // FORMATA PARA EXIBIR EM R$ NA VIEW
+            ViewBag.Parcelas = parcelas;
+            ViewBag.ValorParcela = valorParcela.ToString("F2", new CultureInfo("pt-BR"));
+
+
+            Console.WriteLine("SESSION ValorParcela RAW = " + HttpContext.Session.GetString("ValorParcela"));
 
             // Obter pedido do banco
             var pedido = await _pedidoRepository.ObterPedidoPorId(pedidoId);
@@ -445,11 +475,18 @@ namespace Virtus.Controllers
         [HttpPost]
         public async Task<IActionResult> ConfirmarPagamentoCartao(int pedidoId)
         {
+
             var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
             if (string.IsNullOrEmpty(usuarioIdStr))
                 return RedirectToAction("Login", "Usuario");
 
             int usuarioId = Convert.ToInt32(usuarioIdStr);
+
+            if (TempData["Parcelas"] == null || TempData["ValorParcela"] == null)
+            {
+                return RedirectToAction("ErroPagamento"); // Ou voltar ao carrinho
+            }
+
 
             var pedido = await _pedidoRepository.ObterPedidoPorId(pedidoId);
             if (pedido == null)

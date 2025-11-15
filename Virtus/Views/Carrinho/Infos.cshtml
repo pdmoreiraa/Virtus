@@ -67,7 +67,7 @@
                                    class="card cartao-card p-3 d-flex justify-content-between align-items-center border border-dark rounded-3 hover-zoom mb-2"
                                    onclick="selecionarCartao('@cartao.Id')">
                                 <div class="d-flex align-items-center gap-3">
-                                    <input class="form-check-input me-2 metodo-pagamento" type="radio" name="MetodoPagamento" value="Cartão" />
+                                    <input class="form-check-input me-2 metodo-pagamento" type="radio" name="MetodoPagamento" value="Cartão" data-tipo="@cartao.Tipo" />
                                     @if (cartao.Tipo == "Débito")
                                     {
                                         <i class="bi bi-credit-card-2-front-fill" title="Cartão de Débito" style="font-size:2rem;"></i>
@@ -96,6 +96,24 @@
                     <button class="btn btn-dark mt-3 smooth-btn" type="button" data-bs-toggle="modal" data-bs-target="#AdicionarCartao">
                         Adicionar cartão
                     </button>
+
+                    <div id="sectionParcelas" style="display:none;" class="mt-2">
+                        <h5>Parcelamento</h5>
+
+                        
+                        <p>Total da compra: <span>R$ @Model.Total.ToString("F2")</span></p>
+                        <div class="d-flex">
+                        <label class="form-label">Número de parcelas:</label>
+                            <select id="selectParcelas" class="form-select form-select-sm ms-3 border border-dark rounded-3" style="width: 100px;">
+                        </select>
+
+                        <p class="mt-2 fw-semibold ms-2">
+                            de: R$ <span id="valorParcela">R$ 0,00</span>
+                        </p>
+                        </div>
+                    </div>
+
+
                 </div>
 
 
@@ -131,6 +149,10 @@
                         <span id="frete">R$ @Model.TaxaEntrega.ToString("F2")</span>
                     </div>
                     <hr />
+
+                    <input type="hidden" id="ParcelasSelecionadas" name="ParcelasSelecionadas" value="@ViewBag.Parcelas" />
+                    <input type="hidden" id="ValorParcela" name="ValorParcela" value="@ViewBag.ValorParcela" />
+
                     <div class="d-flex justify-content-between fw-bold">
                         <span>Valor total:</span>
                         <span id="total">R$ @Model.Total.ToString("F2")</span>
@@ -140,9 +162,15 @@
                         ou R$ <span id="pixPrice">@Model.Pix.ToString("F2")</span> no pix com desconto de 5%
                     </small>
 
+                    <div class="mt-2">
+                        <span id="parcelasResumo" class="text-muted"></span>
+
+                    </div>
+
                     <button type="submit" class="btn btn-dark w-100 mt-3 smooth-btn">
                         Usar esse método de pagamento
                     </button>
+
                 </div>
             </div>
         </div>
@@ -264,6 +292,10 @@
             border-color: #343a40 !important; /* mantém a cor normal */
         }
 
+    select:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
 
     .section-animate {
         animation: fadeIn 1s ease both;
@@ -294,90 +326,6 @@
 
 </style>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const metodoRadios = document.querySelectorAll('input[name="MetodoPagamento"]');
-        const botao = document.querySelector('button[type="submit"].btn-dark.w-100');
-        let etapaConfirmacao = false;
-
-        // Seleção visual de cartões / pix
-        metodoRadios.forEach(radio => {
-            radio.addEventListener("change", () => {
-                document.querySelectorAll('.pix-card, .cartao-card').forEach(c => c.classList.remove('selected'));
-                radio.closest(".card").classList.add("selected");
-            });
-        });
-
-        // Clique no botão principal
-        botao.addEventListener("click", (e) => {
-            const metodo = document.querySelector('input[name="MetodoPagamento"]:checked');
-
-            if (!etapaConfirmacao) {
-                e.preventDefault(); // bloqueia o submit no primeiro clique
-
-                if (!metodo) {
-                    mostrarErro("Por favor, selecione um método de pagamento antes de continuar.");
-                    return;
-                }
-
-                // Muda para modo "Confirmar pedido"
-                botao.textContent = "Confirmar pedido";
-                botao.classList.add("confirmando");
-
-                // Animação leve
-                botao.animate(
-                    [{ transform: "scale(1)" }, { transform: "scale(1.07)" }, { transform: "scale(1)" }],
-                    { duration: 400, easing: "ease-in-out" }
-                );
-
-                etapaConfirmacao = true;
-            } else {
-                // Segundo clique → submete o formulário normalmente
-                botao.textContent = "Processando...";
-                botao.classList.add("disabled");
-            }
-        });
-
-        // Função de erro visual (aparece e some depois)
-        function mostrarErro(msg) {
-            let alerta = document.getElementById("alertaErro");
-
-            if (!alerta) {
-                alerta = document.createElement("div");
-                alerta.id = "alertaErro";
-                alerta.className = "alert alert-danger mt-3 fade show";
-                alerta.role = "alert";
-                document.querySelector(".col-md-8").prepend(alerta);
-            }
-
-            alerta.textContent = msg;
-            alerta.style.opacity = "1";
-            alerta.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: "forwards" });
-
-            // Some automaticamente após 3s
-            setTimeout(() => {
-                alerta.classList.remove("show");
-                alerta.classList.add("fade");
-            }, 3000);
-        }
-    });
-
-    function selecionarCartao(cartaoId) {
-        // Atualiza o campo hidden
-        document.getElementById('cartaoSelecionado').value = cartaoId;
-
-        // Remove o destaque de todos
-        document.querySelectorAll('.cartao-card').forEach(card => {
-            card.classList.remove('border-4', 'border-primary', 'shadow');
-        });
-
-        // Destaca o cartão selecionado
-        const selecionado = document.getElementById('cartao-' + cartaoId);
-        if (selecionado) {
-            selecionado.classList.add('border-4', 'border-primary', 'shadow');
-        }
-    }
-</script>
 
 
 
@@ -532,6 +480,7 @@
     </div>
 </div>
 
+
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
@@ -569,5 +518,211 @@
                 e.target.value = formatado.trim();
             });
         });
+
+                document.addEventListener("DOMContentLoaded", function () {
+            const metodoRadios = document.querySelectorAll('input[name="MetodoPagamento"]');
+            const botao = document.querySelector('button[type="submit"].btn-dark.w-100');
+            let etapaConfirmacao = false;
+
+            // Seleção visual de cartões / pix
+            metodoRadios.forEach(radio => {
+                radio.addEventListener("change", () => {
+                    document.querySelectorAll('.pix-card, .cartao-card').forEach(c => c.classList.remove('selected'));
+                    radio.closest(".card").classList.add("selected");
+                });
+            });
+
+            // Clique no botão principal
+            botao.addEventListener("click", (e) => {
+                const metodo = document.querySelector('input[name="MetodoPagamento"]:checked');
+
+                if (!etapaConfirmacao) {
+                    e.preventDefault(); // bloqueia o submit no primeiro clique
+
+                    if (!metodo) {
+                        mostrarErro("Por favor, selecione um método de pagamento antes de continuar.");
+                        return;
+                    }
+
+                    // Muda para modo "Confirmar pedido"
+                    botao.textContent = "Confirmar pedido";
+                    botao.classList.add("confirmando");
+
+                    // Animação leve
+                    botao.animate(
+                        [{ transform: "scale(1)" }, { transform: "scale(1.07)" }, { transform: "scale(1)" }],
+                        { duration: 400, easing: "ease-in-out" }
+                    );
+
+                    etapaConfirmacao = true;
+                } else {
+                    // Segundo clique → submete o formulário normalmente
+                    botao.textContent = "Processando...";
+                    botao.classList.add("disabled");
+                }
+            });
+
+            // Função de erro visual (aparece e some depois)
+            function mostrarErro(msg) {
+                let alerta = document.getElementById("alertaErro");
+
+                if (!alerta) {
+                    alerta = document.createElement("div");
+                    alerta.id = "alertaErro";
+                    alerta.className = "alert alert-danger mt-3 fade show";
+                    alerta.role = "alert";
+                    document.querySelector(".col-md-8").prepend(alerta);
+                }
+
+                alerta.textContent = msg;
+                alerta.style.opacity = "1";
+                alerta.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: "forwards" });
+
+                // Some automaticamente após 3s
+                setTimeout(() => {
+                    alerta.classList.remove("show");
+                    alerta.classList.add("fade");
+                }, 3000);
+            }
+        });
+
+        function getTotalCompra() {
+        let txt = document.getElementById("total").innerText;
+
+        // Remove "R$ " e espaços
+        txt = txt.replace("R$", "").trim();
+
+        // Remove separador de milhar, troca vírgula por ponto
+        txt = txt.replace(/\./g, "").replace(",", ".");
+
+        return parseFloat(txt);
+        }
+
+            document.addEventListener("DOMContentLoaded", function () {
+
+            const radios = document.querySelectorAll(".metodo-pagamento");
+            const secParcelas = document.getElementById("sectionParcelas");
+            const selectParcelas = document.getElementById("selectParcelas");
+            const spanValorParcela = document.getElementById("valorParcela");
+
+            function atualizarValorParcela() {
+                const total = getTotalCompra();
+                const qtd = parseInt(document.getElementById("selectParcelas").value);
+
+                if (!qtd || qtd === 0) {
+                    spanValorParcela.innerText = "R$ 0,00";
+                    return;
+                }
+
+                const valorParcela = total / qtd;
+                spanValorParcela.innerText = valorParcela.toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+        document.getElementById("ParcelasSelecionadas").value = qtd;
+        document.getElementById("ValorParcela").value = valorParcela.toFixed(2);
+
+
+            }
+
+            // Quando troca o cartão
+            radios.forEach(r => {
+                r.addEventListener("change", function () {
+                    const tipo = this.dataset.tipo; 
+                    const total = getTotalCompra();
+
+
+
+                    if (tipo === "Crédito") {
+                        secParcelas.style.display = "block";
+
+                        // Preenche opções de parcelas 1 até 12
+                        selectParcelas.innerHTML = "";
+                        for (let i = 1; i <= 12; i++) {
+                            let option = document.createElement("option");
+                            option.value = i;
+                            option.textContent = `${i}x`;
+                            selectParcelas.appendChild(option);
+                        }
+
+                        atualizarValorParcela();
+                    }
+                    else {
+                        secParcelas.style.display = "none";
+                        selectParcelas.innerHTML = "";
+                    }
+                });
+            });
+
+            // Recalcula valor quando troca número de parcelas
+            selectParcelas.addEventListener("change", atualizarValorParcela);
+
+        });
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const spanResumo = document.getElementById("parcelasResumo");
+            const selectParcelas = document.getElementById("selectParcelas");
+
+            function getTotalCompra() {
+                let txt = document.getElementById("total").innerText.replace("R$", "").trim();
+                return parseFloat(txt.replace(".", "").replace(",", "."));
+            }
+
+            // Atualiza o texto fora da área dos cartões
+            function atualizarParcelasResumo(qtdParcelas = 1) {
+                if (!spanResumo) return;
+
+                const total = getTotalCompra();
+                const valorParcela = total / qtdParcelas;
+
+                spanResumo.innerText = `${qtdParcelas}x de ` +
+                    valorParcela.toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+
+            // Quando escolher outra quantidade de parcelas no select
+            selectParcelas?.addEventListener("change", function () {
+                const qtd = parseInt(this.value);
+                atualizarParcelasResumo(qtd);
+            });
+
+            // Quando mudar o cartão
+            const radios = document.querySelectorAll("input.metodo-pagamento");
+
+            radios.forEach(r => {
+                r.addEventListener("change", function () {
+                    const tipo = this.dataset.tipo;
+
+                    if (tipo === "Crédito") {
+
+                        // Recria o select 1 a 12
+                        selectParcelas.innerHTML = "";
+                        for (let i = 1; i <= 12; i++) {
+                            selectParcelas.innerHTML += `<option value="${i}">${i}x</option>`;
+                        }
+
+                        // Sempre começar com 1x
+                        selectParcelas.value = "1";
+                        atualizarParcelasResumo(1);
+
+                    } else if (tipo === "Débito") {
+                        // Débito sempre é 1x
+                        atualizarParcelasResumo(1);
+                    }
+                    else if (tipo === "Pix"){
+                        atualizarParcelasResumo.style.display = "none";
+                    }
+                });
+            });
+
+            // Ao carregar a página → sempre começa em 1x
+            atualizarParcelasResumo.style.display = "none";
+
+        });
+
     </script>
 }
