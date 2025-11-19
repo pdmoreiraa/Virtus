@@ -34,8 +34,8 @@
                             {
                                 <label class="card endereco-card p-3 border rounded-3 d-flex justify-content-between align-items-center hover-zoom border border-dark rounded-3 p-3">
                                     <div>
-                                        <input class="form-check-input me-2" type="radio" name="EnderecoSelecionadoId" value="@endereco.Id" @(index == 0 ? "checked" : "") />
-                                        <strong>@endereco.NomeCompleto</strong>: @($"{endereco.Logradouro}, {endereco.Numero} - {endereco.Cidade}/{endereco.Estado} - CEP {endereco.CEP}")
+                                        <input class="form-check-input me-2" type="radio" name="EnderecoSelecionadoId" value="@endereco.EndId" @(index == 0 ? "checked" : "") />
+                                        <strong>@endereco.EndNomeCompleto</strong>: @($"{endereco.EndLogradouro}, {endereco.EndNumero} - {endereco.EndBairro} - {endereco.EndCidade}/{endereco.EndEstado}")
                                     </div>
                                 </label>
                                 index++;
@@ -63,22 +63,22 @@
                     {
                         foreach (var cartao in Model.Cartoes)
                         {
-                            <label id="cartao-@cartao.Id"
+                            <label id="cartao-@cartao.CarId"
                                    class="card cartao-card p-3 d-flex justify-content-between align-items-center border border-dark rounded-3 hover-zoom mb-2"
-                                   onclick="selecionarCartao('@cartao.Id')">
+                                   onclick="selecionarCartao('@cartao.CarId')">
                                 <div class="d-flex align-items-center gap-3">
-                                    <input class="form-check-input me-2 metodo-pagamento" type="radio" name="MetodoPagamento" value="Cartão" data-tipo="@cartao.Tipo" />
-                                    @if (cartao.Tipo == "Débito")
+                                    <input class="form-check-input me-2 metodo-pagamento" type="radio" name="MetodoPagamento" value="Cartão" data-tipo="@cartao.CarTipo" />
+                                    @if (cartao.CarTipo == "Débito")
                                     {
                                         <i class="bi bi-credit-card-2-front-fill" title="Cartão de Débito" style="font-size:2rem;"></i>
                                     }
-                                    else if (cartao.Tipo == "Crédito")
+                                    else if (cartao.CarTipo == "Crédito")
                                     {
                                         <i class="bi bi-credit-card-2-front" title="Cartão de Crédito" style="font-size:2rem;"></i>
                                     }
                                     <div>
-                                        <div>@cartao.NomeTitular</div>
-                                        <div class="text-muted small">@cartao.Bandeira - @cartao.Validade</div>
+                                        <div>@cartao.CarNomeTitular</div>
+                                        <div class="text-muted small">@cartao.CarBandeira - @cartao.CarValidade</div>
                                     </div>
                                 </div>
                             </label>
@@ -341,74 +341,81 @@
 
             <div class="modal-body">
                 <form asp-action="SalvarEndereco" method="post">
-                    <input type="hidden" name="Id" value="@Model.NovoEndereco.Id" />
+                    <input type="hidden" name="EndId" value="@Model.NovoEndereco.EndId" />
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Nome Completo</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="NomeCompleto" value="@Model.NovoEndereco.NomeCompleto" />
+                            <input class="form-control" name="EndNomeCompleto" value="@Model.NovoEndereco.EndNomeCompleto"
+                                   placeholder="Digite seu nome completo" />
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Logradouro</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="Logradouro" value="@Model.NovoEndereco.Logradouro" />
+                            <input class="form-control" name="EndLogradouro" value="@Model.NovoEndereco.EndLogradouro"
+                            placeholder="Digite o logradouro" />
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Número</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="Numero" value="@Model.NovoEndereco.Numero" />
+                            <input class="form-control" name="EndNumero" value="@Model.NovoEndereco.EndNumero"
+                            placeholder="Digite o número do endereço" />
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Bairro</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="Bairro" value="@Model.NovoEndereco.Bairro" />
+                            <input class="form-control" name="EndBairro" value="@Model.NovoEndereco.EndBairro"
+                            placeholder="Digite o bairro" />
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Cidade</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="Cidade" value="@Model.NovoEndereco.Cidade" />
+                            <input class="form-control" name="EndCidade" value="@Model.NovoEndereco.EndCidade"
+                                   placeholder="Digite a cidade" />
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Estado</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="Estado" value="@Model.NovoEndereco.Estado" />
+                            <input class="form-control" name="EndEstado" value="@Model.NovoEndereco.EndEstado" 
+                            placeholder="Digite o estado"/>
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">CEP</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="CEP" value="@Model.NovoEndereco.CEP" />
+                            <input class="form-control" name="EndCEP" id="CEP" value="@Model.NovoEndereco.EndCEP" placeholder="00000-000" />
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">Complemento</label>
                         <div class="col-sm-8">
-                            <input class="form-control" name="Complemento" value="@Model.NovoEndereco.Complemento" />
+                            <input class="form-control" name="EndComplemento" value="@Model.NovoEndereco.EndComplemento"
+                                   placeholder="Digite o complemento (Opcional)"/>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="offset-sm-4 col-sm-8">
-                            <button type="submit" class="btn btn-primary">Salvar</button>
+                            <button type="submit" class="btn btn-dark smooth-btn">Salvar</button>
                         </div>
                     </div>
                 </form>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-light border border-dark rounded smooth-btn" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
     </div>
@@ -428,7 +435,7 @@
                 <form asp-action="SalvarCartao" method="post">
                     <div class="mb-3">
                         <label class="form-label">Tipo</label>
-                        <select name="Tipo" class="form-select" value="@Model.NovoCartao.Tipo" required>
+                        <select name="CarTipo" class="form-select" value="@Model.NovoCartao.CarTipo" required>
                             <option value="">Selecione...</option>
                             <option>Crédito</option>
                             <option>Débito</option>
@@ -436,29 +443,29 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Nome no cartão</label>
-                        <input type="text" name="NomeTitular" class="form-control" value="@Model.NovoCartao.NomeTitular" required  />
+                        <input type="text" name="CarNomeTitular" class="form-control" value="@Model.NovoCartao.CarNomeTitular" required />
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Número do cartão</label>
-                        <input type="text" id="Numero" name="Numero" inputmode="numeric" placeholder="0000 0000 0000 0000"
-                            autocomplete="cc-number" maxlength="19" class="form-control" value="@Model.NovoCartao.Numero" required />
+                        <input type="text" id="Numero" name="CarNumero" inputmode="numeric" placeholder="0000 0000 0000 0000"
+                               autocomplete="cc-number" maxlength="19" class="form-control" value="@Model.NovoCartao.CarNumero" required />
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Validade (MM/AA)</label>
-                            <input type="text" name="Validade" id="Validade" class="form-control" placeholder="MM/AA" value="@Model.NovoCartao.Validade" required />
+                            <input type="text" name="CarValidade" id="Validade" class="form-control" placeholder="MM/AA" value="@Model.NovoCartao.CarValidade" required />
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">CVV</label>
-                            <input type="text" id="CVV" name="CVV" placeholder="123" class="form-control" value="@Model.NovoCartao.CVV" required />
+                            <input type="text" id="CVV" name="CarCVV" placeholder="123" class="form-control" value="@Model.NovoCartao.CarCVV" required />
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Bandeira</label>
-                        <select name="Bandeira" class="form-select" value="@Model.NovoCartao.Bandeira" required>
+                        <select name="CarBandeira" class="form-select" value="@Model.NovoCartao.CarBandeira" required>
                             <option value="">Selecione...</option>
                             <option>Mastercard</option>
                             <option>Visa</option>
@@ -485,23 +492,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
-        $(document).ready(function () {
-            $('#Validade').mask('00/00');
-
-        });
-
-            document.addEventListener("DOMContentLoaded", function () {
-            const cvv = document.getElementById("CVV");
-
-            cvv.addEventListener("input", function (e) {
-                // remove tudo que não for número
-                e.target.value = e.target.value.replace(/\D/g, '');
-                // limita a 3 caracteres
-                if (e.target.value.length > 3) {
-                    e.target.value = e.target.value.slice(0, 3);
-                }
-            });
-        });
 
                 document.addEventListener("DOMContentLoaded", function () {
             const campo = document.getElementById("Numero");

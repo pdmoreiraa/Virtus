@@ -58,16 +58,16 @@
 <table class="table">
     <thead>
         <tr>
-            <th style="cursor: pointer;" onclick="sortTable('Id')">ID @getArrow("Id")</th>
-            <th style="cursor: pointer;" onclick="sortTable('Nome')">Nome @getArrow("Nome")</th>
-            <th style="cursor: pointer;" onclick="sortTable('Marca')">Marca @getArrow("Marca")</th>
-            <th style="cursor: pointer;" onclick="sortTable('Categoria')">Categoria @getArrow("Categoria")</th>
-            <th style="cursor: pointer;" onclick="sortTable('Tipo')">Tipo @getArrow("Tipo")</th>
-            <th style="cursor: pointer;" onclick="sortTable('Tipo')">Esporte @getArrow("Esporte")</th>
-            <th style="cursor: pointer;" onclick="sortTable('Preco')">Preço @getArrow("Preco")</th>
+            <th style="cursor: pointer;" onclick="sortTable('PrdId')">ID @getArrow("PrdId")</th>
+            <th style="cursor: pointer;" onclick="sortTable('PrdNome')">Nome @getArrow("PrdNome")</th>
+            <th style="cursor: pointer;" onclick="sortTable('PrdMarca')">Marca @getArrow("PrdMarca")</th>
+            <th style="cursor: pointer;" onclick="sortTable('PrdCategoria')">Categoria @getArrow("PrdCategoria")</th>
+            <th style="cursor: pointer;" onclick="sortTable('PrdTipo')">Tipo @getArrow("PrdTipo")</th>
+            <th style="cursor: pointer;" onclick="sortTable('PrdTipo')">Esporte @getArrow("PrdEsporte")</th>
+            <th style="cursor: pointer;" onclick="sortTable('PrdPreco')">Preço @getArrow("PrdPreco")</th>
             <th>Imagem</th>
-            <th style="cursor: pointer;" onclick="sortTable('Estoque')">Estoque @getArrow("Estoque")</th>
-            <th style="cursor: pointer;" onclick="sortTable('DataCriada')">Data de Criação @getArrow("DataCriada")</th>
+            <th style="cursor: pointer;" onclick="sortTable('PrdCor')">Cor @getArrow("PrdCor")</th>
+            <th style="cursor: pointer;" onclick="sortTable('PrdData')">Data de Criação @getArrow("PrdData")</th>
             <th>Ações</th>
         </tr>
     </thead>
@@ -76,20 +76,20 @@
         @foreach (var produto in Model)
         {
             <tr>
-                <td>@produto.Id</td>
-                <td>@produto.Nome</td>
-                <td>@produto.Marca</td>
-                <td>@produto.Categoria</td>
-                <td>@produto.Tipo</td>
-                <td>@produto.Esporte</td>
-                <td>R$ @produto.Preco.ToString("F2")</td>
-                <td><img src="@Url.Content("~/img/" + produto.Imagens.FirstOrDefault()?.Url)" width="100" /></td>
-                <td>@produto.Estoque</td>
-                <td>@produto.DataCriada.ToString("dd/MM/yyyy")</td>
+                <td>@produto.PrdId</td>
+                <td>@produto.PrdNome</td>
+                <td>@produto.PrdMarca</td>
+                <td>@produto.PrdCategoria</td>
+                <td>@produto.PrdTipo</td>
+                <td>@produto.PrdEsporte</td>
+                <td>R$ @produto.PrdPreco.ToString("F2")</td>
+                <td><img src="@Url.Content("~/img/" + produto.Imagens.FirstOrDefault()?.PimgUrl)" width="100" /></td>
+                <td>@produto.PrdCor</td>
+                <td>@produto.PrdData.ToString("dd/MM/yyyy")</td>
                 <td style="white-space:nowrap">
                     <a class="btn btn-light border border-dark rounded smooth-btn" asp-controller="Produto" asp-action="Editar"
-                       asp-route-id="@produto.Id">Editar</a>
-                    <form asp-action="Deletar" asp-route-id="@produto.Id" method="post" style="display:inline;">
+                       asp-route-id="@produto.PrdId">Editar</a>
+                    <form asp-action="Deletar" asp-route-id="@produto.PrdId" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-dark smooth-btn" onclick="return confirm('Tem certeza que deseja excluir este produto?')">
                             Excluir
                         </button>

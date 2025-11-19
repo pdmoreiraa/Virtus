@@ -23,7 +23,7 @@ namespace Virtus.Controllers
             if (!string.IsNullOrEmpty(buscar))
             {
                 produtos = produtos
-                    .Where(p => p.Nome.Contains(buscar, StringComparison.OrdinalIgnoreCase)
+                    .Where(p => p.PrdNome.Contains(buscar, StringComparison.OrdinalIgnoreCase)
                              )
                     .ToList();
 
@@ -54,9 +54,9 @@ namespace Virtus.Controllers
             return View(produtosPaginados);
         }
 
-        public async Task<IActionResult> Detalhes(Produto produto)
+        public async Task<IActionResult> Detalhes(int id)
         {
-            var produtos = await _produtoRepository.ProdutosPorId(produto.Id);
+            var produtos = await _produtoRepository.ProdutosPorId(id);
             if (produtos == null)
             {
                 return RedirectToAction("Index", "Loja");

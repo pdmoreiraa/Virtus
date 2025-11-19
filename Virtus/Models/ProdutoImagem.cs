@@ -2,9 +2,9 @@
 {
     public class ProdutoImagem
     {
-        public int ImagemId { get; set; }
+        public int PimgId { get; set; }
         public int ProdutoId { get; set; }
-        public string Url { get; set; } = string.Empty;
-        public int OrdemImagem { get; set; }
+        public string PimgUrl { get; set; } = string.Empty;
+        public int PimgOrdemImagem { get; set; }
     }
 }

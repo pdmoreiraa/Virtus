@@ -12,17 +12,17 @@
     {
         <div class="col-lg-3 col-md-6">
             <div class="rounded border shadow p-3 text-center h-100">
-                <img src="@produto.Imagens.FirstOrDefault()?.Url" class="img-fluid" alt="..."
+                <img src="@produto.Imagens.FirstOrDefault()?.PimgUrl" class="img-fluid" alt="..."
                      style="height: 180px; object-fit: contain" />
                 <hr />
-                <h5 class="py-2">@produto.Nome</h5>
+                <h5 class="py-2">@produto.PrdNome</h5>
                 <p>
-                    Marca: @produto.Marca, Categoria: @produto.Categoria
+                    Marca: @produto.PrdMarca, Categoria: @produto.PrdCategoria
                 </p>
-                <h4 class="mb-3">R$ @produto.Preco.ToString("F2")</h4>
+                <h4 class="mb-3">R$ @produto.PrdPreco.ToString("F2")</h4>
                 <a class="btn btn-primary btn-sm mb-2" asp-controller="Loja"
-                   asp-action="Detalhes" asp-route-id="@produto.Id" role="button">Detalhes</a>
-                <button type="button" class="btn btn-warning btn-sm mb-2" onclick="adicionarAoCarrinho(this, @produto.Id)">
+                   asp-action="Detalhes" asp-route-id="@produto.PrdId" role="button">Detalhes</a>
+                <button type="button" class="btn btn-warning btn-sm mb-2" onclick="adicionarAoCarrinho(this, @produto.PrdId)">
                     Adicionar ao Carrinho <i class="bi bi-cart4"></i>
                 </button>
             </div>

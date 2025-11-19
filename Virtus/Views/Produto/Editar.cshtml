@@ -6,35 +6,40 @@
 
 
         <form asp-action="Editar" method="post" enctype="multipart/form-data">
-            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="PrdId" />
 
             <div class="row mb-3">
                 <label class="col-sm-4 col-form-label">Id</label>
                 <div class="col-sm-8">
-                    <input class="form-control-plaintext" readonly value="@Model.Id">
+                    <input class="form-control-plaintext" readonly value="@Model.PrdId">
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label for="Nome" class="col-sm-4 col-form-label">Nome</label>
                 <div class="col-sm-8">
-                    <input id="Nome" class="form-control" asp-for="Nome">
-                    <span asp-validation-for="Nome" class="text-danger"></span>
+                    <input id="PrdNome" class="form-control" asp-for="PrdNome">
+                    <span asp-validation-for="PrdNome" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label for="Marca" class="col-sm-4 col-form-label">Marca</label>
                 <div class="col-sm-8">
-                    <input id="Marca" name="Marca" class="form-control" asp-for="Marca">
-                    <span asp-validation-for="Marca" class="text-danger"></span>
+                    <select class="form-select" name="PrdMarca" asp-for="PrdMarca">
+                        <option value='Adidas'>Adidas</option>
+                        <option value='Fila'>Fila</option>
+                        <option value='Nike'>Nike</option>
+                        <option value='Puma'>Puma</option>
+                    </select>
+                    <span asp-validation-for="PrdMarca" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label for="Categoria" class="col-sm-4 col-form-label">Categoria</label>
                 <div class="col-sm-8">
-                    <select id="Categoria" name="Categoria" class="form-select" asp-for="Categoria">
+                    <select id="PrdCategoria" name="PrdCategoria" class="form-select" asp-for="PrdCategoria">
                         <option value='Masculino'>Masculino</option>
                         <option value='Feminino'>Feminino</option>
                         <option value='Infantil'>Infantil</option>
@@ -46,22 +51,81 @@
             <div class="row mb-3">
                 <label for="Tipo" class="col-sm-4 col-form-label">Tipo</label>
                 <div class="col-sm-8">
-                    <select id="Tipo" name="Tipo" class="form-select" asp-for="Tipo">
+                    <select id="PrdTipo" name="PrdTipo" class="form-select" asp-for="PrdTipo">
                         <option value='Acessório'>Acessório</option>
                         <option value='Agasalho'>Agasalho</option>
                         <option value='Bermuda'>Bermuda</option>
                         <option value='Calça'>Calça</option>
+                        <option value='Calçado'>Calçado</option>
+                        <option value='Camisa de Time'>Camisa de Time</option>
                         <option value='Camiseta'>Camiseta</option>
-                        <option value='Esporte'>Esporte</option>
-                        <option value='Tenis'>Tênis</option>
+                        <option value='Equipamento'>Equipamento</option>
+                        <option value='Shorts'>Shorts</option>
+                        <option value='Top'>Top</option>
                     </select>
                 </div>
+            </div>
+
+            @foreach (var estoque in Model.Estoques)
+            {
+                <div class="row estoque-item mb-2">
+                    <input type="hidden" name="@estoque.EstTamanho" value="@estoque.EstTamanho" />
+
+                    <div class="row mb-3">
+                        <div class="col-sm-8">
+                        <input type="text"
+                               class="form-control"
+                               value="@estoque.EstTamanho"
+                               readonly />
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-8">
+                        <input type="number"
+                               class="form-control"
+                               name="@estoque.EstQuantidade"
+                               value="@estoque.EstQuantidade" />
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div id="tamanho-div"></div>
+
+            <template id="tamanhos" class="d-none">
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">Tamanho</label>
+                    <div class="col-sm-8">
+                        <select class="form-select tamanho-select">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">Estoque</label>
+                    <div class="col-sm-8">
+                        <input class="form-control estoque-input" type="number">
+                    </div>
+                </div>
+
+                <div class="mb-3 d-flex justify-content-end">
+                    <button type="button" class="btn btn-danger remover">Remover</button>
+                </div>
+
+            </template>
+
+            <div class="mb-3 d-flex justify-content-end">
+                <button type="button" id="Add" class="btn btn-dark smooth-btn">
+                    Adicionar tamanho e quantidade
+                </button>
             </div>
 
             <div class="row mb-3">
                 <label for="Tipo" class="col-sm-4 col-form-label">Esporte</label>
                 <div class="col-sm-8">
-                    <select id="Esporte" name="Esporte" class="form-select" asp-for="Esporte">
+                    <select id="PrdEsporte" name="PrdEsporte" class="form-select" asp-for="PrdEsporte">
                         <option value='Corrida'>Corrida</option>
                         <option value='Futebol'>Futebol</option>
                         <option value='Vôlei'>Vôlei</option>
@@ -73,26 +137,26 @@
             <div class="row mb-3">
                 <label for="Preco" class="col-sm-4 col-form-label">Preço (R$)</label>
                 <div class="col-sm-8">
-                    <input id="Preco" name="Preco" asp-for="Preco" class="form-control" type="text" placeholder="0,00" />
-                    <span asp-validation-for="Preco" class="text-danger"></span>
+                    <input id="Preco" name="PrdPreco" asp-for="PrdPreco" class="form-control" type="text" placeholder="0,00" />
+                    <span asp-validation-for="PrdPreco" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label for="Descricao" class="col-sm-4 col-form-label">Descrição</label>
                 <div class="col-sm-8">
-                    <textarea id="Descricao" name="Descricao" class="form-control" asp-for="Descricao"></textarea>
-                    <span asp-validation-for="Descricao" class="text-danger"></span>
+                    <textarea id="PrdDescricao" name="PrdDescricao" class="form-control" asp-for="PrdDescricao"></textarea>
+                    <span asp-validation-for="PrdDescricao" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="row mb-3">
-            @foreach (var img in Model.Imagens.OrderBy(i => i.OrdemImagem))
+                @foreach (var img in Model.Imagens.OrderBy(i => i.PimgOrdemImagem))
             {
-                    <div class="card" data-imagem-id="@img.ImagemId" style="width: 10rem;">
-                        <img src="@Url.Content("~/img/" + img.Url)" class="card-img-top" alt="Imagem do produto">
+                    <div class="card" data-imagem-id="@img.PimgId" style="width: 10rem;">
+                        <img src="@Url.Content("~/img/" + img.PimgUrl)" class="card-img-top" alt="Imagem do produto">
                         <div class="card-body text-center">
-                            <button type="button" class="btn btn-dark smooth-btn mt-1" onclick="removerImagem(@img.ImagemId)">
+                            <button type="button" class="btn btn-dark smooth-btn mt-1" onclick="removerImagem(@img.PimgId)">
                                 Remover
                             </button>
                         </div>
@@ -109,17 +173,17 @@
             </div>
 
             <div class="row mb-3">
-                <label for="Descricao" class="col-sm-4 col-form-label">Estoque</label>
+                <label for="Descricao" class="col-sm-4 col-form-label">Cor</label>
                 <div class="col-sm-8">
-                    <input class="form-control" id="Estoque" name="Estoque" class="form-control" asp-for="Estoque" />
-                    <span asp-validation-for="Estoque" class="text-danger"></span>
+                    <input class="form-control" id="PrdCor" name="PrdCor" class="form-control" asp-for="PrdCor" />
+                    <span asp-validation-for="PrdCor" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label for="DataCriada" class="col-sm-4 col-form-label">Data Criação</label>
                 <div class="col-sm-8">
-                    <input id="DataCriada" class="form-control-plaintext" readonly value="@Model.DataCriada.ToString("dd/MM/yyyy")">
+                    <input id="PrdData" class="form-control-plaintext" readonly value="@Model.PrdData.ToString("dd/MM/yyyy")">
                 </div>
             </div>
 
@@ -200,5 +264,44 @@
                 alert("Erro de comunicação com o servidor.");
             });
         }
+
+        let index = 0;
+
+        const tamCalcado = ["36","37","38","39","40","41","42"];
+        const tamAcessorio = ["Único"];
+        const tamRoupa = ["P","M","G","GG"];
+
+        document.getElementById("Add").addEventListener("click", () => {
+
+            const tipos = document.getElementById("Tipo").value;
+
+            let opcoes = [];
+            if (tipos === "Calçado") opcoes = tamCalcado;
+            else if (tipos === "Acessório") opcoes = tamAcessorio;
+            else opcoes = tamRoupa;
+
+            // clona template
+            const tamanhos = document.getElementById("tamanhos");
+            const clone = tamanhos.content.cloneNode(true);
+
+            const select = clone.querySelector(".tamanho-select");
+            const input = clone.querySelector(".estoque-input");
+
+            // preenche tamanhos
+            opcoes.forEach(t => {
+                const o = document.createElement("option");
+                o.value = t;
+                o.textContent = t;
+                select.appendChild(o);
+            });
+
+            // define names corretos para subir ao backend
+            select.name = `Estoques[${index}].EstTamanho`;
+            input.name  = `Estoques[${index}].EstQuantidade`;
+
+            index++;
+
+            document.getElementById("tamanho-div").appendChild(clone);
+        });
     </script>
 }

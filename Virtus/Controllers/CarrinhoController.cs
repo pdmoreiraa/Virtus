@@ -25,11 +25,11 @@ namespace Virtus.Controllers
         public async Task<IActionResult> Index()
         {
             // Obter itens do carrinho
-            var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
+            var itensCarrinho = await ArmazenarCarrinho.Itens(Request, Response, _produtoRepository)
                                 ?? new List<ItemPedido>();
 
-            decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
-            decimal taxaEntrega = 10m; // valor fixo, pode ajustar se necessário
+            decimal subtotal = ArmazenarCarrinho.Subtotal(itensCarrinho);
+            decimal taxaEntrega = 10m;
 
             // Montar o model Carrinho
             var carrinho = new Carrinho
@@ -55,10 +55,10 @@ namespace Virtus.Controllers
             int usuarioId = Convert.ToInt32(usuarioIdStr);
 
             // Obter itens do carrinho (ItemPedido)
-            var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
+            var itensCarrinho = await ArmazenarCarrinho.Itens(Request, Response, _produtoRepository)
                                 ?? new List<ItemPedido>();
 
-            decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
+            decimal subtotal = ArmazenarCarrinho.Subtotal(itensCarrinho);
             decimal taxaEntrega = 10m; // Valor fixo
 
             // Obter endereços do usuário
@@ -100,9 +100,9 @@ namespace Virtus.Controllers
             if (!ModelState.IsValid)
             {
                 // Recarrega o carrinho
-                var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
+                var itensCarrinho = await ArmazenarCarrinho.Itens(Request, Response, _produtoRepository)
                                     ?? new List<ItemPedido>();
-                decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
+                decimal subtotal = ArmazenarCarrinho.Subtotal(itensCarrinho);
                 decimal taxaEntrega = 10m;
 
                 var enderecos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId)?.ToList() ?? new List<Endereco>();
@@ -132,9 +132,9 @@ namespace Virtus.Controllers
                 ModelState.AddModelError("", "Erro ao salvar o endereço: " + ex.Message);
 
                 // Recarrega o carrinho em caso de erro
-                var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
+                var itensCarrinho = await ArmazenarCarrinho.Itens(Request, Response, _produtoRepository)
                                     ?? new List<ItemPedido>();
-                decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
+                decimal subtotal = ArmazenarCarrinho.Subtotal(itensCarrinho);
                 decimal taxaEntrega = 10m;
 
                 var enderecos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId)?.ToList() ?? new List<Endereco>();
@@ -178,9 +178,9 @@ namespace Virtus.Controllers
             if (!ModelState.IsValid)
             {
                 // Recarrega o carrinho completo
-                var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
+                var itensCarrinho = await ArmazenarCarrinho.Itens(Request, Response, _produtoRepository)
                                     ?? new List<ItemPedido>();
-                decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
+                decimal subtotal = ArmazenarCarrinho.Subtotal(itensCarrinho);
                 decimal taxaEntrega = 10m;
 
                 var enderecos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId)?.ToList() ?? new List<Endereco>();
@@ -212,9 +212,9 @@ namespace Virtus.Controllers
                 ModelState.AddModelError("", "Erro ao salvar o cartão: " + ex.Message);
 
                 // Recarrega o carrinho completo em caso de erro
-                var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository)
+                var itensCarrinho = await ArmazenarCarrinho.Itens(Request, Response, _produtoRepository)
                                     ?? new List<ItemPedido>();
-                decimal subtotal = AuxiliarCarrinho.ObterSubtotal(itensCarrinho);
+                decimal subtotal = ArmazenarCarrinho.Subtotal(itensCarrinho);
                 decimal taxaEntrega = 10m;
 
                 var enderecos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId)?.ToList() ?? new List<Endereco>();
@@ -236,8 +236,10 @@ namespace Virtus.Controllers
 
 
         }
+
         [HttpPost]
-        public async Task<IActionResult> FinalizarPedido(int EnderecoSelecionadoId, string MetodoPagamento, int? CartaoId, int ParcelasSelecionadas, decimal ValorParcela)
+        public async Task<IActionResult> FinalizarPedido(int EnderecoSelecionadoId, string MetodoPagamento, int? CartaoId, 
+            int ParcelasSelecionadas, decimal ValorParcela, Carrinho carrinho)
         {
             // Validar endereço
             if (EnderecoSelecionadoId <= 0)
@@ -263,7 +265,7 @@ namespace Virtus.Controllers
             }
 
             // Obter itens do carrinho
-            var itensCarrinho = await AuxiliarCarrinho.ObterItensCarrinho(Request, Response, _produtoRepository);
+            var itensCarrinho = await ArmazenarCarrinho.Itens(Request, Response, _produtoRepository);
             if (itensCarrinho == null || !itensCarrinho.Any())
             {
                 TempData["Erro"] = "Seu carrinho está vazio.";
@@ -271,7 +273,7 @@ namespace Virtus.Controllers
             }
 
             // Calcular valores
-            decimal subtotal = itensCarrinho.Sum(i => i.PrecoUnitario * i.Quantidade);
+            decimal subtotal = itensCarrinho.Sum(i => i.IpPrecoUnitario * i.IpQuantidade);
             decimal taxaEntrega = 10m; // valor fixo, pode ajustar
             decimal valorTotal = MetodoPagamento == "Pix"
                 ? (subtotal + taxaEntrega) * 0.95m // desconto de 5% para Pix
@@ -280,6 +282,11 @@ namespace Virtus.Controllers
             // Definir CartaoId apenas se o pagamento for cartão
             int? cartaoIdFinal = MetodoPagamento == "Pix" ? null : CartaoId;
 
+            string? tipoCartaoFinal = MetodoPagamento == "Pix"
+    ? null
+    : carrinho.NovoCartao.CarTipo;
+
+
             // Criar pedido
             var pedido = new Pedido
             {
@@ -287,10 +294,10 @@ namespace Virtus.Controllers
                 EnderecoId = EnderecoSelecionadoId,
                 MetodoPagamentoId = MetodoPagamento == "Pix" ? 2 : 1, // 2 = Pix, 1 = Cartão
                 CartaoId = cartaoIdFinal,
-                TaxaEntrega = taxaEntrega,
-                ValorTotal = valorTotal,
-                StatusPagamento = "Aguardando Pagamento",
-                CriadoEm = DateTime.Now,
+                PdTaxaEntrega = taxaEntrega,
+                PdValorTotal = valorTotal,
+                PdStatusPagamento = "Aguardando Pagamento",
+                PdCriadoEm = DateTime.Now,
                 Itens = itensCarrinho
             };
 
@@ -300,7 +307,7 @@ namespace Virtus.Controllers
                 int pedidoId = await _pedidoRepository.AdicionarPedido(pedido);
 
                 // Limpar carrinho após finalizar pedido
-                AuxiliarCarrinho.SalvarCarrinho(Response, new Dictionary<int, int>());
+                ArmazenarCarrinho.Salvar(Response, new Dictionary<int, int>());
                 Console.WriteLine($"Pedido criado com ID: {pedidoId}");
 
                 // Redirecionar para a tela correta de pagamento
@@ -317,6 +324,8 @@ namespace Virtus.Controllers
 
                     HttpContext.Session.SetString("ValorParcela",
                         ValorParcela.ToString(CultureInfo.InvariantCulture));
+
+                    HttpContext.Session.SetString("TipoCartao", carrinho.NovoCartao.CarTipo);
 
 
                     return RedirectToAction("ConfirmarCartao", "Carrinho", new { pedidoId = pedidoId });
@@ -349,8 +358,8 @@ namespace Virtus.Controllers
             }
 
             var itensCarrinho = pedido.Itens?.ToList() ?? new List<ItemPedido>();
-            decimal subtotal = itensCarrinho.Sum(i => i.PrecoUnitario * i.Quantidade);
-            decimal taxaEntrega = pedido.TaxaEntrega;
+            decimal subtotal = itensCarrinho.Sum(i => i.IpPrecoUnitario * i.IpQuantidade);
+            decimal taxaEntrega = pedido.PdTaxaEntrega;
 
             // Buscar endereços e cartões do usuário
             var enderecos = _carrinhoRepository.ObterEnderecosPorUsuario(usuarioId) ?? new List<Endereco>();
@@ -362,18 +371,18 @@ namespace Virtus.Controllers
                 Itens = itensCarrinho,
                 Enderecos = enderecos,
                 Cartoes = cartoes,
-                ValorTotal = pedido.ValorTotal,
+                ValorTotal = pedido.PdValorTotal,
                 TaxaEntrega = taxaEntrega,
                 NovoEndereco = new Endereco(),
                 NovoCartao = new Cartao(),
                 MetodoPagamento = "Pix",
-                CriadoEm = pedido.CriadoEm,
-                Expiracao = pedido.CriadoEm.AddMinutes(30)
+                CriadoEm = pedido.PdCriadoEm,
+                Expiracao = pedido.PdCriadoEm.AddMinutes(30)
             };
 
             // Gerar código Pix fictício
-            ViewBag.CodigoPix = $"PIX-{pedido.Id}-{Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper()}";
-            ViewBag.PedidoId = pedido.Id;
+            ViewBag.CodigoPix = $"PIX-{pedido.PdId}-{Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper()}";
+            ViewBag.PedidoId = pedido.PdId;
 
 
             return View(carrinho);
@@ -401,8 +410,8 @@ namespace Virtus.Controllers
                 }
 
                 // Atualizar status e data do pagamento
-                pedido.StatusPagamento = "Pago";
-                pedido.DataPagamento = DateTime.Now;
+                pedido.PdStatusPagamento = "Pago";
+                pedido.PdDataPagamento = DateTime.Now;
 
                 var linhas = await _pedidoRepository.AtualizarStatusPagamento(pedido);
                 if (linhas <= 0)
@@ -445,6 +454,11 @@ namespace Virtus.Controllers
             ViewBag.Parcelas = parcelas;
             ViewBag.ValorParcela = valorParcela.ToString("F2", new CultureInfo("pt-BR"));
 
+            string tipoCartao = HttpContext.Session.GetString("TipoCartao") ?? "";
+
+            ViewBag.TipoCartao = tipoCartao;
+
+
 
             Console.WriteLine("SESSION ValorParcela RAW = " + HttpContext.Session.GetString("ValorParcela"));
 
@@ -460,14 +474,13 @@ namespace Virtus.Controllers
             var carrinho = new Carrinho
             {
                 Itens = pedido.Itens,
-                Subtotal = pedido.Itens.Sum(i => i.PrecoUnitario * i.Quantidade),
-                TaxaEntrega = pedido.TaxaEntrega,
+                Subtotal = pedido.Itens.Sum(i => i.IpPrecoUnitario * i.IpQuantidade),
+                TaxaEntrega = pedido.PdTaxaEntrega,
                 CartaoSelecionadoId = pedido.CartaoId,
-                Enderecos = new List<Endereco>(), // opcional, se quiser exibir endereços
                 Cartoes = new List<Cartao>() // opcional, se quiser exibir cartões
             };
 
-            ViewBag.PedidoId = pedido.Id; // necessário para o POST
+            ViewBag.PedidoId = pedido.PdId; // necessário para o POST
 
             return View(carrinho); // continua usando @model Carrinho
         }
@@ -482,11 +495,6 @@ namespace Virtus.Controllers
 
             int usuarioId = Convert.ToInt32(usuarioIdStr);
 
-            if (TempData["Parcelas"] == null || TempData["ValorParcela"] == null)
-            {
-                return RedirectToAction("ErroPagamento"); // Ou voltar ao carrinho
-            }
-
 
             var pedido = await _pedidoRepository.ObterPedidoPorId(pedidoId);
             if (pedido == null)
@@ -495,8 +503,8 @@ namespace Virtus.Controllers
                 return RedirectToAction("Index");
             }
 
-            pedido.StatusPagamento = "Pago";
-            pedido.DataPagamento = DateTime.Now;
+            pedido.PdStatusPagamento = "Pago";
+            pedido.PdDataPagamento = DateTime.Now;
 
             var linhas = await _pedidoRepository.AtualizarStatusPagamento(pedido);
             if (linhas <= 0)

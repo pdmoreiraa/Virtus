@@ -36,11 +36,11 @@ namespace Virtus.Controllers
                 }
 
 
-                HttpContext.Session.SetString("UsuarioId", usuarioCriado.Id.ToString());
-                HttpContext.Session.SetString("UsuarioNome", usuarioCriado.Nome);
-                HttpContext.Session.SetString("UsuarioSobrenome", usuarioCriado.Sobrenome);
-                HttpContext.Session.SetString("UsuarioEmail", usuarioCriado.Email);
-                HttpContext.Session.SetString("UsuarioTipo", usuarioCriado.Tipo);
+                HttpContext.Session.SetString("UsuarioId", usuarioCriado.UsuId.ToString());
+                HttpContext.Session.SetString("UsuarioNome", usuarioCriado.UsuNome);
+                HttpContext.Session.SetString("UsuarioSobrenome", usuarioCriado.UsuSobrenome);
+                HttpContext.Session.SetString("UsuarioEmail", usuarioCriado.UsuEmail);
+                HttpContext.Session.SetString("UsuarioTipo", usuarioCriado.UsuTipo);
 
                 return RedirectToAction("Index", "Home");
             }
@@ -76,11 +76,11 @@ namespace Virtus.Controllers
 
             if (usuarioL != null)
             {
-                HttpContext.Session.SetString("UsuarioId", usuarioL.Id.ToString());
-                HttpContext.Session.SetString("UsuarioNome", usuarioL.Nome);
-                HttpContext.Session.SetString("UsuarioSobrenome", usuarioL.Sobrenome);
-                HttpContext.Session.SetString("UsuarioEmail", usuarioL.Email);
-                HttpContext.Session.SetString("UsuarioTipo", usuarioL.Tipo);
+                HttpContext.Session.SetString("UsuarioId", usuarioL.UsuId.ToString());
+                HttpContext.Session.SetString("UsuarioNome", usuarioL.UsuNome);
+                HttpContext.Session.SetString("UsuarioSobrenome", usuarioL.UsuSobrenome);
+                HttpContext.Session.SetString("UsuarioEmail", usuarioL.UsuEmail);
+                HttpContext.Session.SetString("UsuarioTipo", usuarioL.UsuTipo);
 
                 return RedirectToAction("Index", "Home");
             }
@@ -104,12 +104,12 @@ namespace Virtus.Controllers
 
             var perfil = new Perfil
             {
-                Nome = usuario.Nome,
-                Sobrenome = usuario.Sobrenome,
-                Email = usuario.Email,
-                Telefone = usuario.Telefone,
-                CPF = usuario.CPF,
-                Tipo = usuario.Tipo
+                Nome = usuario.UsuNome,
+                Sobrenome = usuario.UsuSobrenome,
+                Email = usuario.UsuEmail,
+                Telefone = usuario.UsuTelefone,
+                CPF = usuario.UsuCPF,
+                Tipo = usuario.UsuTipo
             };
 
             return View(perfil);
@@ -148,11 +148,11 @@ namespace Virtus.Controllers
 
 
             // Atualiza campos permitidos
-            usuarioL.Nome = perfil.Nome;
-            usuarioL.Sobrenome = perfil.Sobrenome;
-            usuarioL.Email = perfil.Email;
-            usuarioL.Telefone = perfil.Telefone;
-            usuarioL.CPF = perfil.CPF;
+            usuarioL.UsuNome = perfil.Nome;
+            usuarioL.UsuSobrenome = perfil.Sobrenome;
+            usuarioL.UsuEmail = perfil.Email;
+            usuarioL.UsuTelefone = perfil.Telefone;
+            usuarioL.UsuCPF = perfil.CPF;
 
             var sucesso = await _usuarioRepository.AtualizarPerfil(usuarioL);
 
@@ -187,14 +187,14 @@ namespace Virtus.Controllers
                 return View(senhaNova);
 
             // Verifica senha atual
-            if (usuarioL.Senha != senhaNova.SenhaAtual)
+            if (usuarioL.UsuSenha != senhaNova.SenhaAtual)
             {
                 ModelState.AddModelError("", "A senha atual está incorreta.");
                 return View(senhaNova);
             }
 
             // Atualiza senha
-            usuarioL.Senha = senhaNova.NovaSenha;
+            usuarioL.UsuSenha = senhaNova.NovaSenha;
             var sucesso = await _usuarioRepository.AtualizarSenha(usuarioL);
 
             if (sucesso)

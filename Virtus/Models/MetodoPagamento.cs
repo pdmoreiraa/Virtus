@@ -2,8 +2,8 @@
 {
     public class MetodoPagamento
     {
-        public int Id { get; set; }
-        public string Descricao { get; set; } = string.Empty;
+        public int MpId { get; set; }
+        public string MpDescricao { get; set; } = string.Empty;
 
         // Relacionamentos
         public List<Cartao>? Cartoes { get; set; }

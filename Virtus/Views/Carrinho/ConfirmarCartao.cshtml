@@ -19,7 +19,7 @@
             <!-- Detalhes do pedido -->
             <div class="border rounded-3 bg-light p-3 text-start mb-4">
                 <p class="mb-2"><strong>Número do Pedido:</strong> @ViewBag.PedidoId</p>
-                <p class="mb-2"><strong>Método de Pagamento:</strong> Cartão de Crédito</p>
+                <p class="mb-2"><strong>Método de Pagamento:</strong> Cartão</p>
                 <p class="mb-2"><strong>Valor dos Itens:</strong> R$ @Model.Subtotal.ToString("F2")</p>
                 <p class="mb-2"><strong>Taxa de Entrega:</strong> R$ @Model.TaxaEntrega.ToString("F2")</p>
                 <p class="mb-0">
@@ -28,13 +28,13 @@
                 <p>
                     Pagamento em @ViewBag.Parcelas x de R$ @ViewBag.ValorParcela
                 </p>
-                
+
             </div>
 
             <!-- Formulário de confirmação -->
             <form asp-action="ConfirmarPagamentoCartao" asp-controller="Carrinho" method="post">
                 <input type="hidden" name="pedidoId" value="@ViewBag.PedidoId" />
-                <button type="submit" class="btn btn-primary px-4 py-2">
+                <button type="submit" class="btn btn-dark smooth-btn px-4 py-2">
                     Retornar para a tela inicial
                 </button>
             </form>

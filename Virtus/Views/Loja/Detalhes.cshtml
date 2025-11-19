@@ -6,8 +6,8 @@
             <div class="d-flex">
                 <!-- Imagem principal -->
                 <div class="flex-grow-1">
-                    <img src="/img/@Model.Imagens.FirstOrDefault()?.Url"
-                         id="produto-@Model.Id"
+                    <img src="/img/@Model.Imagens.FirstOrDefault()?.PimgUrl"
+                         id="produto-@Model.PrdId"
                          class="img-fluid rounded shadow produto-img"
                          style="width:500px; height:auto; object-fit: contain;">
                 </div>
@@ -16,7 +16,7 @@
                 <div class="d-flex flex-column ms-3">
                     @foreach (var img in Model.Imagens.Take(4))
                     {
-                        <img src="/img/@img.Url" class="img-thumbnail mb-2 thumb" data-id="@Model.Id" style="width:80px; height:80px; object-fit: contain; cursor:pointer;">
+                        <img src="/img/@img.PimgUrl" class="img-thumbnail mb-2 thumb" data-id="@Model.PrdId" style="width:80px; height:80px; object-fit: contain; cursor:pointer;">
                     }
                 </div>
             </div>
@@ -24,15 +24,32 @@
 
         <!-- Informações -->
         <div class="col-lg-6">
-            <h3 class="fw-bold">@Model.Nome</h3>
-            <p class="text-muted mb-1">@Model.Tipo</p>
-            <p class="text-secondary">@Model.Descricao</p>
+            <h3 class="fw-bold">@Model.PrdNome</h3>
+            <p class="text-secondary">@Model.PrdDescricao</p>
 
             <div class="mb-3">
-                <p class="h4 text-primary fw-bold mb-0">R$ @Model.Preco.ToString("F2") à vista</p>
+                <p class="h4 fw-bold mb-0" style="color: #090B54;">R$ @Model.PrdPreco.ToString("F2") à vista</p>
             </div>
 
-            <button type="button" class="btn btn-dark smooth-btn btn-sm" onclick="adicionarAoCarrinho(this, @Model.Id)">
+            <h4>Tamanhos disponíveis:</h4>
+
+            @if (Model.Estoques != null && Model.Estoques.Any())
+            {
+                <ul class="d-flex justify-content-between w-50">
+                    @foreach (var estoque in Model.Estoques)
+                    {
+                        <li style="list-style: none;">
+                            <button type="button" class="btn btn-dark smooth-btn btn-sm">@estoque.EstTamanho</button>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>Este produto não possui tamanhos cadastrados.</p>
+            }
+
+            <button type="button" class="btn btn-dark smooth-btn btn-sm" onclick="adicionarAoCarrinho(this, @Model.PrdId)">
                 Adicionar ao Carrinho <i class="bi bi-cart4"></i>
             </button>
         </div>

@@ -25,16 +25,16 @@
         @foreach (var pedido in Model)
         {
             // Total de unidades
-            int unidades = pedido.Itens?.Sum(i => i.Quantidade) ?? 0;
+            int unidades = pedido.Itens?.Sum(i => i.IpQuantidade) ?? 0;
 
             // Nome do método de pagamento
-            string metodoPagamento = pedido.MetodoPagamento != null ? pedido.MetodoPagamento.Descricao : "Desconhecido";
+            string metodoPagamento = pedido.MetodoPagamento != null ? pedido.MetodoPagamento.MpDescricao : "Desconhecido";
 
             // Badges de Status Pagamento
-            string statusPagamentoBadge = pedido.DataPagamento > DateTime.MinValue ? "bg-success" : "bg-warning text-dark";
+            string statusPagamentoBadge = pedido.PdDataPagamento > DateTime.MinValue ? "bg-success" : "bg-warning text-dark";
 
             // Badges de Status Pedido
-            string statusPedidoBadge = pedido.StatusPedido.ToLower() switch
+            string statusPedidoBadge = pedido.PdStatusPedido.ToLower() switch
             {
                 "Criado" => "bg-warning text-dark",
                 "Aceito" => "bg-success",
@@ -44,17 +44,17 @@
 
             <tr>
                 <td>@unidades</td>
-                <td>@pedido.ValorTotal.ToString("F2")</td>
-                <td>@pedido.MetodoPagamento.Descricao</td>
+                <td>@pedido.PdValorTotal.ToString("F2")</td>
+                <td>@pedido.MetodoPagamento.MpDescricao</td>
                 <td>
                     <span class="badge rounded-pill @statusPagamentoBadge">
-                        @(pedido.DataPagamento > DateTime.MinValue ? "Pago" : "Pendente")
+                        @(pedido.PdDataPagamento > DateTime.MinValue ? "Pago" : "Pendente")
                     </span>
                 </td>
-                <td><span class="badge rounded-pill @statusPedidoBadge">@pedido.StatusPedido</span></td>
-                <td>@pedido.CriadoEm.ToString("dd/MM/yyyy")</td>
+                <td><span class="badge rounded-pill @statusPedidoBadge">@pedido.PdStatusPedido</span></td>
+                <td>@pedido.PdCriadoEm.ToString("dd/MM/yyyy")</td>
                 <td class="d-flex justify-content-center align-items-center">
-                    <a class="btn btn-dark w-100 smooth-btn" asp-controller="UsuarioPedido" asp-action="Detalhes" asp-route-id="@pedido.Id">Detalhes</a>
+                    <a class="btn btn-dark w-100 smooth-btn" asp-controller="UsuarioPedido" asp-action="Detalhes" asp-route-id="@pedido.PdId">Detalhes</a>
                 </td>
             </tr>
         }

@@ -5,7 +5,7 @@
     ViewData["PagInicial"] = true;
 }
 
-<div id="carrossel" class="carousel slide" data-bs-ride="carousel">
+<div id="carrossel" class="carousel slide mx-auto" data-bs-ride="carousel" style="width: 90%">
     <div class="carousel-indicators">
         <button type="button" data-bs-target="#carrossel" data-bs-slide-to="0" class="active"></button>
         <button type="button" data-bs-target="#carrossel" data-bs-slide-to="1"></button>
@@ -14,13 +14,13 @@
 
     <div class="carousel-inner">
         <div class="carousel-item active">
-            <img src="~/img/01.jpg" class="d-block w-100">
+            <img src="~/img/s1.png" class="d-block w-100">
         </div>
         <div class="carousel-item">
-            <img src="~/img/02.jpg" class="d-block w-100">
+            <img src="~/img/s2.png" class="d-block w-100">
         </div>
         <div class="carousel-item">
-            <img src="~/img/03.jpg" class="d-block w-100">
+            <img src="~/img/s1.png" class="d-block w-100">
         </div>
     </div>
 </div>
@@ -54,20 +54,20 @@
             @foreach (var produto in Model)
             {
                 <div class="col-lg-3 col-md-6 d-flex justify-content-center">
-                    <div class="rounded border shadow p-3 text-center h-100 border border-dark rounded-3 p-3 d-flex flex-column" 
-                    onclick="window.location='@Url.Action("Detalhes", "Loja", new { id = produto.Id })'" style="width:90%; cursor: pointer">
-                        <img src="/img/@produto.Imagens.FirstOrDefault()?.Url" class="img-fluid produto-img" id="produto-@produto.Id" alt="..."
+                    <div class="rounded border shadow p-3 text-center h-100 border border-dark rounded-3 p-3 d-flex flex-column"
+                         onclick="window.location='@Url.Action("Detalhes", "Loja", new { id = produto.PrdId })'" style="width:90%; cursor: pointer">
+                        <img src="~/img/@produto.Imagens.FirstOrDefault()?.PimgUrl" class="img-fluid produto-img" id="produto-@produto.PrdId" alt="..."
                              style="height: 180px; object-fit: contain" />
                         <div class="flex-grow-1 mt-2">
-                        <h5 class="py-2">@produto.Nome</h5>
+                            <h5 class="py-2">@produto.PrdNome</h5>
                         <p>
-                            Marca: @produto.Marca, Categoria: @produto.Categoria
+                                Marca: @produto.PrdMarca, Categoria: @produto.PrdCategoria
                         </p>
 
-                        <h4 class="mb-3">R$ @produto.Preco.ToString("F2")</h4>
+                            <h4 class="fw-bold" style="position: relative; bottom: 0; color: #090B54;">R$ @produto.PrdPreco.ToString("F2")</h4>
                         </div>
                         <div class="mt-auto p-1">
-                        <button type="button" class="btn btn-dark smooth-btn btn-sm w-100" onclick="event.stopPropagation(); adicionarAoCarrinho(this, @produto.Id)">
+                            <button type="button" class="btn btn-dark smooth-btn btn-sm w-100" onclick="event.stopPropagation(); adicionarAoCarrinho(this, @produto.PrdId)">
                             Adicionar ao Carrinho <i class="bi bi-cart4"></i>
                         </button>
                         </div>

@@ -17,39 +17,39 @@ namespace Virtus.Repository
         public List<Endereco> ObterEnderecosPorUsuario(int usuarioId)
         {
             using var connection = new MySqlConnection(_connectionString);
-            var sql = "SELECT * FROM enderecos WHERE UsuarioId = @UsuarioId";
+            var sql = "SELECT * FROM tbEndereco WHERE UsuarioId = @UsuarioId";
             return connection.Query<Endereco>(sql, new { UsuarioId = usuarioId }).ToList();
         }
 
         public void AdicionarEndereco(Endereco endereco)
         {
             using var connection = new MySqlConnection(_connectionString);
-            var sql = @"INSERT INTO enderecos 
-                (UsuarioId, NomeCompleto, Logradouro, Numero, Bairro, Cidade, Estado, CEP, Complemento)
-                VALUES (@UsuarioId, @NomeCompleto, @Logradouro, @Numero, @Bairro, @Cidade, @Estado, @CEP, @Complemento)";
+            var sql = @"INSERT INTO tbEndereco 
+                (UsuarioId, EndNomeCompleto, EndLogradouro, EndNumero, EndBairro, EndCidade, EndEstado, EndCEP, EndComplemento)
+                VALUES (@UsuarioId, @EndNomeCompleto, @EndLogradouro, @EndNumero, @EndBairro, @EndCidade, @EndEstado, @EndCEP, @EndComplemento)";
             connection.Execute(sql, endereco);
         }
         public IEnumerable<Cartao> ObterCartoesPorUsuario(int usuarioId)
         {
             using var connection = new MySqlConnection(_connectionString);
-            string sql = "SELECT * FROM cartoes WHERE UsuarioId = @UsuarioId";
+            string sql = "SELECT * FROM tbCartao WHERE UsuarioId = @UsuarioId";
             return connection.Query<Cartao>(sql, new { UsuarioId = usuarioId });
         }
 
         public async Task<Cartao> ObterCartaoPorId(int cartaoId)
         {
             using var connection = new MySqlConnection(_connectionString);
-            string sql = "SELECT * FROM cartoes WHERE Id = @Id";
-            return await connection.QueryFirstOrDefaultAsync<Cartao>(sql, new { Id = cartaoId });
+            string sql = "SELECT * FROM tbCartao WHERE CarId = @CarId";
+            return await connection.QueryFirstOrDefaultAsync<Cartao>(sql, new { CarId = cartaoId });
         }
 
 
         public void AdicionarCartao(Cartao cartao)
         {
             using var connection = new MySqlConnection(_connectionString);
-            var sql = @"INSERT INTO cartoes 
-                (UsuarioId, Tipo, NomeTitular, Numero, Validade, CVV, Bandeira)
-                VALUES (@UsuarioId, @Tipo, @NomeTitular, @Numero, @Validade, @CVV, @Bandeira)";
+            var sql = @"INSERT INTO tbCartao 
+                (UsuarioId, CarTipo, CarNomeTitular, CarNumero, CarValidade, CarCVV, CarBandeira)
+                VALUES (@UsuarioId, @CarTipo, @CarNomeTitular, @CarNumero, @CarValidade, @CarCVV, @CarBandeira)";
             connection.Execute(sql, cartao);
         }
 

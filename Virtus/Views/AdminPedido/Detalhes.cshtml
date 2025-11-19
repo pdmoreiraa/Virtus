@@ -4,14 +4,14 @@
 @{
     // Badge cores
     string paymentBadgeColor = "bg-danger";
-    if (Model.StatusPagamento == "Pendente") paymentBadgeColor = "bg-warning text-dark";
-    else if (Model.StatusPagamento == "Pago") paymentBadgeColor = "bg-success";
-    else if (Model.StatusPagamento == "Cancelado") paymentBadgeColor = "bg-secondary";
+    if (Model.PdStatusPagamento == "Pendente") paymentBadgeColor = "bg-warning text-dark";
+    else if (Model.PdStatusPagamento == "Pago") paymentBadgeColor = "bg-success";
+    else if (Model.PdStatusPagamento == "Cancelado") paymentBadgeColor = "bg-secondary";
 
     string orderBadgeColor = "bg-danger";
-    if (Model.StatusPedido == "Criado") orderBadgeColor = "bg-warning text-dark";
-    else if (Model.StatusPedido == "Aceito") orderBadgeColor = "bg-success";
-    else if (Model.StatusPedido == "Cancelado") orderBadgeColor = "bg-secondary";
+    if (Model.PdStatusPedido == "Criado") orderBadgeColor = "bg-warning text-dark";
+    else if (Model.PdStatusPedido == "Aceito") orderBadgeColor = "bg-success";
+    else if (Model.PdStatusPedido == "Cancelado") orderBadgeColor = "bg-secondary";
 }
 
 <h3 class="text-center mb-4">Detalhes do Pedido</h3>
@@ -25,36 +25,36 @@
 
             <div class="row mb-2 pb-2 border-bottom">
                 <div class="col">ID do Pedido</div>
-                <div class="col">@Model.Id</div>
+                <div class="col">@Model.PdId</div>
             </div>
 
             <div class="row mb-2 pb-2 border-bottom">
                 <div class="col">Endereço de Entrega</div>
                 <div class="col">
-                    @(Model.Endereco != null ? $"{Model.Endereco.NomeCompleto}, {Model.Endereco.Logradouro}, {Model.Endereco.Numero}" : "Desconhecido")
+                    @(Model.Endereco != null ? $"{Model.Endereco.EndNomeCompleto}, {Model.Endereco.EndLogradouro}, {Model.Endereco.EndNumero}" : "Desconhecido")
                 </div>
             </div>
 
             <div class="row mb-2 pb-2 border-bottom">
                 <div class="col">Método de Pagamento</div>
                 <div class="col">
-                    @(Model.MetodoPagamento != null ? Model.MetodoPagamento.Descricao : "Desconhecido")
+                    @(Model.MetodoPagamento != null ? Model.MetodoPagamento.MpDescricao : "Desconhecido")
                 </div>
             </div>
 
             <div class="row mb-2 pb-2 border-bottom">
                 <div class="col">Status do Pagamento</div>
                 <div class="col">
-                    <span class="badge rounded-pill @paymentBadgeColor">@Model.StatusPagamento</span>
+                    <span class="badge rounded-pill @paymentBadgeColor">@Model.PdStatusPagamento</span>
                 </div>
             </div>
 
             <div class="row mb-2 pb-2 border-bottom">
                 <div class="col">Status do Pagamento</div>
                 <div class="col">
-                    <span class="badge rounded-pill @orderBadgeColor">@Model.StatusPedido</span>
-                    <a href="#" class="ms-2 editar-status" data-bs-toggle="modal" data-bs-target="#StatusPedidoModal" data-id="@Model.Id" 
-                       data-status="@Model.StatusPedido">
+                    <span class="badge rounded-pill @orderBadgeColor">@Model.PdStatusPedido</span>
+                    <a href="#" class="ms-2 editar-status" data-bs-toggle="modal" data-bs-target="#StatusPedidoModal" data-id="@Model.PdId"
+                       data-status="@Model.PdStatusPedido">
                         Editar
                     </a>
                 </div>
@@ -62,7 +62,7 @@
 
             <div class="row mb-2">
                 <div class="col">Data do Pedido</div>
-                <div class="col">@Model.CriadoEm.ToString("dd/MM/yyyy")</div>
+                <div class="col">@Model.PdCriadoEm.ToString("dd/MM/yyyy")</div>
             </div>
         </div>
     </div>
@@ -74,18 +74,18 @@
             <div class="row mb-2 pb-2 border-bottom">
                 <div class="col">Nome</div>
                 <div class="col">
-                    @(Model.Usuario != null ? $"{Model.Usuario.Nome} {Model.Usuario.Sobrenome}" : "Desconhecido")
+                    @(Model.Usuario != null ? $"{Model.Usuario.UsuNome} {Model.Usuario.UsuSobrenome}" : "Desconhecido")
                 </div>
             </div>
 
             <div class="row mb-2 pb-2 border-bottom">
                 <div class="col">Email</div>
-                <div class="col">@Model.Usuario?.Email</div>
+                <div class="col">@Model.Usuario?.UsuEmail</div>
             </div>
 
             <div class="row mb-2 pb-2 border-bottom">
                 <div class="col">Telefone</div>
-                <div class="col">@Model.Usuario?.Telefone.FormatarTelefone()</div>
+                <div class="col telefone">@Model.Usuario?.UsuTelefone</div>
             </div>
         </div>
     </div>
@@ -108,15 +108,16 @@
             {
                 foreach (var item in Model.Itens)
                 {
-                    decimal itemTotal = item.PrecoUnitario * item.Quantidade;
+                    decimal itemTotal = item.IpPrecoUnitario * item.IpQuantidade;
                     subtotal += itemTotal;
                     <tr>
                         <td>
-                            <img src="@Url.Content("~/img/" + item.Produto.Imagens.FirstOrDefault()?.Url)" width="100" />
-                        @item.Produto.Nome</td>
-                        <td>@item.Produto.Categoria</td>
-                        <td>@item.Quantidade</td>
-                        <td>@item.PrecoUnitario.ToString("F2")</td>
+                            <img src="@Url.Content("~/img/" + item.Produto.Imagens.FirstOrDefault()?.PimgUrl)" width="100" />
+                            @item.Produto.PrdNome
+                        </td>
+                        <td>@item.Produto.PrdCategoria</td>
+                        <td>@item.IpQuantidade</td>
+                        <td>@item.IpPrecoUnitario.ToString("F2")</td>
                         <td>@itemTotal.ToString("F2")</td>
                     </tr>
                 }
@@ -132,11 +133,11 @@
     </div>
     <div class="row">
         <div class="col fw-bold">Taxa de Entrega:</div>
-        <div class="col text-end">@Model.TaxaEntrega</div>
+        <div class="col text-end">@Model.PdTaxaEntrega</div>
     </div>
     <div class="row">
         <div class="col fw-bold">Total:</div>
-        <div class="col text-end">@Model.ValorTotal</div>
+        <div class="col text-end">@Model.PdValorTotal</div>
     </div>
 </div>
 
@@ -150,7 +151,7 @@
             </div>
 
             <form method="post" asp-controller="AdminPedido" asp-action="Editar">
-                <input type="hidden" name="id" id="pedidoId" value="@Model.Id" />
+                <input type="hidden" name="id" id="pedidoId" value="@Model.PdId" />
                 <select name="status_Pedido" id="status_Pedido" class="form-select">
                     <option value="Criado">Criado</option>
                     <option value="Aceito">Aceito</option>

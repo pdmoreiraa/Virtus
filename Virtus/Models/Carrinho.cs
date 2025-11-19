@@ -28,9 +28,6 @@
         public decimal TaxaEntrega { get; set; } = 10m;
         public decimal Total => Subtotal + TaxaEntrega;
         public decimal Pix => (Subtotal + TaxaEntrega) * 0.95m;
-
-        public int NumeroParcelas { get; set; }
-        public decimal ValorParcela { get; set; }
     }
 
 }

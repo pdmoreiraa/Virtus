@@ -26,8 +26,8 @@ namespace Virtus.Controllers
             if (!string.IsNullOrEmpty(buscar))
             {
                 produtos = produtos
-                    .Where(p => p.Nome.Contains(buscar, StringComparison.OrdinalIgnoreCase)
-                             || p.Marca.Contains(buscar, StringComparison.OrdinalIgnoreCase))
+                    .Where(p => p.PrdNome.Contains(buscar, StringComparison.OrdinalIgnoreCase)
+                             || p.PrdMarca.Contains(buscar, StringComparison.OrdinalIgnoreCase))
                     .ToList();
 
                 pagIndex = 1; // reset para página 1
@@ -40,15 +40,14 @@ namespace Virtus.Controllers
             // Ordenação
             produtos = coluna switch
             {
-                "Nome" => ordPor == "asc" ? produtos.OrderBy(p => p.Nome).ToList() : produtos.OrderByDescending(p => p.Nome).ToList(),
-                "Marca" => ordPor == "asc" ? produtos.OrderBy(p => p.Marca).ToList() : produtos.OrderByDescending(p => p.Marca).ToList(),
-                "Categoria" => ordPor == "asc" ? produtos.OrderBy(p => p.Categoria).ToList() : produtos.OrderByDescending(p => p.Categoria).ToList(),
-                "Tipo" => ordPor == "asc" ? produtos.OrderBy(p => p.Tipo).ToList() : produtos.OrderByDescending(p => p.Tipo).ToList(),
-                "Esporte" => ordPor == "asc" ? produtos.OrderBy(p => p.Esporte).ToList() : produtos.OrderByDescending(p => p.Esporte).ToList(),
-                "Preco" => ordPor == "asc" ? produtos.OrderBy(p => p.Preco).ToList() : produtos.OrderByDescending(p => p.Preco).ToList(),
-                "Estoque" => ordPor == "asc" ? produtos.OrderBy(p => p.Estoque).ToList() : produtos.OrderByDescending(p => p.Estoque).ToList(),
-                "DataCriada" => ordPor == "asc" ? produtos.OrderBy(p => p.DataCriada).ToList() : produtos.OrderByDescending(p => p.DataCriada).ToList(),
-                _ => ordPor == "asc" ? produtos.OrderBy(p => p.Id).ToList() : produtos.OrderByDescending(p => p.Id).ToList(),
+                "Nome" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdNome).ToList() : produtos.OrderByDescending(p => p.PrdNome).ToList(),
+                "Marca" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdMarca).ToList() : produtos.OrderByDescending(p => p.PrdMarca).ToList(),
+                "Categoria" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdCategoria).ToList() : produtos.OrderByDescending(p => p.PrdCategoria).ToList(),
+                "Tipo" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdTipo).ToList() : produtos.OrderByDescending(p => p.PrdTipo).ToList(),
+                "Esporte" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdEsporte).ToList() : produtos.OrderByDescending(p => p.PrdEsporte).ToList(),
+                "Preco" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdPreco).ToList() : produtos.OrderByDescending(p => p.PrdPreco).ToList(),
+                "Data" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdData).ToList() : produtos.OrderByDescending(p => p.PrdData).ToList(),
+                _ => ordPor == "asc" ? produtos.OrderBy(p => p.PrdId).ToList() : produtos.OrderByDescending(p => p.PrdId).ToList(),
             };
 
             if (pagIndex < 1) pagIndex = 1;
@@ -124,8 +123,8 @@ namespace Virtus.Controllers
                     // Adiciona à lista de imagens do produto com ordem
                     produto.Imagens.Add(new ProdutoImagem
                     {
-                        Url = nomeArquivo,
-                        OrdemImagem = ordem
+                        PimgUrl = nomeArquivo,
+                        PimgOrdemImagem = ordem
                     });
 
                     ordem++;
@@ -153,7 +152,7 @@ namespace Virtus.Controllers
         [HttpPost]
         public async Task<IActionResult> Editar(Produto produto, IFormFile[] imagensArquivo)
         {
-            var produtoExistente = await _produtoRepository.ProdutosPorId(produto.Id);
+            var produtoExistente = await _produtoRepository.ProdutosPorId(produto.PrdId);
             if (produtoExistente == null)
                 return RedirectToAction("Index", "Produto");
 
@@ -165,7 +164,7 @@ namespace Virtus.Controllers
 
             // Lista de imagens atualizada
             produto.Imagens = produtoExistente.Imagens ?? new List<ProdutoImagem>();
-            int ordem = produto.Imagens.Any() ? produto.Imagens.Max(i => i.OrdemImagem) + 1 : 1;
+            int ordem = produto.Imagens.Any() ? produto.Imagens.Max(i => i.PimgOrdemImagem) + 1 : 1;
 
             if (imagensArquivo != null && imagensArquivo.Length > 0)
             {
@@ -185,8 +184,8 @@ namespace Virtus.Controllers
                         // Adiciona à lista de imagens
                         produto.Imagens.Add(new ProdutoImagem
                         {
-                            Url = nomeArquivo,
-                            OrdemImagem = ordem
+                            PimgUrl = nomeArquivo,
+                            PimgOrdemImagem = ordem
                         });
 
                         ordem++;
@@ -215,13 +214,13 @@ namespace Virtus.Controllers
             {
                 foreach (var imagem in produto.Imagens)
                 {
-                    if (!string.IsNullOrWhiteSpace(imagem.Url))
+                    if (!string.IsNullOrWhiteSpace(imagem.PimgUrl))
                     {
                         // Garante que o caminho esteja correto (sem barras duplicadas)
                         var caminho= Path.Combine(
                             Directory.GetCurrentDirectory(),
                             "wwwroot", "img",
-                            imagem.Url);
+                            imagem.PimgUrl);
 
                         if (System.IO.File.Exists(caminho))
                         {
@@ -255,7 +254,7 @@ namespace Virtus.Controllers
 
             try
             {
-                var caminho = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", imagem.Url);
+                var caminho = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", imagem.PimgUrl);
                 if (System.IO.File.Exists(caminho)) { 
 
                     System.IO.File.Delete(caminho);

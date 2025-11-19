@@ -18,6 +18,11 @@ html {
     transition: all 0.2s ease;
 }
 
+.form-control:focus,
+.form-select:focus {
+    border-color: #ced4da !important;
+}
+
 html {
   position: relative;
   height: 100%;
@@ -46,6 +51,12 @@ main {
     opacity: 0.8;
 }
 
+.dropdown-item:hover,
+.dropdown-item:focus,
+.dropdown-item.active {
+    background-color: #212529 !important; /* dark */
+    color: #fff !important;
+}
 
 .search-bar {
     display: flex;

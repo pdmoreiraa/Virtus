@@ -42,12 +42,12 @@
 
         <div class="row mb-2">
             <div class="col-sm-4 fw-bold">Telefone</div>
-            <div class="col-sm-8">@Model.Telefone.FormatarTelefone()</div>
+            <div class="col-sm-8 telefone">@Model.Telefone</div>
         </div>
 
         <div class="row mb-2">
             <div class="col-sm-4 fw-bold">CPF</div>
-            <div class="col-sm-8">@Model.CPF.FormatarCPF()</div>
+            <div class="col-sm-8 cpf">@Model.CPF</div>
         </div>
 
         <div class="row mb-2">
@@ -131,21 +131,4 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('#Telefone').mask('(00)00000-0000');
-            $('#CPF').mask('000.000.000-00');
-
-            $('#perfilForm').on('submit', function () {
-                // Remove máscara antes de enviar
-                $('#Telefone').val($('#Telefone').val().replace(/\D/g, ''));
-                $('#CPF').val($('#CPF').val().replace(/\D/g, ''));
-            });
-        });
-    </script>
-}
 

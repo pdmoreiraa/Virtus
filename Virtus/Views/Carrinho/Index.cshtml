@@ -21,25 +21,25 @@
                     <tr class="border border-dark rounded-3 p-3 mt-3">
                         <td>
                             <div class="d-flex">
-                            <img src="@Url.Content("~/img/" + item.Imagem?.Url)" width="150" class="rounded" alt="@item.Produto.Nome"/>
+                                <img src="@Url.Content("~/img/" + item.Imagem?.PimgUrl)" width="150" class="rounded" alt="@item.Produto.PrdNome" />
                             <div class="ms-3">
-                            <h4>@item.Produto.Nome</h4>
+                                    <h4>@item.Produto.PrdNome</h4>
                             <p>
-                                Marca: @item.Produto.Marca<br>
-                                Categoria: @item.Produto.Categoria<br>
-                                Preço: R$ @item.PrecoUnitario
+                                        Marca: @item.Produto.PrdMarca<br>
+                                        Categoria: @item.Produto.PrdCategoria<br>
+                                        Preço: R$ @item.IpPrecoUnitario
                             </p>
                             </div>
                             </div>
                         <div style="white-space:nowrap">
                             Quantidade: 
                             <button type="button" class="btn btn-light border border-dark rounded smooth-btn btn-sm"
-                                    onclick="diminuir(@item.Produto.Id)">
+                                        onclick="diminuir(@item.Produto.PrdId)">
                                 -
                             </button>
-                            <span class="border rounded-3 p-2 m-1">@item.Quantidade</span>
+                                <span class="border rounded-3 p-2 m-1">@item.IpQuantidade</span>
                             <button type="button" class="btn btn-light border border-dark rounded smooth-btn btn-sm"
-                                    onclick="aumentar(@item.Produto.Id)">
+                                        onclick="aumentar(@item.Produto.PrdId)">
                                 +
                             </button>
                         </div>
@@ -47,12 +47,13 @@
 
                         <td class="position-relative">
                             <div class="position-absolute top-0 end-0 m-1 mt-2">
-                            <i class="bi bi-trash h4" style="cursor: pointer; font-size:30px;" onclick="remover(@item.Produto.Id)"></i>
+                                <i class="bi bi-trash h4" style="cursor: pointer; font-size:30px;" onclick="remover(@item.Produto.PrdId)"></i>
                             </div>
 
                             <div class="position-absolute bottom-0 end-0 m-1 fw-bold d-flex align-items-end">
                                 <div class="me-1">R$ </div>
-                                <div>@(item.PrecoUnitario * item.Quantidade)
+                                <div>
+                                    @(item.IpPrecoUnitario * item.IpQuantidade)
                                 </div>
 
                                

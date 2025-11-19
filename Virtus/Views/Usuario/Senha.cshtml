@@ -23,7 +23,10 @@
 		<div class="row mb-2">
 			<label class="col-sm-4 col-form-label">Senha Atual</label>
 			<div class="col-sm-8">
-				<input class="form-control" type="password" asp-for="SenhaAtual">
+				<div class="password-container">
+				<input class="form-control" id="senha" type="password" asp-for="SenhaAtual">
+				<i class="bi bi-eye toggle-visibility" id="toggleSenha"></i>
+			</div>
 				<span asp-validation-for="SenhaAtual" class="text-danger"></span>
 			</div>
 		</div>
@@ -31,7 +34,10 @@
 		<div class="row mb-2">
 			<label class="col-sm-4 col-form-label">Nova Senha</label>
 			<div class="col-sm-8">
-				<input class="form-control" type="password" asp-for="NovaSenha">
+				<div class="password-container">
+				<input class="form-control" id="novaSenha" type="password" asp-for="NovaSenha">
+				<i class="bi bi-eye toggle-visibility" id="toggleNovaSenha"></i>
+				</div>
 				<span asp-validation-for="NovaSenha" class="text-danger"></span>
 			</div>
 		</div>
@@ -39,7 +45,10 @@
 		<div class="row mb-2">
 			<label class="col-sm-4 col-form-label">Confirmar Senha</label>
 			<div class="col-sm-8">
-				<input class="form-control" type="password" asp-for="ConfirmarSenha">
+				<div class="password-container">
+				<input class="form-control" id="confirmarSenha" type="password" asp-for="ConfirmarSenha">
+					<i class="bi bi-eye toggle-visibility" id="toggleConfirmarSenha"></i>
+				</div>
 				<span asp-validation-for="ConfirmarSenha" class="text-danger"></span>
 			</div>
 		</div>

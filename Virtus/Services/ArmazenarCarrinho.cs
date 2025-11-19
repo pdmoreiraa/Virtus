@@ -5,27 +5,26 @@ using Virtus.Repository;
 
 namespace Virtus.Services
 {
-    public static class AuxiliarCarrinho
+    public static class ArmazenarCarrinho
     {
-        /// <summary>
         /// Lê o cookie "shopping_cart" e retorna um dicionário com os produtos e suas quantidades.
-        /// </summary>
-        public static async Task<List<ItemPedido>> ObterItensCarrinho(HttpRequest requisicao, HttpResponse resposta, IProdutoRepository produtoRepository)
+
+        public static async Task<List<ItemPedido>> Itens(HttpRequest requisicao, HttpResponse resposta, IProdutoRepository produtoRepository)
         {
             var itens = new List<ItemPedido>();
-            var dicionario = ObterDicionarioCarrinho(requisicao, resposta);
+            var tItens = TodosItens(requisicao, resposta);
 
-            foreach (var par in dicionario)
+            foreach (var par in tItens)
             {
                 var produto = await produtoRepository.ProdutosPorId(par.Key);
                 if (produto == null) continue;
 
                 itens.Add(new ItemPedido
                 {
-                    ProdutoId = produto.Id,
+                    ProdutoId = produto.PrdId,
                     Produto = produto,
-                    Quantidade = par.Value,
-                    PrecoUnitario = produto.Preco,
+                    IpQuantidade = par.Value,
+                    IpPrecoUnitario = produto.PrdPreco,
                     Imagem = produto.Imagens.FirstOrDefault()
                 });
             }
@@ -33,13 +32,12 @@ namespace Virtus.Services
             return itens;
         }
 
-        /// <summary>
+
         /// Retorna o total de itens no carrinho.
-        /// </summary>
-        public static int ObterTamanhoCarrinho(HttpRequest requisicao, HttpResponse resposta)
+        public static int QtdCarrinho(HttpRequest requisicao, HttpResponse resposta)
         {
             int tamanho = 0;
-            var carrinho = ObterDicionarioCarrinho(requisicao, resposta);
+            var carrinho = TodosItens(requisicao, resposta);
 
             foreach (var item in carrinho)
             {
@@ -52,13 +50,13 @@ namespace Virtus.Services
         /// <summary>
         /// Calcula o subtotal do carrinho.
         /// </summary>
-        public static decimal ObterSubtotal(List<ItemPedido> itensCarrinho)
+        public static decimal Subtotal(List<ItemPedido> itensCarrinho)
         {
             decimal subtotal = 0;
 
             foreach (var item in itensCarrinho)
             {
-                subtotal += item.Quantidade * item.PrecoUnitario;
+                subtotal += item.IpQuantidade * item.IpPrecoUnitario;
             }
 
             return subtotal;
@@ -67,7 +65,7 @@ namespace Virtus.Services
         /// <summary>
         /// Salva o estado atual do carrinho no cookie (JSON + Base64).
         /// </summary>
-        public static void SalvarCarrinho(HttpResponse resposta, Dictionary<int, int> carrinho)
+        public static void Salvar(HttpResponse resposta, Dictionary<int, int> carrinho)
         {
             string json = JsonConvert.SerializeObject(carrinho);
             string valorBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
@@ -86,24 +84,24 @@ namespace Virtus.Services
         /// <summary>
         /// Adiciona um item ao carrinho (ou incrementa se já existir).
         /// </summary>
-        public static void AdicionarAoCarrinho(HttpRequest requisicao, HttpResponse resposta, int produtoId)
+        public static void Adicionar(HttpRequest requisicao, HttpResponse resposta, int produtoId)
         {
-            var carrinho = ObterDicionarioCarrinho(requisicao, resposta);
+            var carrinho = TodosItens(requisicao, resposta);
 
             if (carrinho.ContainsKey(produtoId))
                 carrinho[produtoId]++;
             else
                 carrinho[produtoId] = 1;
 
-            SalvarCarrinho(resposta, carrinho);
+            Salvar(resposta, carrinho);
         }
 
         /// <summary>
         /// Diminui a quantidade de um item no carrinho.
         /// </summary>
-        public static void DiminuirDoCarrinho(HttpRequest requisicao, HttpResponse resposta, int produtoId)
+        public static void Diminuir(HttpRequest requisicao, HttpResponse resposta, int produtoId)
         {
-            var carrinho = ObterDicionarioCarrinho(requisicao, resposta);
+            var carrinho = TodosItens(requisicao, resposta);
 
             if (!carrinho.ContainsKey(produtoId))
                 return;
@@ -113,27 +111,27 @@ namespace Virtus.Services
             else
                 carrinho.Remove(produtoId);
 
-            SalvarCarrinho(resposta, carrinho);
+            Salvar(resposta, carrinho);
         }
 
         /// <summary>
         /// Remove completamente um produto do carrinho.
         /// </summary>
-        public static void RemoverDoCarrinho(HttpRequest requisicao, HttpResponse resposta, int produtoId)
+        public static void Remover(HttpRequest requisicao, HttpResponse resposta, int produtoId)
         {
-            var carrinho = ObterDicionarioCarrinho(requisicao, resposta);
+            var carrinho = TodosItens(requisicao, resposta);
 
             if (carrinho.ContainsKey(produtoId))
             {
                 carrinho.Remove(produtoId);
-                SalvarCarrinho(resposta, carrinho);
+                Salvar(resposta, carrinho);
             }
         }
 
         /// <summary>
         /// Recupera o cookie e converte de Base64 + JSON para dicionário de produtos.
         /// </summary>
-        private static Dictionary<int, int> ObterDicionarioCarrinho(HttpRequest requisicao, HttpResponse resposta)
+        private static Dictionary<int, int> TodosItens(HttpRequest requisicao, HttpResponse resposta)
         {
             try
             {
