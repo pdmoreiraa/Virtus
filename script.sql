@@ -1,7 +1,7 @@
 create database dbVirtus;
 use dbVirtus;
 
-drop database dbvirtus;
+
 
 CREATE TABLE tbProduto(
 PrdId INT PRIMARY KEY AUTO_INCREMENT,
@@ -148,3 +148,7 @@ INSERT INTO tbEstoque(ProdutoId, EstTamanho, EstQuantidade) VALUES
 (8, '39',10), (8, '40',10), (8, '41',10), (8, '42',10),
 (9, '39',10), (9, '40',10), (9, '41',10), (9, '42',10),
 (10, '39',10), (10, '40',10), (10, '41',10), (10, '42',10);
+
+INSERT INTO tbUsuario(UsuNome, UsuSobrenome, UsuEmail, UsuSenha, UsuCPF, UsuTelefone, UsuTipo)
+VALUES 
+('Leonardo', 'Pessanha','adm@gmail.com', 'admin123', '12345678910', '11987654321', 'admin');
