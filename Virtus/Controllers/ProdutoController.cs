@@ -46,7 +46,7 @@ namespace Virtus.Controllers
                 "PrdTipo" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdTipo).ToList() : produtos.OrderByDescending(p => p.PrdTipo).ToList(),
                 "PrdEsporte" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdEsporte).ToList() : produtos.OrderByDescending(p => p.PrdEsporte).ToList(),
                 "PrdPreco" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdPreco).ToList() : produtos.OrderByDescending(p => p.PrdPreco).ToList(),
-                "PrdCor" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdPreco).ToList() : produtos.OrderByDescending(p => p.PrdPreco).ToList(),
+                "PrdCor" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdCor).ToList() : produtos.OrderByDescending(p => p.PrdCor).ToList(),
                 "PrdData" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdData).ToList() : produtos.OrderByDescending(p => p.PrdData).ToList(),
                 _ => ordPor == "asc" ? produtos.OrderBy(p => p.PrdId).ToList() : produtos.OrderByDescending(p => p.PrdId).ToList(),
             };
@@ -217,7 +217,6 @@ namespace Virtus.Controllers
                 {
                     if (!string.IsNullOrWhiteSpace(imagem.PimgUrl))
                     {
-                        // Garante que o caminho esteja correto (sem barras duplicadas)
                         var caminho= Path.Combine(
                             Directory.GetCurrentDirectory(),
                             "wwwroot", "img",

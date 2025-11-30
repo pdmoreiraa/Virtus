@@ -134,8 +134,7 @@ namespace Virtus.Repository
                 {
                     var sqlEstoque = @"
                 INSERT INTO tbEstoque (ProdutoId, EstTamanho, EstQuantidade)
-                VALUES (@ProdutoId, @EstTamanho, @EstQuantidade);
-            ";
+                VALUES (@ProdutoId, @EstTamanho, @EstQuantidade);";
 
                     foreach (var est in produto.Estoques)
                     {
@@ -161,13 +160,13 @@ namespace Virtus.Repository
             using var cnct = new MySqlConnection(_connectionString);
 
             var sql = @"
-        SELECT p.*, pi.PimgId, pi.ProdutoId, pi.PimgUrl, pi.PimgOrdemImagem,
-        es.EstId, es.EstTamanho, es.EstQuantidade
-        FROM tbProduto p
-        LEFT JOIN tbPrdImagem pi ON pi.ProdutoId = p.PrdId
-        LEFT JOIN tbEstoque es ON es.ProdutoId = p.PrdId
-        WHERE p.PrdId = @PrdId
-        ORDER BY pi.PimgOrdemImagem, es.EstTamanho;";
+            SELECT p.*, pi.PimgId, pi.ProdutoId, pi.PimgUrl, pi.PimgOrdemImagem,
+            es.EstId, es.EstTamanho, es.EstQuantidade
+            FROM tbProduto p
+            LEFT JOIN tbPrdImagem pi ON pi.ProdutoId = p.PrdId
+            LEFT JOIN tbEstoque es ON es.ProdutoId = p.PrdId
+            WHERE p.PrdId = @PrdId
+            ORDER BY pi.PimgOrdemImagem, es.EstTamanho;";
 
             var produtoDict = new Dictionary<int, Produto>();
 
