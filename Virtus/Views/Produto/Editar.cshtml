@@ -154,7 +154,7 @@
                 @foreach (var img in Model.Imagens.OrderBy(i => i.PimgOrdemImagem))
             {
                     <div class="card" data-imagem-id="@img.PimgId" style="width: 10rem;">
-                        <img src="@Url.Content("~/img/" + img.PimgUrl)" class="card-img-top" alt="Imagem do produto">
+                        <img src="/img/@img.PimgUrl" class="card-img-top" alt="Imagem do produto">
                         <div class="card-body text-center">
                             <button type="button" class="btn btn-dark smooth-btn mt-1" onclick="removerImagem(@img.PimgId)">
                                 Remover

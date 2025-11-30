@@ -21,13 +21,12 @@ namespace Virtus.Repository
             await cnct.OpenAsync();
 
             var sql = @"
-SELECT 
-    p.PrdId, p.PrdNome, p.PrdMarca, p.PrdCategoria, p.PrdTipo, p.PrdEsporte, p.PrdDescricao, p.PrdPreco, p.PrdCor, p.PrdData,
-    pi.PimgId, pi.ProdutoId, pi.PimgUrl, pi.PimgOrdemImagem
-FROM tbProduto p
-LEFT JOIN tbPrdImagem pi ON pi.ProdutoId = p.PrdId
-ORDER BY p.PrdId, pi.PimgOrdemImagem;
-";
+            SELECT 
+            p.PrdId, p.PrdNome, p.PrdMarca, p.PrdCategoria, p.PrdTipo, p.PrdEsporte, p.PrdDescricao, p.PrdPreco, p.PrdCor, p.PrdData,
+            pi.PimgId, pi.ProdutoId, pi.PimgUrl, pi.PimgOrdemImagem
+            FROM tbProduto p
+            LEFT JOIN tbPrdImagem pi ON pi.ProdutoId = p.PrdId
+            ORDER BY p.PrdId, pi.PimgOrdemImagem;";
 
             var produtoDict = new Dictionary<int, Produto>();
 
@@ -60,13 +59,12 @@ ORDER BY p.PrdId, pi.PimgOrdemImagem;
             await cnct.OpenAsync();
 
             var sql = @"
-SELECT 
-    p.PrdId, p.PrdNome, p.PrdMarca, p.PrdCategoria, p.PrdTipo, p.PrdEsporte, p.PrdDescricao, p.PrdPreco, p.PrdCor, p.PrdData,
-    pi.PimgId, pi.ProdutoId, pi.PimgUrl, pi.PimgOrdemImagem
-FROM tbProduto p
-LEFT JOIN tbPrdImagem pi ON pi.ProdutoId = p.PrdId
-ORDER BY p.PrdId DESC, pi.PimgOrdemImagem;
-";
+            SELECT 
+            p.PrdId, p.PrdNome, p.PrdMarca, p.PrdCategoria, p.PrdTipo, p.PrdEsporte, p.PrdDescricao, p.PrdPreco, p.PrdCor, p.PrdData,
+            pi.PimgId, pi.ProdutoId, pi.PimgUrl, pi.PimgOrdemImagem
+            FROM tbProduto p
+            LEFT JOIN tbPrdImagem pi ON pi.ProdutoId = p.PrdId
+            ORDER BY p.PrdId DESC, pi.PimgOrdemImagem;";
 
             var produtoDict = new Dictionary<int, Produto>();
 
@@ -273,9 +271,9 @@ ORDER BY p.PrdId DESC, pi.PimgOrdemImagem;
 
         public async Task<Estoque?> EstPorId(int produtoId)
         {
-            using var connection = new MySqlConnection(_connectionString);
+            using var cnct = new MySqlConnection(_connectionString);
             var sql = "SELECT * FROM tbEstoque WHERE ProdutoId = @ProdutoId";
-            return await connection.QueryFirstOrDefaultAsync<Estoque>(sql, new { ProdutoId = produtoId });
+            return await cnct.QueryFirstOrDefaultAsync<Estoque>(sql, new { ProdutoId = produtoId });
         }
 
 
@@ -288,51 +286,19 @@ ORDER BY p.PrdId DESC, pi.PimgOrdemImagem;
             await cnct.ExecuteAsync(sql, new { PrdId = id });
         }
 
-        public async Task<Dictionary<string, List<string>>> ObterCategoriasTipos()
-        {
-            const string sql = @"
-                SELECT PrdCategoria, PrdTipo
-                FROM tbProduto
-                WHERE PrdCategoria IS NOT NULL
-                  AND PrdTipo IS NOT NULL;
-            ";
-
-            await using var connection = new MySqlConnection(_connectionString);
-            // QueryAsync sem tipagem -> retorna IEnumerable<dynamic>
-            var rows = await connection.QueryAsync(sql);
-
-            // Transformar explicitamente em strings e agrupar
-            var mapped = rows
-                .Select(r => new
-                {
-                    PrdCategoria = (r.PrdCategoria == null) ? string.Empty : (string)r.Categoria,
-                    PrdTipo = (r.PrdTipo == null) ? string.Empty : (string)r.PrdTipo
-                })
-                .Where(x => !string.IsNullOrWhiteSpace(x.PrdCategoria) && !string.IsNullOrWhiteSpace(x.PrdTipo));
-
-            var resultado = mapped
-                .GroupBy(x => x.PrdCategoria)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(x => x.PrdTipo).Distinct().OrderBy(t => t).ToList()
-                );
-
-            return resultado;
-        }
-
         public async Task<ProdutoImagem?> ImagemPorId(int id)
         {
-            using var connection = new MySqlConnection(_connectionString);
+            using var cnct = new MySqlConnection(_connectionString);
             var sql = "SELECT * FROM tbPrdImagem WHERE PimgId = @PimgId";
-            return await connection.QueryFirstOrDefaultAsync<ProdutoImagem>(sql, new { PimgId = id });
+            return await cnct.QueryFirstOrDefaultAsync<ProdutoImagem>(sql, new { PimgId = id });
         }
 
         public async Task DeletarImagem(int imagemId)
         {
-            using (var connection = new MySqlConnection(_connectionString))
+            using (var cnct = new MySqlConnection(_connectionString))
             {
                 string sql = "DELETE FROM tbPrdImagem WHERE PimgId = @PimgId";
-                await connection.ExecuteAsync(sql, new { PimgId = imagemId });
+                await cnct.ExecuteAsync(sql, new { PimgId = imagemId });
             }
         }
 

@@ -44,7 +44,7 @@ namespace Virtus.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Infos()
+        public async Task<IActionResult> Finalizar()
         {
             // Verificar se usuário está logado
             var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
@@ -119,13 +119,13 @@ namespace Virtus.Controllers
                     NovoCartao = new Cartao()
                 };
 
-                return View("Infos", carrinho);
+                return View("Finalizar", carrinho);
             }
 
             try
             {
                 _carrinhoRepository.AdicionarEndereco(endereco);
-                return RedirectToAction("Infos");
+                return RedirectToAction("Finalizar");
             }
             catch (Exception ex)
             {
@@ -151,7 +151,7 @@ namespace Virtus.Controllers
                     NovoCartao = new Cartao()
                 };
 
-                return View("Infos", carrinho);
+                return View("Finalizar", carrinho);
             }
         }
 
@@ -163,7 +163,7 @@ namespace Virtus.Controllers
             if (cartao == null)
             {
                 ModelState.AddModelError("", "Não foi possível processar o cartão.");
-                return RedirectToAction("Infos");
+                return RedirectToAction("Finalizar");
             }
 
             // Verifica se o usuário está logado
@@ -197,7 +197,7 @@ namespace Virtus.Controllers
                     NovoCartao = cartao // mantém os dados preenchidos do cartão
                 };
 
-                return View("Infos", carrinho);
+                return View("Finalizar", carrinho);
             }
 
             try
@@ -205,7 +205,7 @@ namespace Virtus.Controllers
                 // Salvar cartão no banco
                 _carrinhoRepository.AdicionarCartao(cartao);
 
-                return RedirectToAction("Infos");
+                return RedirectToAction("Finalizar");
             }
             catch (Exception ex)
             {
@@ -231,7 +231,7 @@ namespace Virtus.Controllers
                     NovoCartao = cartao
                 };
 
-                return View("Infos", carrinho);
+                return View("Finalizar", carrinho);
             }
 
 
@@ -245,7 +245,7 @@ namespace Virtus.Controllers
             if (EnderecoSelecionadoId <= 0)
             {
                 TempData["Erro"] = "Selecione um endereço antes de continuar.";
-                return RedirectToAction("Infos");
+                return RedirectToAction("Finalizar");
             }
 
             // Obter usuário logado
@@ -261,7 +261,7 @@ namespace Virtus.Controllers
             if (string.IsNullOrEmpty(MetodoPagamento))
             {
                 TempData["Erro"] = "Por favor, selecione um método de pagamento antes de continuar.";
-                return RedirectToAction("Infos");
+                return RedirectToAction("Finalizar");
             }
 
             // Obter itens do carrinho
@@ -274,17 +274,17 @@ namespace Virtus.Controllers
 
             // Calcular valores
             decimal subtotal = itensCarrinho.Sum(i => i.IpPrecoUnitario * i.IpQuantidade);
-            decimal taxaEntrega = 10m; // valor fixo, pode ajustar
+            decimal taxaEntrega = 10m;
             decimal valorTotal = MetodoPagamento == "Pix"
-                ? (subtotal + taxaEntrega) * 0.95m // desconto de 5% para Pix
+                ? (subtotal + taxaEntrega) * 0.95m // desconto pix
                 : subtotal + taxaEntrega;
 
             // Definir CartaoId apenas se o pagamento for cartão
             int? cartaoIdFinal = MetodoPagamento == "Pix" ? null : CartaoId;
 
             string? tipoCartaoFinal = MetodoPagamento == "Pix"
-    ? null
-    : carrinho.NovoCartao.CarTipo;
+            ? null
+            : carrinho.NovoCartao.CarTipo;
 
 
             // Criar pedido
@@ -292,7 +292,7 @@ namespace Virtus.Controllers
             {
                 UsuarioId = usuarioId,
                 EnderecoId = EnderecoSelecionadoId,
-                MetodoPagamentoId = MetodoPagamento == "Pix" ? 2 : 1, // 2 = Pix, 1 = Cartão
+                MetodoPagamentoId = MetodoPagamento == "Pix" ? 2 : 1, // 2 = pix, 1 = cartao
                 CartaoId = cartaoIdFinal,
                 PdTaxaEntrega = taxaEntrega,
                 PdValorTotal = valorTotal,
@@ -328,7 +328,7 @@ namespace Virtus.Controllers
                     HttpContext.Session.SetString("TipoCartao", carrinho.NovoCartao.CarTipo);
 
 
-                    return RedirectToAction("ConfirmarCartao", "Carrinho", new { pedidoId = pedidoId });
+                    return RedirectToAction("Cartao", "Carrinho", new { pedidoId = pedidoId });
                 }
             }
             catch (Exception ex)
@@ -389,7 +389,7 @@ namespace Virtus.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ConfirmarPagamento(int pedidoId)
+        public async Task<IActionResult> ConfirmarPix(int pedidoId)
         {
 
             var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
@@ -431,7 +431,7 @@ namespace Virtus.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ConfirmarCartao(int pedidoId)
+        public async Task<IActionResult> Cartao(int pedidoId)
         {
 
             if (pedidoId <= 0)
@@ -459,9 +459,6 @@ namespace Virtus.Controllers
             ViewBag.TipoCartao = tipoCartao;
 
 
-
-            Console.WriteLine("SESSION ValorParcela RAW = " + HttpContext.Session.GetString("ValorParcela"));
-
             // Obter pedido do banco
             var pedido = await _pedidoRepository.ObterPedidoPorId(pedidoId);
             if (pedido == null)
@@ -477,16 +474,16 @@ namespace Virtus.Controllers
                 Subtotal = pedido.Itens.Sum(i => i.IpPrecoUnitario * i.IpQuantidade),
                 TaxaEntrega = pedido.PdTaxaEntrega,
                 CartaoSelecionadoId = pedido.CartaoId,
-                Cartoes = new List<Cartao>() // opcional, se quiser exibir cartões
+                Cartoes = new List<Cartao>()
             };
 
-            ViewBag.PedidoId = pedido.PdId; // necessário para o POST
+            ViewBag.PedidoId = pedido.PdId;
 
-            return View(carrinho); // continua usando @model Carrinho
+            return View(carrinho);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ConfirmarPagamentoCartao(int pedidoId)
+        public async Task<IActionResult> ConfirmarCartao(int pedidoId)
         {
 
             var usuarioIdStr = HttpContext.Session.GetString("UsuarioId");
@@ -510,7 +507,7 @@ namespace Virtus.Controllers
             if (linhas <= 0)
             {
                 TempData["Erro"] = "Não foi possível atualizar o status do pagamento.";
-                return RedirectToAction("ConfirmarCartao", new { pedidoId });
+                return RedirectToAction("Cartao", new { pedidoId });
             }
 
             TempData["Sucesso"] = "Pagamento confirmado com sucesso!";

@@ -4,12 +4,12 @@ using Virtus.Repository;
 
 namespace Virtus.Controllers
 {
-    public class UsuarioPedidoController : Controller
+    public class PedidoUsuarioController : Controller
     {
         private readonly IPedidoRepository _pedidoRepository;
         private readonly int pagTam = 5;
 
-        public UsuarioPedidoController(IPedidoRepository pedidoRepository)
+        public PedidoUsuarioController(IPedidoRepository pedidoRepository)
         {
             _pedidoRepository = pedidoRepository;
         }

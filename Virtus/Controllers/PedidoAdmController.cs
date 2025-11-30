@@ -5,12 +5,12 @@ using Virtus.Repository;
 namespace Virtus.Controllers
 {
     [Route("/Admin/[controller]/{action=Index}/{id?}")]
-    public class AdminPedidoController : Controller
+    public class PedidoAdmController : Controller
     {
         private readonly IPedidoRepository _pedidoRepository;
         private readonly int pagTam = 8;
 
-        public AdminPedidoController(IPedidoRepository pedidoRepository)
+        public PedidoAdmController(IPedidoRepository pedidoRepository)
         {
             _pedidoRepository = pedidoRepository;
         }

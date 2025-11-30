@@ -64,11 +64,11 @@
                                 @if (tipo?.ToLower() == "admin")
                                 {
                                     <li><a class="dropdown-item" asp-controller="Produto" asp-action="Index">Produtos</a></li>
-                                    <li><a class="dropdown-item" asp-controller="AdminPedido" asp-action="Index">Pedidos</a></li>
+                                    <li><a class="dropdown-item" asp-controller="PedidoAdm" asp-action="Index">Pedidos</a></li>
                                 }
                                 else
                                 {
-                                    <li><a class="dropdown-item" asp-controller="UsuarioPedido" asp-action="Index">Meus Pedidos</a></li>
+                                    <li><a class="dropdown-item" asp-controller="PedidoUsuario" asp-action="Index">Meus Pedidos</a></li>
                                 }
 
                                 <li><a class="dropdown-item" asp-controller="Usuario" asp-action="Perfil">Perfil</a></li>

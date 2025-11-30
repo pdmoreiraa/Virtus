@@ -13,7 +13,6 @@ namespace Virtus.Repository
         Task DeletarProduto(int id);
         Task DeletarImagem(int imagemId);
         Task<ProdutoImagem?> ImagemPorId(int id);
-        Task<Dictionary<string, List<string>>> ObterCategoriasTipos();
 
     }
 }

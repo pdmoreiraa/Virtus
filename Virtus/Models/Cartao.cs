@@ -10,7 +10,6 @@ namespace Virtus.Models
         public string CarTipo { get; set; } = string.Empty;
         public string CarNomeTitular { get; set; } = string.Empty;
         public string CarNumero { get; set; } = string.Empty;
-        public string CarBandeira { get; set; } = string.Empty;
         public string CarValidade { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "O CVV é obrigatório.")]

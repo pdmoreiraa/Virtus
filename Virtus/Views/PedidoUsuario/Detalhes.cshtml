@@ -15,7 +15,7 @@
 
 <h3 class="text-center mb-4">Detalhes do Pedido</h3>
 
-<a class="btn btn-link shadow-none" asp-controller="UsuarioPedido" asp-action="Index">Voltar para Pedidos</a>
+<a class="btn btn-link shadow-none" asp-controller="PedidoUsuario" asp-action="Index">Voltar para Pedidos</a>
 
 <div class="row mb-4">
     <div class="col">
@@ -30,7 +30,7 @@
             <div class="row mb-2 pb-2 border-bottom">
                 <div class="col">Endereço de Entrega</div>
                 <div class="col">
-                    @Model.Endereco
+                    @(Model.Endereco != null ? $"{Model.Endereco.EndNomeCompleto}, {Model.Endereco.EndLogradouro}, {Model.Endereco.EndNumero}" : "Desconhecido")
                 </div>
             </div>
 
@@ -83,7 +83,7 @@
                     subtotal += itemTotal;
                     <tr>
                         <td>
-                                <img src="@Url.Content("~/img/" + item.Produto.Imagens.FirstOrDefault()?.PimgUrl)" width="100" />
+                                <img src="/img/@item.Produto.Imagens.FirstOrDefault()?.PimgUrl" width="100" />
                                 @item.Produto.PrdNome
                         </td>
                             <td>@item.Produto.PrdCategoria</td>

@@ -12,7 +12,6 @@
                          style="width:500px; height:auto; object-fit: contain;">
                 </div>
 
-                <!-- Miniaturas -->
                 <div class="d-flex flex-column ms-3">
                     @foreach (var img in Model.Imagens.Take(4))
                     {
@@ -49,7 +48,7 @@
                 <p>Este produto não possui tamanhos cadastrados.</p>
             }
 
-            <button type="button" class="btn btn-dark smooth-btn btn-sm" onclick="adicionarAoCarrinho(this, @Model.PrdId)">
+            <button type="button" class="btn btn-dark smooth-btn btn-sm" onclick="adicionarCarrinho(this, @Model.PrdId)">
                 Adicionar ao Carrinho <i class="bi bi-cart4"></i>
             </button>
         </div>

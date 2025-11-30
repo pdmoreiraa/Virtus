@@ -54,7 +54,7 @@
                 <td><span class="badge rounded-pill @statusPedidoBadge">@pedido.PdStatusPedido</span></td>
                 <td>@pedido.PdCriadoEm.ToString("dd/MM/yyyy")</td>
                 <td class="d-flex justify-content-center align-items-center">
-                    <a class="btn btn-dark w-100 smooth-btn" asp-controller="UsuarioPedido" asp-action="Detalhes" asp-route-id="@pedido.PdId">Detalhes</a>
+                    <a class="btn btn-dark w-100 smooth-btn" asp-controller="PedidoUsuario" asp-action="Detalhes" asp-route-id="@pedido.PdId">Detalhes</a>
                 </td>
             </tr>
         }

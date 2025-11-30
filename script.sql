@@ -73,8 +73,7 @@ CREATE TABLE tbCartao (
     UsuarioId INT NOT NULL,
     CarTipo varchar(20) NOT NULL,
     CarNomeTitular VARCHAR(100) NOT NULL,
-    CarNumero VARCHAR(25) NOT NULL, 
-    CarBandeira VARCHAR(30) NOT NULL,
+    CarNumero VARCHAR(25) NOT NULL,
     CarValidade VARCHAR(10) NOT NULL,
     CarCVV VARCHAR(3) NOT NULL,
     FOREIGN KEY (UsuarioId) REFERENCES tbUsuario(UsuId)
@@ -121,7 +120,7 @@ INSERT INTO tbMetPagamento (MpDescricao)
 VALUES ('Cartão'),
 ('Pix');
 
-SELECT * FROM tbEstoque;
+SELECT * FROM tbEndereco;
 
 INSERT INTO tbProduto (PrdNome, PrdMarca, PrdCategoria, PrdTipo, PrdEsporte, PrdDescricao, PrdPreco, PrdCor)
 VALUES ('Top Adidas Suporte Leve Colorblock ', 'Adidas', 'Feminino', 'Top', 'Corrida', 'Top Adidas Suporte Leve Colorblock Feminino - Roxo', 161.49, 'Roxo'),

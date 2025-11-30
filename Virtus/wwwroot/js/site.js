@@ -1,32 +1,32 @@
 ﻿function salvarCarrinho(carrinho) {
 
-    let carrinhoStr = btoa(JSON.stringify(carrinho));
+    let carString = btoa(JSON.stringify(carrinho));
 
     let data = new Date();
     data.setDate(data.getDate() + 365);
     let expiracao = data.toUTCString();
 
-    document.cookie = "shopping_cart=" + carrinhoStr + ";expires=" + expiracao + ";path=/; SameSite=Strict; Secure";
+    document.cookie = "shopping_cart=" + carString + ";expires=" + expiracao + ";path=/; SameSite=Strict; Secure";
 }
 
 // Função para adicionar um produto ao carrinho
-function adicionarAoCarrinho(botao, id) {
-    let carrinho = obterCarrinhoDeCompras();
+function adicionarCarrinho(botao, id) {
+    let carrinho = carrinhoDeCompras();
 
-    let quantidade = carrinho[id];
-    if (isNaN(quantidade)) {
+    let qtd = carrinho[id];
+    if (isNaN(qtd)) {
         carrinho[id] = 1;
     } else {
-        carrinho[id] = Number(quantidade) + 1;
+        carrinho[id] = Number(qtd) + 1;
     }
 
     salvarCarrinho(carrinho);
 
     let tamanhoCarrinho = 0;
     for (var item of Object.entries(carrinho)) {
-        quantidade = item[1];
-        if (isNaN(quantidade)) continue;
-        tamanhoCarrinho += Number(quantidade);
+        qtd = item[1];
+        if (isNaN(qtd)) continue;
+        tamanhoCarrinho += Number(qtd);
     }
 
     document.getElementById("CartSize").innerHTML = tamanhoCarrinho;
@@ -83,35 +83,34 @@ function animarProduto(produtoImg, cartIcon) {
     }, 800);
 }
 
-
-// Função para aumentar a quantidade de um item no carrinho
+// Função para aumentar a qtd de um item no carrinho
 function aumentar(id) {
-    let carrinho = obterCarrinhoDeCompras();
+    let carrinho = carrinhoDeCompras();
 
-    let quantidade = carrinho[id];
-    if (isNaN(quantidade)) {
+    let qtd = carrinho[id];
+    if (isNaN(qtd)) {
         carrinho[id] = 1;
     } else {
-        carrinho[id] = Number(quantidade) + 1;
+        carrinho[id] = Number(qtd) + 1;
     }
 
     salvarCarrinho(carrinho);
     location.reload();
 }
 
-// Função para diminuir a quantidade de um item no carrinho
+// Função para diminuir a qtd de um item no carrinho
 function diminuir(id) {
-    let carrinho = obterCarrinhoDeCompras();
+    let carrinho = carrinhoDeCompras();
 
-    let quantidade = carrinho[id];
-    if (isNaN(quantidade)) {
+    let qtd = carrinho[id];
+    if (isNaN(qtd)) {
         return;
     }
 
-    quantidade = Number(quantidade);
+    qtd = Number(qtd);
 
-    if (quantidade > 1) {
-        carrinho[id] = quantidade - 1;
+    if (qtd > 1) {
+        carrinho[id] = qtd - 1;
         salvarCarrinho(carrinho);
         location.reload();
     }
@@ -119,7 +118,7 @@ function diminuir(id) {
 
 // Função para remover um item do carrinho
 function remover(id) {
-    let carrinho = obterCarrinhoDeCompras();
+    let carrinho = carrinhoDeCompras();
 
     if (carrinho[id]) {
         delete carrinho[id];
@@ -129,7 +128,7 @@ function remover(id) {
 }
 
 // Função auxiliar para obter o carrinho a partir do cookie
-function obterCarrinhoDeCompras() {
+function carrinhoDeCompras() {
     const nomeCookie = "shopping_cart";
     let cookies = document.cookie.split(';');
 
@@ -148,17 +147,17 @@ function obterCarrinhoDeCompras() {
 
     return {};
 }
-function atualizarContadorCarrinho() {
+function atualizarCarrinho() {
     const elemento = document.getElementById("CartSize");
-    if (!elemento) return; // Evita erro se o elemento não existir ainda
+    if (!elemento) return;
 
-    let carrinho = obterCarrinhoDeCompras();
+    let carrinho = CarrinhoDeCompras();
 
     let tamanhoCarrinho = 0;
     for (var item of Object.entries(carrinho)) {
-        let quantidade = item[1];
-        if (isNaN(quantidade)) continue;
-        tamanhoCarrinho += Number(quantidade);
+        let qtd = item[1];
+        if (isNaN(qtd)) continue;
+        tamanhoCarrinho += Number(qtd);
     }
 
     elemento.innerHTML = tamanhoCarrinho;
@@ -166,5 +165,5 @@ function atualizarContadorCarrinho() {
 
 // Chamada automática quando a página termina de carregar
 window.addEventListener("DOMContentLoaded", () => {
-    atualizarContadorCarrinho();
+    atualizarCarrinho();
 });

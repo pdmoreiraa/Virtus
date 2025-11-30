@@ -16,6 +16,5 @@
 }
 
 togglePassword("senha", "toggleSenha");
-togglePassword("novaSenha", "toggleNovaSenha");
 togglePassword("confirmarSenha", "toggleConfirmarSenha");
-
+togglePassword("novaSenha", "toggleNovaSenha");

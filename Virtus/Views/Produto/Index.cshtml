@@ -35,7 +35,7 @@
     <div class="col">
         <form class="d-flex" role="search">
             <input class="form-control me-2" type="search" name="buscar" value="@buscar" placeholder="Buscar por Nome ou Marca" aria-label="Buscar">
-            <button class="btn btn-outline-success" type="submit">Buscar</button>
+            <button class="btn btn-dark smooth-btn" type="submit">Buscar</button>
         </form>
     </div>
 </div>
@@ -63,7 +63,7 @@
             <th style="cursor: pointer;" onclick="sortTable('PrdMarca')">Marca @getArrow("PrdMarca")</th>
             <th style="cursor: pointer;" onclick="sortTable('PrdCategoria')">Categoria @getArrow("PrdCategoria")</th>
             <th style="cursor: pointer;" onclick="sortTable('PrdTipo')">Tipo @getArrow("PrdTipo")</th>
-            <th style="cursor: pointer;" onclick="sortTable('PrdTipo')">Esporte @getArrow("PrdEsporte")</th>
+            <th style="cursor: pointer;" onclick="sortTable('PrdEsporte')">Esporte @getArrow("PrdEsporte")</th>
             <th style="cursor: pointer;" onclick="sortTable('PrdPreco')">Preço @getArrow("PrdPreco")</th>
             <th>Imagem</th>
             <th style="cursor: pointer;" onclick="sortTable('PrdCor')">Cor @getArrow("PrdCor")</th>
@@ -83,7 +83,7 @@
                 <td>@produto.PrdTipo</td>
                 <td>@produto.PrdEsporte</td>
                 <td>R$ @produto.PrdPreco.ToString("F2")</td>
-                <td><img src="@Url.Content("~/img/" + produto.Imagens.FirstOrDefault()?.PimgUrl)" width="100" /></td>
+                <td><img src="/img/@produto.Imagens.FirstOrDefault()?.PimgUrl" width="100" /></td>
                 <td>@produto.PrdCor</td>
                 <td>@produto.PrdData.ToString("dd/MM/yyyy")</td>
                 <td style="white-space:nowrap">

@@ -7,7 +7,6 @@
 <div class="container py-4">
     <div class="card shadow-sm border border-dark rounded-3 p-3">
         <div class="card-body">
-            <!-- Cabeçalho -->
             <div class="d-flex align-items-center mb-3">
                 <i class="bi bi-exclamation-triangle-fill text-warning me-2 fs-4"></i>
                 <h5 class="fw-semibold mb-0 text-warning">Pagamento via PIX</h5>
@@ -54,7 +53,7 @@
 
             <!-- Botão de confirmação -->
             <div class="text-center mt-4">
-                <form asp-action="ConfirmarPagamento" method="post">
+                <form asp-action="ConfirmarPix" method="post">
                     <input type="hidden" name="pedidoId" value="@ViewBag.PedidoId" />
 
                     <button type="submit" class="btn btn-success w-100 mt-3">

@@ -15,34 +15,32 @@ namespace Virtus.Repository
 
         public async Task<int> AdicionarPedido(Pedido pedido)
         {
-            using var connection = new MySqlConnection(_connectionString);
-            await connection.OpenAsync();
+            using var cnct = new MySqlConnection(_connectionString);
+            await cnct.OpenAsync();
 
             // Inserir o pedido
             var sqlInsert = @"
-        INSERT INTO tbPedido (UsuarioId, EnderecoId, MetodoPagamentoId, CartaoId, PdTaxaEntrega, 
-        PdStatusPagamento, PdStatusPedido, PdCriadoEm, PdValorTotal)
-        VALUES (@UsuarioId, @EnderecoId, @MetodoPagamentoId, @CartaoId, @PdTaxaEntrega, @PdStatusPagamento, 
-        @PdStatusPedido, @PdCriadoEm, @PdValorTotal);
-    ";
+            INSERT INTO tbPedido (UsuarioId, EnderecoId, MetodoPagamentoId, CartaoId, PdTaxaEntrega, 
+            PdStatusPagamento, PdStatusPedido, PdCriadoEm, PdValorTotal)
+            VALUES (@UsuarioId, @EnderecoId, @MetodoPagamentoId, @CartaoId, @PdTaxaEntrega, @PdStatusPagamento, 
+            @PdStatusPedido, @PdCriadoEm, @PdValorTotal);";
 
 
-            await connection.ExecuteAsync(sqlInsert, pedido);
+            await cnct.ExecuteAsync(sqlInsert, pedido);
 
             // Obter o ID gerado
-            int pedidoId = await connection.ExecuteScalarAsync<int>("SELECT LAST_INSERT_ID();");
+            int pedidoId = await cnct.ExecuteScalarAsync<int>("SELECT LAST_INSERT_ID();");
 
             pedido.PdId = pedidoId;
 
             // Inserir itens
             const string sqlItem = @"
-        INSERT INTO tbItemPedido (PedidoId, ProdutoId, IpQuantidade, IpPrecoUnitario)
-        VALUES (@PedidoId, @ProdutoId, @IpQuantidade, @IpPrecoUnitario);
-    ";
+            INSERT INTO tbItemPedido (PedidoId, ProdutoId, IpQuantidade, IpPrecoUnitario)
+            VALUES (@PedidoId, @ProdutoId, @IpQuantidade, @IpPrecoUnitario);";
 
             foreach (var item in pedido.Itens)
             {
-                await connection.ExecuteAsync(sqlItem, new
+                await cnct.ExecuteAsync(sqlItem, new
                 {
                     PedidoId = pedidoId,
                     item.ProdutoId,
@@ -57,11 +55,11 @@ namespace Virtus.Repository
 
         public async Task<Pedido?> ObterPedidoPorId(int pedidoId)
         {
-            using var connection = new MySqlConnection(_connectionString);
+            using var cnct = new MySqlConnection(_connectionString);
 
             // Buscar pedido pelo Id
             var sqlPedido = "SELECT * FROM tbPedido WHERE PdId = @PdId";
-            var pedido = await connection.QueryFirstOrDefaultAsync<Pedido>(
+            var pedido = await cnct.QueryFirstOrDefaultAsync<Pedido>(
                 sqlPedido,
                 new { PdId = pedidoId }  // o nome do parâmetro deve coincidir com o @Id
             );
@@ -73,10 +71,9 @@ namespace Virtus.Repository
             SELECT i.*, p.*
             FROM tbItemPedido i
             INNER JOIN tbProduto p ON i.ProdutoId = p.PrdId
-            WHERE i.PedidoId = @PedidoId
-        ";
+            WHERE i.PedidoId = @PedidoId";
 
-                var itens = await connection.QueryAsync<ItemPedido, Produto, ItemPedido>(
+                var itens = await cnct.QueryAsync<ItemPedido, Produto, ItemPedido>(
                     sqlItens,
                     (item, produto) => { item.Produto = produto; return item; },
                     new { PedidoId = pedidoId },
@@ -91,15 +88,14 @@ namespace Virtus.Repository
 
         public async Task<int> AtualizarStatusPagamento(Pedido pedido)
         {
-            using var connection = new MySqlConnection(_connectionString);
+            using var cnct = new MySqlConnection(_connectionString);
 
             string sql = @"
         UPDATE tbPedido 
         SET PdStatusPagamento = @PdStatusPagamento, PdDataPagamento = @PdDataPagamento 
-        WHERE PdId = @PdId
-    ";
+        WHERE PdId = @PdId";
 
-            return await connection.ExecuteAsync(sql, new { pedido.PdStatusPagamento, pedido.PdDataPagamento, pedido.PdId });
+            return await cnct.ExecuteAsync(sql, new { pedido.PdStatusPagamento, pedido.PdDataPagamento, pedido.PdId });
         }
 
 
@@ -107,10 +103,10 @@ namespace Virtus.Repository
 
         public async Task<List<Pedido>> ObterPedidosPorUsuario(int usuarioId)
         {
-            using var connection = new MySqlConnection(_connectionString);
+            using var cnct = new MySqlConnection(_connectionString);
 
             var sql = "SELECT * FROM tbPedido WHERE UsuarioId = @UsuarioId ORDER BY PdCriadoEm DESC";
-            var pedidos = await connection.QueryAsync<Pedido>(sql, new { UsuarioId = usuarioId });
+            var pedidos = await cnct.QueryAsync<Pedido>(sql, new { UsuarioId = usuarioId });
 
             return pedidos.ToList();
         }
@@ -118,25 +114,25 @@ namespace Virtus.Repository
 
         public async Task<List<Pedido>> ObterTodosPedidos()
         {
-            using var connection = new MySqlConnection(_connectionString);
-            await connection.OpenAsync();
+            using var cnct = new MySqlConnection(_connectionString);
+            await cnct.OpenAsync();
 
             var sqlPedidos = @"
-SELECT 
-    p.PdId, p.UsuarioId, p.EnderecoId, p.MetodoPagamentoId, p.CartaoId, 
-    p.PdTaxaEntrega, p.PdStatusPagamento, p.PdStatusPedido, p.PdCriadoEm, p.PdDataPagamento, p.PdValorTotal,
-    u.UsuId, u.UsuNome, u.UsuSobrenome, u.UsuEmail, u.UsuCPF, u.UsuTelefone, u.UsuTipo,
-    e.EndId, e.EndNomeCompleto, e.EndLogradouro, e.EndNumero, e.EndBairro, e.EndCidade, e.EndEstado, e.EndCEP, e.EndComplemento,
-    m.MpId, m.MpDescricao,
-    c.CarId, c.CarNomeTitular, c.CarNumero, c.CarBandeira, c.CarValidade, c.CarTipo
-FROM tbPedido p
-LEFT JOIN tbUsuario u ON p.UsuarioId = u.UsuId
-LEFT JOIN tbEndereco e ON p.EnderecoId = e.EndId
-LEFT JOIN tbMetPagamento m ON p.MetodoPagamentoId = m.MpId
-LEFT JOIN tbCartao c ON p.CartaoId = c.CarId
-ORDER BY p.PdCriadoEm DESC;";
+            SELECT 
+            p.PdId, p.UsuarioId, p.EnderecoId, p.MetodoPagamentoId, p.CartaoId, 
+            p.PdTaxaEntrega, p.PdStatusPagamento, p.PdStatusPedido, p.PdCriadoEm, p.PdDataPagamento, p.PdValorTotal,
+            u.UsuId, u.UsuNome, u.UsuSobrenome, u.UsuEmail, u.UsuCPF, u.UsuTelefone, u.UsuTipo,
+            e.EndId, e.EndNomeCompleto, e.EndLogradouro, e.EndNumero, e.EndBairro, e.EndCidade, e.EndEstado, e.EndCEP, e.EndComplemento,
+            m.MpId, m.MpDescricao,
+            c.CarId, c.CarNomeTitular, c.CarNumero, c.CarTipo
+            FROM tbPedido p
+            LEFT JOIN tbUsuario u ON p.UsuarioId = u.UsuId
+            LEFT JOIN tbEndereco e ON p.EnderecoId = e.EndId
+            LEFT JOIN tbMetPagamento m ON p.MetodoPagamentoId = m.MpId
+            LEFT JOIN tbCartao c ON p.CartaoId = c.CarId
+            ORDER BY p.PdCriadoEm DESC;";
 
-            var pedidos = (await connection.QueryAsync<Pedido, Usuario, Endereco, MetodoPagamento, Cartao, Pedido>(
+            var pedidos = (await cnct.QueryAsync<Pedido, Usuario, Endereco, MetodoPagamento, Cartao, Pedido>(
                 sqlPedidos,
                 (pedido, usuario, endereco, metodoPagamento, cartao) =>
                 {
@@ -153,31 +149,21 @@ ORDER BY p.PdCriadoEm DESC;";
 
             // Obter itens e produtos
             var sqlItens = @"
-SELECT 
-    ip.IpId AS ItemPedidoId,
-    ip.PedidoId,
-    ip.ProdutoId,
-    ip.IpQuantidade,
-    ip.IpPrecoUnitario,
-    p.PrdId,
-    p.PrdNome,
-    p.PrdMarca,
-    p.PrdCategoria,
-    p.PrdTipo,
-    p.PrdEsporte,
-    p.PrdPreco,
-    (
-        SELECT pi.PimgUrl
-        FROM tbPrdImagem pi
-        WHERE pi.ProdutoId = p.PrdId
-        ORDER BY pi.PimgOrdemImagem ASC
-        LIMIT 1
-    ) AS ImagemUrl
-FROM tbItemPedido ip
-INNER JOIN tbProduto p ON ip.ProdutoId = p.PrdId
-WHERE ip.PedidoId IN @PedidoIds;";
+            SELECT 
+            ip.IpId AS ItemPedidoId, ip.PedidoId, ip.ProdutoId, ip.IpQuantidade, ip.IpPrecoUnitario, 
+            p.PrdId, p.PrdNome, p.PrdMarca, p.PrdCategoria, p.PrdTipo, p.PrdEsporte, p.PrdPreco,
+            (
+            SELECT pi.PimgUrl
+            FROM tbPrdImagem pi
+            WHERE pi.ProdutoId = p.PrdId
+            ORDER BY pi.PimgOrdemImagem ASC
+            LIMIT 1
+            ) AS ImagemUrl
+            FROM tbItemPedido ip
+            INNER JOIN tbProduto p ON ip.ProdutoId = p.PrdId
+            WHERE ip.PedidoId IN @PedidoIds;";
 
-            var itens = await connection.QueryAsync<ItemPedido, Produto, ItemPedido>(
+            var itens = await cnct.QueryAsync<ItemPedido, Produto, ItemPedido>(
                 sqlItens,
                 (item, produto) =>
                 {
@@ -202,25 +188,24 @@ WHERE ip.PedidoId IN @PedidoIds;";
 
         public async Task<Pedido?> ObterPedidoPorIdAdm(int pedidoId)
         {
-            using var connection = new MySqlConnection(_connectionString);
+            using var cnct = new MySqlConnection(_connectionString);
 
             var sql = @"
-    SELECT 
-        p.PdId, p.UsuarioId, p.EnderecoId, p.MetodoPagamentoId, p.CartaoId,
-        p.PdValorTotal, p.PdTaxaEntrega, p.PdStatusPagamento, p.PdStatusPedido, p.PdCriadoEm, p.PdDataPagamento,
-        u.UsuId, u.UsuNome, u.UsuSobrenome, u.UsuEmail, u.UsuTelefone,
-        e.EndId, e.EndNomeCompleto, e.EndLogradouro, e.EndNumero, e.EndBairro, e.EndCidade, e.EndEstado, e.EndCEP, e.EndComplemento,
-        m.MpId, m.MpDescricao,
-        c.CarId, c.CarNomeTitular, c.CarNumero, c.CarBandeira, c.CarValidade, c.CarTipo
-    FROM tbPedido p
-    LEFT JOIN tbUsuario u ON p.UsuarioId = u.UsuId
-    LEFT JOIN tbEndereco e ON p.EnderecoId = e.EndId
-    LEFT JOIN tbMetPagamento m ON p.MetodoPagamentoId = m.MpId
-    LEFT JOIN tbCartao c ON p.CartaoId = c.CarId
-    WHERE p.PdId = @PedidoId;
-";
+            SELECT 
+            p.PdId, p.UsuarioId, p.EnderecoId, p.MetodoPagamentoId, p.CartaoId,
+            p.PdValorTotal, p.PdTaxaEntrega, p.PdStatusPagamento, p.PdStatusPedido, p.PdCriadoEm, p.PdDataPagamento,
+            u.UsuId, u.UsuNome, u.UsuSobrenome, u.UsuEmail, u.UsuTelefone,
+            e.EndId, e.EndNomeCompleto, e.EndLogradouro, e.EndNumero, e.EndBairro, e.EndCidade, e.EndEstado, e.EndCEP, e.EndComplemento,
+            m.MpId, m.MpDescricao,
+            c.CarId, c.CarNomeTitular, c.CarNumero, c.CarValidade, c.CarTipo
+            FROM tbPedido p
+            LEFT JOIN tbUsuario u ON p.UsuarioId = u.UsuId
+            LEFT JOIN tbEndereco e ON p.EnderecoId = e.EndId
+            LEFT JOIN tbMetPagamento m ON p.MetodoPagamentoId = m.MpId
+            LEFT JOIN tbCartao c ON p.CartaoId = c.CarId
+            WHERE p.PdId = @PedidoId;";
 
-            var pedido = await connection.QueryAsync<Pedido, Usuario, Endereco, MetodoPagamento, Cartao, Pedido>(
+            var pedido = await cnct.QueryAsync<Pedido, Usuario, Endereco, MetodoPagamento, Cartao, Pedido>(
                 sql,
                 (p, u, e, m, c) =>
                 {
@@ -240,20 +225,17 @@ WHERE ip.PedidoId IN @PedidoIds;";
             {
                 // Carregar itens e produtos
                 var sqlItens = @"
-SELECT 
-    i.*, 
-    pr.*, 
-    pi.PimgId, pi.PimgUrl, pi.PimgOrdemImagem
-FROM tbItemPedido i
-INNER JOIN tbProduto pr ON i.ProdutoId = pr.PrdId
-LEFT JOIN tbPrdImagem pi ON pr.PrdId = pi.ProdutoId
-WHERE i.PedidoId = @PedidoId
-ORDER BY pi.PimgOrdemImagem ASC;
-";
+                SELECT 
+                i.*, pr.*, pi.PimgId, pi.PimgUrl, pi.PimgOrdemImagem
+                FROM tbItemPedido i
+                INNER JOIN tbProduto pr ON i.ProdutoId = pr.PrdId
+                LEFT JOIN tbPrdImagem pi ON pr.PrdId = pi.ProdutoId
+                WHERE i.PedidoId = @PedidoId
+                ORDER BY pi.PimgOrdemImagem ASC;";
 
                 var itemDict = new Dictionary<int, ItemPedido>();
 
-                var itens = await connection.QueryAsync<ItemPedido, Produto, ProdutoImagem, ItemPedido>(
+                var itens = await cnct.QueryAsync<ItemPedido, Produto, ProdutoImagem, ItemPedido>(
                     sqlItens,
                     (i, pr, pi) =>
                     {
@@ -290,29 +272,28 @@ ORDER BY pi.PimgOrdemImagem ASC;
 
         public async Task AtualizarStatus(int pedidoId, string statusPedido)
         {
-            using var connection = new MySqlConnection(_connectionString);
+            using var cnct = new MySqlConnection(_connectionString);
 
             var sql = "UPDATE tbPedido SET PdStatusPedido = @PdStatusPedido WHERE PdId = @PdId";
             var parameters = new { PdId = pedidoId, StatusPedido = statusPedido };
 
-            await connection.ExecuteAsync(sql, parameters);
+            await cnct.ExecuteAsync(sql, parameters);
         }
 
         public async Task<List<Pedido>> ObterPedidosDoUsuario(int usuarioId)
         {
-            using var connection = new MySqlConnection(_connectionString);
+            using var cnct = new MySqlConnection(_connectionString);
 
             var sqlPedidos = @"
-        SELECT 
+            SELECT 
             p.PdId, p.UsuarioId, p.PdCriadoEm, p.PdValorTotal, p.PdStatusPedido, p.PdDataPagamento,
-            p.MetodoPagamentoId,
-            m.MpId, m.MpDescricao
-        FROM tbPedido p
-        LEFT JOIN tbMetPagamento m ON p.MetodoPagamentoId = m.MpId
-        WHERE p.UsuarioId = @UsuarioId
-        ORDER BY p.PdCriadoEm DESC";
+            p.MetodoPagamentoId, m.MpId, m.MpDescricao
+            FROM tbPedido p
+            LEFT JOIN tbMetPagamento m ON p.MetodoPagamentoId = m.MpId
+            WHERE p.UsuarioId = @UsuarioId
+            ORDER BY p.PdCriadoEm DESC";
 
-            var pedidos = await connection.QueryAsync<Pedido, MetodoPagamento, Pedido>(
+            var pedidos = await cnct.QueryAsync<Pedido, MetodoPagamento, Pedido>(
                 sqlPedidos,
                 (pedido, metodoPagamento) =>
                 {
@@ -329,11 +310,11 @@ ORDER BY pi.PimgOrdemImagem ASC;
             {
                 var pedidoIds = listaPedidos.Select(p => p.PdId).ToArray(); // <--- usa Id
                 var sqlItens = @"
-            SELECT PedidoId, IpQuantidade
-            FROM tbItemPedido
-            WHERE PedidoId IN @PedidoIds";
+                SELECT PedidoId, IpQuantidade
+                FROM tbItemPedido
+                WHERE PedidoId IN @PedidoIds";
 
-                var itens = await connection.QueryAsync<ItemPedido>(sqlItens, new { PedidoIds = pedidoIds });
+                var itens = await cnct.QueryAsync<ItemPedido>(sqlItens, new { PedidoIds = pedidoIds });
 
                 foreach (var pedido in listaPedidos)
                 {

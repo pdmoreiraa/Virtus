@@ -16,7 +16,7 @@
 
 <h3 class="text-center mb-4">Detalhes do Pedido</h3>
 
-<a class="btn btn-link" asp-controller="AdminPedido" asp-action="Index">Voltar para Pedidos</a>
+<a class="btn btn-link" asp-controller="PedidoAdm" asp-action="Index">Voltar para Pedidos</a>
 
 <div class="row mb-4">
     <div class="col-lg-6">
@@ -112,7 +112,7 @@
                     subtotal += itemTotal;
                     <tr>
                         <td>
-                            <img src="@Url.Content("~/img/" + item.Produto.Imagens.FirstOrDefault()?.PimgUrl)" width="100" />
+                            <img src="/img/@item.Produto.Imagens.FirstOrDefault()?.PimgUrl" width="100" />
                             @item.Produto.PrdNome
                         </td>
                         <td>@item.Produto.PrdCategoria</td>
@@ -150,7 +150,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
 
-            <form method="post" asp-controller="AdminPedido" asp-action="Editar">
+            <form method="post" asp-controller="PedidoAdm" asp-action="Editar">
                 <input type="hidden" name="id" id="pedidoId" value="@Model.PdId" />
                 <select name="status_Pedido" id="status_Pedido" class="form-select">
                     <option value="Criado">Criado</option>
@@ -158,8 +158,8 @@
                     <option value="Cancelado">Cancelado</option>
                 </select>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="button" class="btn btn-light border border-dark rounded smooth-btn" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-dark smooth-btn">Salvar</button>
                 </div>
             </form>
         </div>

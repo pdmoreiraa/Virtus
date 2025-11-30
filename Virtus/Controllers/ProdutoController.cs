@@ -34,19 +34,20 @@ namespace Virtus.Controllers
             }
 
             // Normaliza coluna
-            coluna ??= "Id";
+            coluna ??= "PrdId";
             ordPor ??= "desc";
 
             // Ordenação
             produtos = coluna switch
             {
-                "Nome" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdNome).ToList() : produtos.OrderByDescending(p => p.PrdNome).ToList(),
-                "Marca" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdMarca).ToList() : produtos.OrderByDescending(p => p.PrdMarca).ToList(),
-                "Categoria" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdCategoria).ToList() : produtos.OrderByDescending(p => p.PrdCategoria).ToList(),
-                "Tipo" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdTipo).ToList() : produtos.OrderByDescending(p => p.PrdTipo).ToList(),
-                "Esporte" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdEsporte).ToList() : produtos.OrderByDescending(p => p.PrdEsporte).ToList(),
-                "Preco" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdPreco).ToList() : produtos.OrderByDescending(p => p.PrdPreco).ToList(),
-                "Data" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdData).ToList() : produtos.OrderByDescending(p => p.PrdData).ToList(),
+                "PrdNome" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdNome).ToList() : produtos.OrderByDescending(p => p.PrdNome).ToList(),
+                "PrdMarca" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdMarca).ToList() : produtos.OrderByDescending(p => p.PrdMarca).ToList(),
+                "PrdCategoria" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdCategoria).ToList() : produtos.OrderByDescending(p => p.PrdCategoria).ToList(),
+                "PrdTipo" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdTipo).ToList() : produtos.OrderByDescending(p => p.PrdTipo).ToList(),
+                "PrdEsporte" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdEsporte).ToList() : produtos.OrderByDescending(p => p.PrdEsporte).ToList(),
+                "PrdPreco" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdPreco).ToList() : produtos.OrderByDescending(p => p.PrdPreco).ToList(),
+                "PrdCor" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdPreco).ToList() : produtos.OrderByDescending(p => p.PrdPreco).ToList(),
+                "PrdData" => ordPor == "asc" ? produtos.OrderBy(p => p.PrdData).ToList() : produtos.OrderByDescending(p => p.PrdData).ToList(),
                 _ => ordPor == "asc" ? produtos.OrderBy(p => p.PrdId).ToList() : produtos.OrderByDescending(p => p.PrdId).ToList(),
             };
 

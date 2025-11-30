@@ -21,7 +21,7 @@
                     <tr class="border border-dark rounded-3 p-3 mt-3">
                         <td>
                             <div class="d-flex">
-                                <img src="@Url.Content("~/img/" + item.Imagem?.PimgUrl)" width="150" class="rounded" alt="@item.Produto.PrdNome" />
+                                <img src="/img/@item.Imagem?.PimgUrl" width="150" class="rounded" alt="@item.Produto.PrdNome" />
                             <div class="ms-3">
                                     <h4>@item.Produto.PrdNome</h4>
                             <p>
@@ -31,7 +31,7 @@
                             </p>
                             </div>
                             </div>
-                        <div style="white-space:nowrap">
+                        <div class="mt-3" style="white-space:nowrap">
                             Quantidade: 
                             <button type="button" class="btn btn-light border border-dark rounded smooth-btn btn-sm"
                                         onclick="diminuir(@item.Produto.PrdId)">
@@ -89,7 +89,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-dark w-100 mt-3 smooth-btn" asp-controller="Carrinho" asp-action="Infos">
+                    <button type="submit" class="btn btn-dark w-100 mt-3 smooth-btn" asp-controller="Carrinho" asp-action="Finalizar">
                         Finalizar Compra
                     </button>
                     <button class="btn btn-light border border-dark rounded w-100 mt-3 smooth-btn" asp-controller="Home" asp-action="Index">
@@ -101,7 +101,7 @@
             {
                 <div class="row">
                     <div class="col d-grid">
-                        <a class="btn btn-dark w-100 mt-3 smooth-btn" asp-controller="Usuario" asp-action="Cadastrar">Cadastrar</a>
+                        <a class="btn btn-dark w-100 mt-3 smooth-btn" asp-controller="Usuario" asp-action="Registrar">Registrar</a>
                     </div>
                     <div class="col d-grid">
                         <a class="btn btn-light border border-dark rounded w-100 mt-3 smooth-btn" asp-controller="Usuario" asp-action="Login">Login</a>

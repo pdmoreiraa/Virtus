@@ -181,6 +181,15 @@ main {
         font-size: 1.2rem; /* Ajuste o tamanho do ícone */
     }
 
+.page-item:not(.active) .page-link {
+    color: #000;
+}
+
+.page-item.active .page-link {
+    background-color: #23272b;
+    border-color: #23272b;
+    color: #fff;
+}
 
 .footer {
     background-color: #232323;

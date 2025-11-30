@@ -6,8 +6,6 @@ $(document).ready(function () {
     $("#CPF").mask("000.000.000-00");
 
     $("#CEP").mask("00000-000");
-
-    $("#Validade").mask("00/00");
 });
 
 function Telefone(tel) {
@@ -29,6 +27,38 @@ function CPF(cpf) {
     }
     return cpf;
 }
+
+document.getElementById("Validade").addEventListener("input", function (e) {
+    let v = e.target.value.replace(/\D/g, ""); // remove tudo que não é número
+
+    if (v.length >= 3)
+        e.target.value = v.slice(0, 2) + "/" + v.slice(2, 4);
+    else
+        e.target.value = v;
+});
+
+// VALIDAÇÃO DE MÊS E ANO
+document.getElementById("Validade").addEventListener("blur", function () {
+    const valor = this.value;
+
+    if (!valor.includes("/")) {
+        this.value = "";
+        return;
+    }
+
+    const partes = valor.split("/");
+    const mes = parseInt(partes[0]);
+    const ano = parseInt(partes[1]);
+
+    // validações
+    if (
+        isNaN(mes) || mes < 1 || mes > 12 ||   // mês inválido
+        isNaN(ano) || ano < 0 || ano > 99      // ano inválido
+    ) {
+        alert("Data inválida. Use o formato MM/AA.");
+        this.value = "";
+    }
+});
 
 function CVV(cvv) {
     // Mantém só números
