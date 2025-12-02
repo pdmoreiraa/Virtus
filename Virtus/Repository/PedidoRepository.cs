@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using MySql.Data.MySqlClient;
 using Virtus.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Virtus.Repository
 {
@@ -150,18 +151,32 @@ namespace Virtus.Repository
             // Obter itens e produtos
             var sqlItens = @"
             SELECT 
-            ip.IpId AS ItemPedidoId, ip.PedidoId, ip.ProdutoId, ip.IpQuantidade, ip.IpPrecoUnitario, 
-            p.PrdId, p.PrdNome, p.PrdMarca, p.PrdCategoria, p.PrdTipo, p.PrdEsporte, p.PrdPreco,
+            ip.IpId,
+            ip.PedidoId,
+            ip.ProdutoId,
+            ip.IpQuantidade,
+            ip.IpPrecoUnitario,
+
+            p.PrdId,
+            p.PrdNome,
+            p.PrdMarca,
+            p.PrdCategoria,
+            p.PrdTipo,
+            p.PrdEsporte,
+            p.PrdPreco,
+
             (
-            SELECT pi.PimgUrl
-            FROM tbPrdImagem pi
-            WHERE pi.ProdutoId = p.PrdId
-            ORDER BY pi.PimgOrdemImagem ASC
-            LIMIT 1
+                SELECT pi.PimgUrl
+                FROM tbPrdImagem pi
+                WHERE pi.ProdutoId = p.PrdId
+                ORDER BY pi.PimgOrdemImagem ASC
+                LIMIT 1
             ) AS ImagemUrl
+
             FROM tbItemPedido ip
             INNER JOIN tbProduto p ON ip.ProdutoId = p.PrdId
-            WHERE ip.PedidoId IN @PedidoIds;";
+            WHERE ip.PedidoId IN @PedidoIds;
+            ";
 
             var itens = await cnct.QueryAsync<ItemPedido, Produto, ItemPedido>(
                 sqlItens,
@@ -171,7 +186,7 @@ namespace Virtus.Repository
                     return item;
                 },
                 new { PedidoIds = pedidos.Select(p => p.PdId).ToArray() },
-                splitOn: "ProdutoId"
+                splitOn: "PrdId"
             );
 
             // 3️⃣ Atribuir itens a cada pedido
@@ -225,8 +240,8 @@ namespace Virtus.Repository
             {
                 // Carregar itens e produtos
                 var sqlItens = @"
-                SELECT 
-                i.*, pr.*, pi.PimgId, pi.PimgUrl, pi.PimgOrdemImagem
+                SELECT DISTINCT 
+                i.*, pr.*, pi.PimgId, pi.PimgUrl    , pi.PimgOrdemImagem
                 FROM tbItemPedido i
                 INNER JOIN tbProduto pr ON i.ProdutoId = pr.PrdId
                 LEFT JOIN tbPrdImagem pi ON pr.PrdId = pi.ProdutoId
@@ -247,18 +262,16 @@ namespace Virtus.Repository
                             itemDict.Add(item.IpId, item);
                         }
 
-                        if (pi != null)
+                        if (pi != null && pi.PimgId > 0)
+                        {
                             item.Produto.Imagens.Add(pi);
-
+                        }
                         return item;
                     },
                     new { PedidoId = pedidoId },
                     splitOn: "PrdId,PimgId"
                 );
-
                 pedidoResult.Itens = itemDict.Values.ToList();
-
-                pedidoResult.Itens = itens.ToList();
 
                 // Garante valor total consistente
                 if (pedidoResult.PdValorTotal == 0 && pedidoResult.Itens.Any())

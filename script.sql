@@ -120,7 +120,7 @@ INSERT INTO tbMetPagamento (MpDescricao)
 VALUES ('Cartão'),
 ('Pix');
 
-SELECT * FROM tbEndereco;
+SELECT * FROM tbItemPedido;
 
 INSERT INTO tbProduto (PrdNome, PrdMarca, PrdCategoria, PrdTipo, PrdEsporte, PrdDescricao, PrdPreco, PrdCor)
 VALUES ('Top Adidas Suporte Leve Colorblock ', 'Adidas', 'Feminino', 'Top', 'Corrida', 'Top Adidas Suporte Leve Colorblock Feminino - Roxo', 161.49, 'Roxo'),
